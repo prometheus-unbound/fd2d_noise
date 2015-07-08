@@ -28,12 +28,12 @@ elseif (model_type==2)
     % rho(98:102,123:127) = rho(98:102,123:127) + 2000.0;
     % mu(140:160,140:160) = mu(140:160,140:160) + 2.0e10;
     
-    x_sourcem = 2.0e5;
-    z_sourcem = 2.0e5;
-    x_width = 0.4e5;
+    [Lx,Lz,nx,nz] = input_parameters();
+    [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
+    x_sourcem = Lx/2.0;
+    z_sourcem = Lz/2.0;
+    x_width = Lx/10;
     
-    [Lx,Lz,nx,nz,~,~,~,~] = input_parameters();
-    [X,Z,~,~,~,~] = define_computational_domain(Lx,Lz,nx,nz);
     mu = mu - 8.0e9 * ( exp( -( (X-x_sourcem).^2 + (Z-z_sourcem).^2 ) / (x_width)^2 ) );
     
     
@@ -154,6 +154,9 @@ else
     load(['models/mu_' str(model_type)]);
     load(['models/rho_' str(model_type)]);
     
+end
+
+
 end
 
 
