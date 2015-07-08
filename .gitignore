@@ -5,5 +5,5 @@ output/interferometry/
 
 
 *~
-*.mat
+# *.mat
 *.mexmaci64
