@@ -27,7 +27,16 @@ function [displacement_seismograms,t,C_2_dxv,C_2_dzv] = run_forward_correlation_
 [Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
 
 % reshape source distribution and mu - input is a column vector
-noise_source_distribution = reshape(source_dist, nx, nz);
+if( size(source_dist,2) == 1 )
+    n_noise_sources = size(source_dist,1)/(nx*nz);
+else
+    n_noise_sources = size(source_dist,3);
+end
+
+f_peak = [0.125 0.125];            % peak frequency in Hz
+bandwidth = [0.03 0.03];           % bandwidth in Hz
+
+noise_source_distribution = reshape(source_dist, nx, nz, n_noise_sources);
 mu = reshape(mu, nx, nz);
 
 [~,~,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
@@ -78,12 +87,6 @@ C_2_dxv = zeros(nx-1,nz,length(f_sample)) + 1i*zeros(nx-1,nz,length(f_sample));
 C_2_dzv = zeros(nx,nz-1,length(f_sample)) + 1i*zeros(nx,nz-1,length(f_sample));
 
 
-%- initialise noise source locations and spectra
-n_noise_sources = 1;
-f_peak = 0.125;             % peak frequency in Hz
-bandwidth = 0.03;           % bandwidth in Hz
-
-
 noise_spectrum = zeros(length(f_sample),n_noise_sources);
 %- spectrum for source regions --------------------------------------------
 for i=1:n_noise_sources
@@ -130,7 +133,7 @@ for n = 1:length(t)
             end
             
             %- add sources
-            DS = DS + noise_source_distribution(:,:) .* real(S(:,:,ns));
+            DS = DS + noise_source_distribution(:,:,ns) .* real(S(:,:,ns));
             
         end
            

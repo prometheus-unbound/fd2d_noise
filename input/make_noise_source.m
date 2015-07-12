@@ -23,10 +23,15 @@ function [noise_spectrum, noise_source_distribution] = make_noise_source(source_
         % sourcearea_width = 0.4e5;
         % strength = 3.0;
 
-        x_sourcem = [0.5e6 1.4e6];
-        z_sourcem = [0.8e6 1.6e6];
-        sourcearea_width = [2.0e5 2.0e5];
-        strength = [100.0 100.0];
+        % x_sourcem = [0.5e6 1.4e6];
+        % z_sourcem = [0.8e6 1.6e6];
+        % sourcearea_width = [2.0e5 2.0e5];
+        % strength = [3.0 1.0];
+        
+        x_sourcem = [1.25e6];
+        z_sourcem = [1.0e6];
+        sourcearea_width = [1.5e5];
+        strength = [3.0];
 
     %- ring of sources ----------------------------------------------------
     elseif(strcmp(source_type,'ring'))
@@ -63,19 +68,19 @@ function [noise_spectrum, noise_source_distribution] = make_noise_source(source_
     for i=1:n_noise_sources
         noise_spectrum(:,i) = 1/(1-i+1)*exp(-(abs(f_sample)-f_peak(i)).^2/bandwidth(i)^2);
 
-        if ( strcmp(make_plots,'yes') )
-            if(i==1)
-                figure
-                set(gca,'FontSize',12)
-                hold on
-                cstring = [];
-            end
-            
-            plot(f_sample,noise_spectrum(:,i),'Color',cmap(i,:))
-            cstring{end+1} = ['source ' num2str(i)];
-            xlabel('frequency [Hz]');
-            legend(cstring)
-        end
+%         if ( strcmp(make_plots,'yes') )
+%             if(i==1)
+%                 figure
+%                 set(gca,'FontSize',12)
+%                 hold on
+%                 cstring = [];
+%             end
+%             
+%             plot(f_sample,noise_spectrum(:,i),'Color',cmap(i,:))
+%             cstring{end+1} = ['source ' num2str(i)];
+%             xlabel('frequency [Hz]');
+%             legend(cstring)
+%         end
     end
 
 
@@ -124,22 +129,27 @@ function [noise_spectrum, noise_source_distribution] = make_noise_source(source_
     
     for i=1:n_noise_sources
         if ( strcmp(make_plots,'yes') && ~strcmp(source_type,'equal') )
-            overlay = 'no';
+            overlay = 'yes';
             
-            figure;
-            hold on
-            set(gca,'FontSize',12);
-            
+            if( (strcmp(overlay,'yes') && i==1) || strcmp(overlay,'no'))
+                figure
+                hold on
+                set(gca,'FontSize',12);
+            end
             
             if(strcmp(overlay,'yes'))
-                pcolor(X,Z,(noise_source_distribution(:,:,i)-1)'/max(max(max(abs(noise_source_distribution(:,:,i)-1)))));
-                model = pcolor(X,Z,(mu-4.8e10)'/max(max(abs(mu-4.8e10))));
+                if(i == 1)
+                    pcolor(X,Z,(mu-4.8e10)'/max(max(abs(mu-4.8e10))))
+                end
+                
+                dist(i,:) = pcolor(X,Z,(noise_source_distribution(:,:,i)-1)'/max(max(max(abs(noise_source_distribution(:,:,i)-1)))));
+                alpha(dist(i,:),0.5)
                 cm = cbrewer('div','RdBu',100,'PCHIP');
                 colormap(cm);
                 % cb = colorbar;
                 % ylabel(cb,'normalized for overlay') 
                 caxis([-1.0 1.0])
-                alpha(model,0.5)
+                
             else
                 pcolor(X,Z,(noise_source_distribution(:,:,i))');
                 load cm_psd
