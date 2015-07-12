@@ -1,5 +1,6 @@
 #!/bin/bash
 
+module load matlab/r2015a
 
 while true; do
     read -p "Do conversion to mex-functions? " yn
