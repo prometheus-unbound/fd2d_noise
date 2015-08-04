@@ -52,7 +52,7 @@ A0 = log( e0_caus/e0_acaus );
 
 % compute misfit
 misfit = 0.5 * ( A - A0 )^2;
-% misfit = A0;
+% misfit = abs(A-A0);
 
 % compute adjoint source time function
 de_caus = win_caus.^2 .* u;

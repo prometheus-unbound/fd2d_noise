@@ -15,6 +15,15 @@ b3_h = load([folder 'data_16_ref_blob3_homog_structure.mat']);
 
 ub3_1 = load([folder 'data_16_ref_uniform_blob3_structure_1.mat']);
 ub3_h = load([folder 'data_16_ref_uniform_blob3_homog_structure.mat']);
+ub3_r5 = load([folder 'data_16_ref_uniform_blob3_rand_5.mat']);
+ub3_r10 = load([folder 'data_16_ref_uniform_blob3_rand_10.mat']);
+ub3_r10m = load([folder 'data_16_ref_uniform_blob3_rand_10_muchos.mat']);
+ub3_r10d = load([folder 'data_16_ref_uniform_blob3_rand_10_demasiados.mat']);
+ub3_r20 = load([folder 'data_16_ref_uniform_blob3_rand_20.mat']);
+ub3_r30 = load([folder 'data_16_ref_uniform_blob3_rand_30.mat']);
+ub3_r40 = load([folder 'data_16_ref_uniform_blob3_rand_40.mat']);
+
+u2b_3_1_1 = load([folder 'data_16_ref_uniform_2blob_3_1_structure_1.mat']);
 
 ub20_1 = load([folder 'data_16_ref_uniform_blob20_structure_1.mat']);
 ub20_h = load([folder 'data_16_ref_uniform_blob20_homog_structure.mat']);
@@ -23,8 +32,6 @@ ub100_1 = load([folder 'data_16_ref_uniform_blob100_structure_1.mat']);
 ub100_2 = load([folder 'data_16_ref_uniform_blob100_structure_2.mat']);
 ub100_3 = load([folder 'data_16_ref_uniform_blob100_structure_3.mat']);
 ub100_h = load([folder 'data_16_ref_uniform_blob100_homog_structure.mat']);
-ub100_p2 = load([folder 'data_16_ref_uniform_blob100_picture_rand_2.mat']);
-ub100_p3 = load([folder 'data_16_ref_uniform_blob100_picture_rand_3.mat']);
 
 ub1000_1 = load([folder 'data_16_ref_uniform_blob1000_structure_1.mat']);
 ub1000_h = load([folder 'data_16_ref_uniform_blob1000_homog_structure']);
@@ -76,8 +83,8 @@ if( right > t(end) )
 end
 
 
-sum(abs(misfit),1)
-max(abs(misfit))
+fprintf('%f\n',sum(abs(misfit),1))
+% fprintf('%f',max(abs(misfit)))
 
 
 % % index = 165:180;
