@@ -23,15 +23,15 @@ function [noise_spectrum, noise_source_distribution] = make_noise_source(source_
         % sourcearea_width = 0.4e5;
         % strength = 3.0;
 
-        % x_sourcem = [0.5e6 1.4e6];
-        % z_sourcem = [0.8e6 1.6e6];
-        % sourcearea_width = [2.0e5 2.0e5];
-        % strength = [3.0 1.0];
+        x_sourcem = [0.5e6 1.4e6];
+        z_sourcem = [0.8e6 1.6e6];
+        sourcearea_width = [2.0e5 2.0e5];
+        strength = [3.0 1.0];
         
-        x_sourcem = [1.25e6];
-        z_sourcem = [1.0e6];
-        sourcearea_width = [1.5e5];
-        strength = [3.0];
+        % x_sourcem = [1.25e6];
+        % z_sourcem = [1.0e6];
+        % sourcearea_width = [1.5e5];
+        % strength = [3.0];
 
     %- ring of sources ----------------------------------------------------
     elseif(strcmp(source_type,'ring'))

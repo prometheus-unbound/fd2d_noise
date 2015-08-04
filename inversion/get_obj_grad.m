@@ -29,7 +29,7 @@ function [f, g, c_all] = get_obj_grad(x)
     
     % load array with reference stations and data
     load('../output/interferometry/array_16_ref.mat');
-    load('../output/interferometry/data_16_ref_uniform_center_blob3_structure_1.mat');
+    load('../output/interferometry/data_16_ref_uniform_blob3_homog_structure.mat');
     
     % design filter for smoothing of kernel
     % myfilter = fspecial('gaussian',[40 40], 20);
