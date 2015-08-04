@@ -93,6 +93,33 @@ elseif (model_type==7)
     mu(331:end,:) = 2.7e10;
 
     
+elseif ( model_type==666 )
+    
+    rho = 3000.0 * ones(nx,nz);
+    mu = 4.8e10 * ones(nx,nz);
+    
+%     mu(300:310,300:310) = 5.0e10;
+    
+%     A = imread('../models/rand_10.png');
+%     mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
+%     mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
+    
+    [Lx,Lz,nx,nz] = input_parameters();
+    [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
+    
+    if( strcmp(make_plots,'yes') )
+        figure(1)
+        clf
+        pcolor(X,Z,sqrt(mu./rho)')
+        disp([ num2str( (max(max(sqrt(mu./rho)))-4000)/4000 * 100) ' % perturbation'])
+        shading interp
+        axis square
+        colorbar
+        cm = cbrewer('div','RdBu',100,'PCHIP');
+        colormap(cm)
+    end
+    
+    
 elseif (model_type==999)
     
     rho = 3000.0*ones(nx,nz);
@@ -117,37 +144,33 @@ elseif (model_type==999)
         figure(1)
         clf
         mesh(X,Z,sqrt(mu./rho)')
-        disp([ num2str( (max(max(sqrt(mu./rho)))-4000)/4000 * 100) ' % perturbation'])
+        disp([ num2str( max(max( abs( sqrt(mu./rho)-4000) ))/4000 * 100) ' % perturbation'])
         shading interp
         axis square
         colorbar
         cm = cbrewer('div','RdBu',100,'PCHIP');
         colormap(cm)
     end
+
     
+elseif (model_type==100)
     
-elseif (strcmp(model_type,'picture') )
+    rho = 3000.0*ones(nx,nz);
+    mu = 4.8e10*ones(nx,nz);
     
-    rho = 3000.0 * ones(nx,nz); 
-    A = imread('../models/rand_3.png');
-    mu = 4.8e10 + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
-    mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
-    
-    [Lx,Lz,nx,nz] = input_parameters();
-    [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
+    mu(350:370,350:370) = mu(350:370,350:370) + 4.0e9;
     
     if( strcmp(make_plots,'yes') )
         figure(1)
         clf
-        pcolor(X,Z,sqrt(mu./rho)')
-        disp([ num2str( (max(max(sqrt(mu./rho)))-4000)/4000 * 100) ' % perturbation'])
+        mesh(X,Z,sqrt(mu./rho)')
+        disp([ num2str( max(max( abs( sqrt(mu./rho)-4000) ))/4000 * 100) ' % perturbation'])
         shading interp
         axis square
         colorbar
         cm = cbrewer('div','RdBu',100,'PCHIP');
         colormap(cm)
     end
-   
     
 else
 

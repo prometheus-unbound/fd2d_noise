@@ -32,8 +32,10 @@ order=4;            % finite-difference order (2 or 4)
 % model type
 %==========================================================================
 
-model_type = 999;
-% model_type = 'picture';
+model_type = 666;
+% model_type = 999;
+
+% model_type = 100;
 
 % 1=homogeneous 
 % 2=homogeneous with localised density perturbation
@@ -42,7 +44,9 @@ model_type = 999;
 % 5=different layered medium
 % 6=vertical gradient medium in mu
 % 7=another layered medium
-% "picture" = put source picture in ../models-folder
+% 666 = put source picture in ../models-folder
+% 999 = IUGG structure, two pills
+% x00 = smooth + rough structure, x = level of roughness
 
 
 %==========================================================================

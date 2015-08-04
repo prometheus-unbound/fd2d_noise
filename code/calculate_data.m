@@ -3,7 +3,7 @@ clear all
 close all
 
 
-% mode = 'local'
+% mode = 'local';
 mode = 'monch';
 % mode = 'euler';
 % mode = 'brutus';
@@ -15,7 +15,12 @@ output_specs
 
 [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type] = input_parameters();
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
-[mu,rho] = define_material_parameters(nx,nz,model_type); 
+[mu,rho] = define_material_parameters(nx,nz,model_type);
+if(model_type==666)
+    A = imread('../models/rand_10_demasiados.png');
+    mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
+    mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
+end
 [~,source_dist] = make_noise_source(source_type,make_plots);
 [width] = absorb_specs();
 
@@ -107,8 +112,8 @@ parfor i = 1:n_ref
     rec = array( find(~ismember(array,src,'rows') ) , :);
     
     % calculate the correlation for each pair
-    % [~,~] = run_forward('forward_green',src,rec,i,flip_sr);
-    % [c_it(i,:,:),~] = run_forward('correlation',src,rec,i,flip_sr);
+%     [~,~] = run_forward('forward_green',src,rec,i,flip_sr);
+%     [c_it(i,:,:),~] = run_forward('correlation',src,rec,i,flip_sr);
     
     % use mex-functions
     [G_2] = run_forward_green_fast_mex(mu, src);
