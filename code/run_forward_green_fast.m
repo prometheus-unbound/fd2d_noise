@@ -27,10 +27,7 @@ mu = reshape(mu,nx,nz);
 
 
 %- initialise interferometry ----------------------------------------------
-f_sample = input_interferometry();
-n_sample = length(f_sample);
-w_sample = 2*pi*f_sample;
-dw = w_sample(2) - w_sample(1);
+[~,n_sample,w_sample] = input_interferometry();
 
 
 %- time axis --------------------------------------------------------------
@@ -51,11 +48,11 @@ stf = 1.0e9*ones(1,length(t));
 
 
 %- Fourier transform of the forward Greens function
-G_2 = zeros(nx,nz,length(f_sample)) + 1i*zeros(nx,nz,length(f_sample));
+G_2 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
 
 
 % prepare coefficients for Fourier transform
-fft_coeff = zeros(length(t),length(w_sample)) + 1i*zeros(length(t),length(f_sample));
+fft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
 for k = 1:n_sample
     fft_coeff(:,k) = exp(-1i*w_sample(k)*t')*dt;
 end

@@ -52,13 +52,11 @@ end
 
 
 %- initialise interferometry ----------------------------------------------        
-f_sample = input_interferometry();
-w_sample = 2*pi*f_sample;
-dw = w_sample(2) - w_sample(1);
+[~,n_sample,w_sample,dw] = input_interferometry();
 
-G_1 = zeros(nx,nz,length(f_sample)) + + 1i*zeros(nx,nz,length(f_sample));
-G_1_dxv = zeros(nx-1,nz,length(f_sample)) + 1i*zeros(nx-1,nz,length(f_sample));
-G_1_dzv = zeros(nx,nz-1,length(f_sample)) + 1i*zeros(nx,nz-1,length(f_sample));
+G_1 = zeros(nx,nz,n_sample) + + 1i*zeros(nx,nz,n_sample);
+G_1_dxv = zeros(nx-1,nz,n_sample) + 1i*zeros(nx-1,nz,n_sample);
+G_1_dzv = zeros(nx,nz-1,n_sample) + 1i*zeros(nx,nz-1,n_sample);
             
 
 %- dynamic fields and absorbing boundary field ----------------------------
@@ -105,7 +103,7 @@ for n=1:length(t)
     
     %- accumulate Fourier transform of the velocity field -----------------
     if( mod(n,5) == 1 )
-        for k=1:length(w_sample)
+        for k=1:n_sample
             G_1(:,:,k) = G_1(:,:,k) + v(:,:) * exp(-1i*w_sample(k)*t(n)) * dt;            
             G_1_dxv(:,:,k) = G_1_dxv(:,:,k) + strain_dxv(:,:) * exp(-1i*w_sample(k)*t(n)) * dt;
             G_1_dzv(:,:,k) = G_1_dzv(:,:,k) + strain_dzv(:,:) * exp(-1i*w_sample(k)*t(n)) * dt;
@@ -122,7 +120,7 @@ end
 %- accumulate kernel by looping over frequency
 K_rho = zeros(nx,nz) + 1i*zeros(nx,nz);
 K_mu = zeros(nx,nz) + 1i*zeros(nx,nz);
-for k=1:length(w_sample)
+for k=1:n_sample
     K_rho = K_rho - G_1(:,:,k) .* C_2(:,:,k) * dw;
     
     % both are still in velocity => integreation via 1/w^2

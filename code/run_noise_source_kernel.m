@@ -70,12 +70,10 @@ end
 
 
 %- initialise interferometry ----------------------------------------------       
-f_sample = input_interferometry();
-w_sample = 2*pi*f_sample;
-dw = w_sample(2)-w_sample(1);
+[~, n_sample, w_sample] = input_interferometry();
 
-G_1 = zeros(nx,nz,length(f_sample)) + 1i*zeros(nx,nz,length(f_sample));
-K_s = zeros(nx,nz,length(f_sample)) + 1i*zeros(nx,nz,length(f_sample));
+G_1 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
+K_s = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
            
 
 %- dynamic fields and absorbing boundary field ----------------------------
@@ -125,7 +123,7 @@ for n=1:length(t)
     
     %- accumulate Fourier transform of the velocity field -----------------
     if( mod(n,5) == 1 )
-        for k=1:length(w_sample)
+        for k=1:n_sample
             G_1(:,:,k) = G_1(:,:,k) + v(:,:) * exp(-1i*w_sample(k)*t(n))*dt;
         end
     end    
@@ -148,7 +146,7 @@ load(['../output/interferometry/G_2_' num2str(i_ref) '.mat']);
 
 
 %- multiply Fourier transformed Greens functions
-for k=1:length(w_sample)
+for k=1:n_sample
     K_s(:,:,k) = G_1(:,:,k) .* conj(G_2(:,:,k)) / (1i*w_sample(k)+eps);
 end
 
