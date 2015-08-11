@@ -30,7 +30,7 @@ function [f, g, c_all] = get_obj_grad(x)
     
     % load array with reference stations and data
     load('../output/interferometry/array_16_ref.mat');
-    load('../output/interferometry/data_16_ref_uniform_blob3_homog_structure.mat');
+    load('../output/interferometry/data_16_ref_uniform_2blob_freq_homog_structure.mat');
     
     % design filter for smoothing of kernel
     % myfilter = fspecial('gaussian',[40 40], 20);
@@ -139,9 +139,10 @@ function [f, g, c_all] = get_obj_grad(x)
     end
     
     
+    save(sprintf('test_%f.mat',rand(1)),'K_all')
     % sum frequencies of source kernel
     if( strcmp(type,'source') )
-        K_all = sum_source_kernel(K_all, n_basis_fct);
+        K_all = sum_source_kernel(K_all);
     end
     
     
