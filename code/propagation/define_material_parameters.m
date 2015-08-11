@@ -130,7 +130,7 @@ elseif (model_type==999)
     x_width = [1.1e5 1.1e5];
     z_width = [2.5e5 2.5e5];
     
-    [Lx,Lz,nx,nz] = input_parameters();
+    [Lx,Lz] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
     % first structure: 4.0e9
@@ -159,6 +159,9 @@ elseif (model_type==100)
     mu = 4.8e10*ones(nx,nz);
     
     mu(350:370,350:370) = mu(350:370,350:370) + 4.0e9;
+    
+    [Lx,Lz] = input_parameters();
+    [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
     if( strcmp(make_plots,'yes') )
         figure(1)

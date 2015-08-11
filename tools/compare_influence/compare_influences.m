@@ -61,7 +61,7 @@ for i = 1:n_ref
 %     veldis = 'vel';
     veldis = 'dis';
     first(indices,:) = u_h.c_data( indices , : );
-    second(indices,:) = ub3_h.c_data( indices , : );
+    second(indices,:) = u_h_t.c_data( indices , : );
     
     [misfit( (i-1)*n_rec + 1 : i*n_rec, :),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
 %     [misfit( (i-1)*n_rec + 1 : i*n_rec, :),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);

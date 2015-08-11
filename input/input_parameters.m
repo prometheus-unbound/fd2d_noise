@@ -1,5 +1,5 @@
 
-function [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type] = input_parameters()
+function [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters()
 
 %==========================================================================
 % set basic simulation parameters
@@ -32,7 +32,7 @@ order=4;            % finite-difference order (2 or 4)
 % model type
 %==========================================================================
 
-model_type = 666;
+model_type = 1;
 % model_type = 999;
 
 % model_type = 100;
@@ -46,12 +46,15 @@ model_type = 666;
 % 7=another layered medium
 % 666 = put source picture in ../models-folder
 % 999 = IUGG structure, two pills
-% x00 = smooth + rough structure, x = level of roughness
 
 
 %==========================================================================
 % source type
 %==========================================================================
 
+% source_type = 'homogeneous';
 source_type = 'gaussian';
+
+% number of frequency bands
+n_basis_fct = 0;
 
