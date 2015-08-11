@@ -24,23 +24,18 @@ function [displacement_seismograms,t,C_2_dxv,C_2_dzv] = run_forward_correlation_
 %==========================================================================
 
 %- material and domain ----------------------------------------------------
-[Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
-
-% reshape source distribution and mu - input is a column vector
-if( size(source_dist,2) == 1 )
-    n_noise_sources = size(source_dist,1)/(nx*nz);
-else
-    n_noise_sources = size(source_dist,3);
-end
-
-f_peak = [0.125 0.125];            % peak frequency in Hz
-bandwidth = [0.03 0.03];           % bandwidth in Hz
-
-noise_source_distribution = reshape(source_dist, nx, nz, n_noise_sources);
-mu = reshape(mu, nx, nz);
-
+[Lx,Lz,nx,nz,dt,nt,order,model_type,~,n_basis_fct] = input_parameters();
 [~,~,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 [~,rho] = define_material_parameters(nx,nz,model_type); 
+mu = reshape(mu, nx, nz);
+
+
+%- initialise interferometry ----------------------------------------------
+[~,n_sample,w_sample,dw] = input_interferometry();
+
+
+% reshape source distribution ---------------------------------------------
+noise_source_distribution = reshape(source_dist, nx, nz, n_sample);
 
 
 %- compute indices for receiver locations ---------------------------------
@@ -62,16 +57,9 @@ t = -(nt-1)*dt:dt:(nt-1)*dt;
 nt = length(t);
 
 
-%- initialise interferometry ----------------------------------------------
-f_sample = input_interferometry();
-n_sample = length(f_sample);
-w_sample = 2*pi*f_sample;
-dw = w_sample(2) - w_sample(1);
-
-
-% prepare coefficients for Fourier transform and its inverse
-fft_coeff = zeros(length(t),length(f_sample)) + 1i*zeros(length(t),length(f_sample));
-ifft_coeff = zeros(length(t),length(f_sample)) + 1i*zeros(length(t),length(f_sample));
+% prepare coefficients for Fourier transform and its inverse --------------
+fft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
+ifft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
 for k = 1:n_sample
     G_2(:,:,k) = conj(G_2(:,:,k));
     fft_coeff(:,k) = exp( -1i*w_sample(k)*t' )*dt;
@@ -79,20 +67,13 @@ for k = 1:n_sample
 end
 
 
-%- Fourier transform of the correlation velocity field
-% C_2 = zeros(nx,nz,length(f_sample)) + 1i*zeros(nx,nz,length(f_sample));
+%- Fourier transform of the correlation velocity field --------------------
+% C_2 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
 
 %- Fourier transform of strain field
-C_2_dxv = zeros(nx-1,nz,length(f_sample)) + 1i*zeros(nx-1,nz,length(f_sample));
-C_2_dzv = zeros(nx,nz-1,length(f_sample)) + 1i*zeros(nx,nz-1,length(f_sample));
-
-
-noise_spectrum = zeros(length(f_sample),n_noise_sources);
-%- spectrum for source regions --------------------------------------------
-for i=1:n_noise_sources
-    noise_spectrum(:,i) = 1/(n_noise_sources-i+1) * exp(-(abs(f_sample)-f_peak(i)).^2/bandwidth(i)^2);
-end
-    
+C_2_dxv = zeros(nx-1,nz,n_sample) + 1i*zeros(nx-1,nz,n_sample);
+C_2_dzv = zeros(nx,nz-1,n_sample) + 1i*zeros(nx,nz-1,n_sample);
+ 
 
 %- dynamic fields and absorbing boundary field ----------------------------
 v = zeros(nx,nz);
@@ -109,6 +90,7 @@ velocity_seismograms = zeros(n_receivers,nt);
 [absbound] = init_absbound();
 
 
+
 %==========================================================================
 % iterate
 %==========================================================================
@@ -122,21 +104,29 @@ for n = 1:length(t)
     %- add sources of the correlation field -------------------------------    
     if( mod(n,5) == 1 && (t(n)<0.0) )
         
-        %- transform on the fly to the time domain        
-        S = zeros(nx,nz,n_noise_sources) + 1i*zeros(nx,nz,n_noise_sources);
         
-        for ns = 1:n_noise_sources
-            
-            %- inverse Fourier transform for each noise source region           
-            for k=1:n_sample
-                S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * G_2(:,:,k) * ifft_coeff(n,k);
-            end
-            
-            %- add sources
-            DS = DS + noise_source_distribution(:,:,ns) .* real(S(:,:,ns));
-            
-        end
+        %- transform on the fly to the time domain        
+        S = zeros(nx,nz) + 1i*zeros(nx,nz);
+        
+        
+%         % noise source for coupled spectra and distributions
+%         for ns = 1:n_noise_sources
+%             
+%             for k=1:n_sample
+%                 S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * G_2(:,:,k) * ifft_coeff(n,k);
+%             end
+%             
+%             DS = DS + noise_source_distribution(:,:,ns) .* real(S(:,:,ns));
+%             
+%         end
+        
            
+        for k = 1:n_sample
+            S(:,:) = S(:,:) + noise_source_distribution(:,:,k) .* G_2(:,:,k) * ifft_coeff(n,k);
+        end
+        
+        DS = DS + real(S);
+        
     end
     
     

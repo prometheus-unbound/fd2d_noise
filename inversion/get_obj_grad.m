@@ -9,6 +9,7 @@ function [f, g, c_all] = get_obj_grad(x)
     % type = 'structure';
 
     [~,~,nx,nz,dt,nt] = input_parameters();
+    
     if( strcmp(type,'source') )
         %%% SPECIFY WHICH STRUCTURE SHOULD BE ASSUMED %%%
         % load('models/true_mu_structure_2.mat')
@@ -140,12 +141,12 @@ function [f, g, c_all] = get_obj_grad(x)
     
     % sum frequencies of source kernel
     if( strcmp(type,'source') )
-        K_all = sum( K_all, 3 );
+        K_all = sum_source_kernel(K_all, n_basis_fct);
     end
     
     
     % smooth final kernel
-    K_all = imfilter( K_all, myfilter, 'symmetric' );
+    K_all = imfilter( K_all, myfilter, 'replicate' );
     
     
     % reshape kernel to column vector 
@@ -157,3 +158,5 @@ function [f, g, c_all] = get_obj_grad(x)
 
       
 end
+
+

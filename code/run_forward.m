@@ -39,7 +39,7 @@ clear tmp;
 %==========================================================================
 
 %- material and domain ----------------------------------------------------
-[Lx,Lz,nx,nz,dt,nt,order,model_type,source_type] = input_parameters();
+[Lx,Lz,nx,nz,dt,nt,order,model_type,~,n_basis_fct] = input_parameters();
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 [mu,rho] = define_material_parameters(nx,nz,model_type); 
 
@@ -58,20 +58,17 @@ end
 
 
 %- initialise interferometry ----------------------------------------------
-f_sample = input_interferometry();
-n_sample = length(f_sample);
-w_sample = 2*pi*f_sample;
-dw = w_sample(2) - w_sample(1);
+[~, n_sample, w_sample, dw] = input_interferometry();
 
 
 %- forward simulations ('forward', 'forward_green') -----------------------
 if (strcmp(simulation_mode,'forward') || strcmp(simulation_mode,'forward_green'))
 
-    %- time axis ----------------------------------------------------------    
+    %- time axis
     t = 0:dt:dt*(nt-1);     
     
     
-    %- compute indices for source locations -------------------------------
+    %- compute indices for source locations
     ns = size(src,1);    
     src_id = zeros(ns,2);
     for i = 1:ns
@@ -80,7 +77,7 @@ if (strcmp(simulation_mode,'forward') || strcmp(simulation_mode,'forward_green')
     end        
     
     
-    %- make source time function ------------------------------------------
+    %- make source time function
     make_source_time_function;
     
     
@@ -88,11 +85,11 @@ if (strcmp(simulation_mode,'forward') || strcmp(simulation_mode,'forward_green')
     if strcmp(simulation_mode,'forward_green')    
         
         %- Fourier transform of the forward Greens function
-        G_2 = zeros(nx,nz,length(f_sample)) + 1i*zeros(nx,nz,length(f_sample));
+        G_2 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
         
         
         % prepare coefficients for Fourier transform
-        fft_coeff = zeros(length(t),length(w_sample)) + 1i*zeros(length(t),length(f_sample));
+        fft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
         for k = 1:n_sample
             fft_coeff(:,k) = exp(-1i*w_sample(k)*t')*dt;
         end
@@ -103,17 +100,17 @@ if (strcmp(simulation_mode,'forward') || strcmp(simulation_mode,'forward_green')
 %- forward simulation to compute correlation function ---------------------
 elseif strcmp(simulation_mode,'correlation')
 
-    %- time axis ----------------------------------------------------------
+    %- time axis
     t = -(nt-1)*dt:dt:(nt-1)*dt; 
     
     
     %- Fourier transform of the correlation velocity field
-    C_2 = zeros(nx,nz,length(f_sample)) + 1i*zeros(nx,nz,length(f_sample));
+    C_2 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
     
     
     %- Fourier transform of strain field
-    C_2_dxv = zeros(nx-1,nz,length(f_sample)) + 1i*zeros(nx-1,nz,length(f_sample));
-    C_2_dzv = zeros(nx,nz-1,length(f_sample)) + 1i*zeros(nx,nz-1,length(f_sample));
+    C_2_dxv = zeros(nx-1,nz,n_sample) + 1i*zeros(nx-1,nz,n_sample);
+    C_2_dzv = zeros(nx,nz-1,n_sample) + 1i*zeros(nx,nz-1,n_sample);
     
     
     %- load frequency-domain Greens function
@@ -125,18 +122,20 @@ elseif strcmp(simulation_mode,'correlation')
     
     
     % prepare coefficients for Fourier transform and its inverse
-    fft_coeff = zeros(length(t),length(f_sample)) + 1i*zeros(length(t),length(f_sample));
-    ifft_coeff = zeros(length(t),length(f_sample)) + 1i*zeros(length(t),length(f_sample));
+    fft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
+    ifft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
     for k = 1:n_sample
         G_2(:,:,k) = conj(G_2(:,:,k));
         fft_coeff(:,k) = exp( -1i*w_sample(k)*t' )*dt;
         ifft_coeff(:,k) = dw*exp( 1i*w_sample(k)*t' )/(2*pi);
     end
-        
+    
     
     %- initialise noise source locations and spectra
-    [noise_spectrum, noise_source_distribution] = make_noise_source(source_type,make_plots); 
-    n_noise_sources = size(noise_spectrum,2);
+%     [noise_source_distribution,noise_spectrum] = make_noise_source(make_plots);
+%     n_noise_sources = size(noise_spectrum,2);
+    
+    [noise_source_distribution] = make_noise_source(make_plots);
     
 end
  
@@ -188,25 +187,35 @@ for n = 1:length(t)
     if( mod(n,5) == 1 && strcmp(simulation_mode,'correlation') && (t(n)<0.0) )
         
         %- transform on the fly to the time domain 
-        S = zeros(nx,nz,n_noise_sources);
+        S = zeros(nx,nz) + 1i*zeros(nx,nz);
+
         
-        for ns = 1:n_noise_sources
-            
-            %- inverse Fourier transform for each noise source region
-            t_ifft_start = tic;
-            
-            for k=1:n_sample
-                % S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * conj(G_2(:,:,k)) * exp( 1i*w_sample(k)*t(n) );
-                S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * G_2(:,:,k) * ifft_coeff(n,k);
-            end
-            % S(:,:,ns) = dw*S(:,:,ns)/pi; 
-            
-            t_ifft = t_ifft + toc(t_ifft_start);
-            
-            %- add sources
-            DS = DS + noise_source_distribution(:,:,ns) .* real(S(:,:,ns));
-            
+%         % noise source for coupled spectra and distributions
+%         for ns = 1:n_noise_sources
+%             
+%             t_ifft_start = tic;
+%             
+%             for k = 1:n_sample
+%                 % S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * conj(G_2(:,:,k)) * exp( 1i*w_sample(k)*t(n) );
+%                 S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * G_2(:,:,k) * ifft_coeff(n,k);
+%             end
+%             % S(:,:,ns) = dw*S(:,:,ns)/pi; 
+%             
+%             t_ifft = t_ifft + toc(t_ifft_start);
+%             
+%             DS = DS + noise_source_distribution(:,:,ns) .* real(S(:,:,ns));
+% 
+%         end
+        
+
+        t_ifft_start = tic;
+        
+        for k = 1:n_sample
+            S(:,:) = S(:,:) + noise_source_distribution(:,:,k) .* G_2(:,:,k) * ifft_coeff(n,k);
         end
+        DS = DS + real(S);
+        
+        t_ifft = t_ifft + toc(t_ifft_start);
            
     end
     
