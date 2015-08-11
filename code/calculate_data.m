@@ -1,6 +1,6 @@
 
 clear all
-close all
+% close all
 
 
 % mode = 'local';
@@ -9,21 +9,27 @@ mode = 'monch';
 % mode = 'brutus';
 
 
-%% define model
 addpath(genpath('../'))
-output_specs
 
-[Lx,Lz,nx,nz,dt,nt,order,model_type,source_type] = input_parameters();
+
+%% set up model
+[Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
+[width] = absorb_specs();
+
+
+%% get source and material
+[source_dist] = make_noise_source();
 [mu,rho] = define_material_parameters(nx,nz,model_type);
 if(model_type==666)
     A = imread('../models/rand_10_demasiados.png');
     mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
     mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
 end
-[~,source_dist] = make_noise_source(source_type,make_plots);
-[width] = absorb_specs();
 
+
+%% specify output behaviour
+output_specs
 if(strcmp(mode,'cluster'))
     make_plots = 'no';
 end
@@ -37,6 +43,9 @@ for i = 1:nr_x
     for j = 1:nr_z        
         array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
+        
+%         array( (i-1)*nr_x + j, 1 ) = 1.5e5 + ( i-1 )*0.4e5;
+%         array( (i-1)*nr_z + j, 2 ) = 1.5e5 + ( j-1 )*0.4e5;
     end
 end
 
@@ -101,6 +110,8 @@ c_it = zeros(n_ref,n_rec,length(t));
 
 fprintf('\n')
 flip_sr = 'no';
+
+
 parfor i = 1:n_ref
     
     if( strcmp(verbose,'yes') )
@@ -147,4 +158,5 @@ if( ~strcmp(mode,'local') )
     delete(parobj)
     rmpath(genpath('../'))
 end
+
 
