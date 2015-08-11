@@ -16,7 +16,6 @@ i4 = coder.typeof(1,1,0);
 % source dist
 i5 = coder.typeof(zeros(2,2,2),[inf,inf,inf],1);
 
-
 % run_forward_green_fast(mu,src)
 codegen run_forward_green_fast.m -args {i2,i3}
 
@@ -29,3 +28,4 @@ clear i1
 clear i2
 clear i3
 clear i4
+clear i5
