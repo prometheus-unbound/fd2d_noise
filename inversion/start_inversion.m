@@ -55,14 +55,18 @@ end
 [~,~,nx,nz] = input_parameters();
 
 
+
 % run source inversion
 if( strcmp(type,'source') )
-    x0 = ones(nx*nz, 1);
+    % x0 = ones(nx*nz, 1);
+    x0 = make_noise_source();
     [x,c_final] = steepest_descent(x0,'get_obj_grad',0.05,0);
 
 % run source inversion with lower and upper bounds
 elseif( strcmp(type,'source_constrained') )
-    x0 = ones(nx*nz, 1);
+    % x0 = ones(nx*nz, 1);
+    x0 = make_noise_source();
+    
     xl = zeros(nx*nz, 1);
     xu = inf(nx*nz, 1);
     [x,c_final] = projected_steepest_descent(x0,xl,xu,'get_obj_grad',0.05,0);
