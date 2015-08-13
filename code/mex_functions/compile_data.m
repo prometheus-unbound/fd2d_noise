@@ -4,7 +4,7 @@ addpath(genpath('../../'))
 % G_2, C_2, C_2_dxv, C_2_dzv
 i1 = coder.typeof(complex(zeros(2,2,2)),[inf,inf,inf],1);
 
-% source_dist, mu, adstf
+% mu, adstf
 i2 = coder.typeof(zeros(2,2),[inf,inf],1);
 
 % src, rec
