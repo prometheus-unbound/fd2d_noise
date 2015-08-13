@@ -39,6 +39,10 @@ ub1000_h = load([folder 'data_16_ref_uniform_blob1000_homog_structure']);
 ub10000_1 = load([folder 'data_16_ref_uniform_blob10000_structure_1.mat']);
 
 
+u_h_f = load([folder 'data_16_ref_uniform_freq_homog_structure.mat']);
+u2b_h_f = load([folder 'data_16_ref_uniform_2blob_freq_homog_structure.mat']);
+
+
 load([folder 'array_16_ref.mat'])
 n_ref = size(ref_stat,1);
 n_rec = size(array,1)-1;
@@ -58,10 +62,10 @@ for i = 1:n_ref
     % calculate misfit
     indices = (i-1)*n_rec + 1 : i*n_rec;
     
-%     veldis = 'vel';
-    veldis = 'dis';
-    first(indices,:) = u_h.c_data( indices , : );
-    second(indices,:) = u_h_t.c_data( indices , : );
+    veldis = 'vel';
+%     veldis = 'dis';
+    first(indices,:) = u_h_f.c_data( indices , : );
+    second(indices,:) = u2b_h_f.c_data( indices , : );
     
     [misfit( (i-1)*n_rec + 1 : i*n_rec, :),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
 %     [misfit( (i-1)*n_rec + 1 : i*n_rec, :),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);
