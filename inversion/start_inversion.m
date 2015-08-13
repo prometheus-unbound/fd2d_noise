@@ -8,8 +8,8 @@ mode = 'monch';
 % mode = 'euler';
 % mode = 'brutus';
 
-type = 'source';
-% type = 'source_constrained';
+% type = 'source';
+type = 'source_constrained';
 % type = 'structure';
 
 
@@ -53,22 +53,26 @@ end
 
 % get model dimensions
 [~,~,nx,nz] = input_parameters();
-
+[~,n_sample] = input_interferometry();
 
 
 % run source inversion
 if( strcmp(type,'source') )
-    % x0 = ones(nx*nz, 1);
+    % x0 = ones(nx*nz*n_sample,1);
     x0 = make_noise_source();
+    x0 = reshape(x0,[],1);
+    
     [x,c_final] = steepest_descent(x0,'get_obj_grad',0.05,0);
 
 % run source inversion with lower and upper bounds
 elseif( strcmp(type,'source_constrained') )
-    % x0 = ones(nx*nz, 1);
+    % x0 = ones(nx*nz*n_sample,1);
     x0 = make_noise_source();
+    x0 = reshape(x0,[],1);
     
-    xl = zeros(nx*nz, 1);
-    xu = inf(nx*nz, 1);
+    xl = zeros(nx*nz*n_sample,1);
+    xu = inf(nx*nz*n_sample,1);
+    
     [x,c_final] = projected_steepest_descent(x0,xl,xu,'get_obj_grad',0.05,0);
 
 % run structure inversion

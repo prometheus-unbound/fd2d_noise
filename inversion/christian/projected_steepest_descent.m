@@ -27,7 +27,7 @@ del=0.001;
 % constant del<theta<1 for Wolfe condition
 theta=0.6;
 
-sig = 0.250;
+sig = 0.1;
 
 verbose = true;
 
@@ -44,9 +44,9 @@ if (verbose)
    norm(max(xl-xj,0) + max(xj-xu,0) ) 
    norm(gp-g)
    disp 'Active set lower bound:'
-   find(xj==xl)
+%    find(xj==xl)
    disp 'Active set upper bound:'
-   find(xj==xu)
+%    find(xj==xu)
 end
 
 % main loop
