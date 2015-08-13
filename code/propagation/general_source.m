@@ -6,7 +6,7 @@ function [dist_general] = general_source( noise_spectrum, noise_source_distribut
     %
     % keep number of degrees of freedom - mapping function from small setup
     % to map for each frequency
-    % don't want to keep noise spectrum separate, thinking about it... ;)
+    % still thinking about it... ;)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     
@@ -25,15 +25,31 @@ function [dist_general] = general_source( noise_spectrum, noise_source_distribut
         for ib = 1:n_basis_fct
             
             indices = int_limits(ib,1) : int_limits(ib,2);
+            ni = length(indices);
             
             % combine to frequency bands - leads to the same source map for several frequencies
             % normalize the summation over frequencies by number of frequencies involved
+            
+            % % slow, but nicer version
+            % for k = indices
+            %     for ns = 1:n_noise_sources
+            %         dist_general(:,:,indices) = dist_general(:,:,indices) + ...
+            %             repmat( noise_spectrum(k,ns) * noise_source_distribution(:,:,ns) / ni, 1, 1, ni ) ;
+            %     end
+            % end
+            
+            % faster version
+            dist_basis = zeros(nx,nz);
             for k = indices
                 for ns = 1:n_noise_sources
-                    dist_general(:,:,indices) = dist_general(:,:,indices) + ...
-                        repmat( noise_spectrum(k,ns) * noise_source_distribution(:,:,ns), 1, 1, length(indices) ) / length(indices);
+                    dist_basis = dist_basis + noise_spectrum(k,ns) * noise_source_distribution(:,:,ns);
                 end
             end
+            
+            for k = indices
+                dist_general(:,:,k) = dist_basis/ni;
+            end
+            
             
         end
         
