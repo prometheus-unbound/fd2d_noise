@@ -1,5 +1,5 @@
 
-function [noise_source_distribution] = make_noise_source(make_plots)
+function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
 
     % define make_plots if not specified
     if( nargin < 1 )
@@ -20,35 +20,49 @@ function [noise_source_distribution] = make_noise_source(make_plots)
     
     n_noise_sources = 2;
     
+    
     %- specify spectrum ---------------------------------------------------
-    f_peak = [1/14, 1/7];
+    
+    % two overlapping spectra
+    f_peak = [1/11, 1/7];
     bandwidth = [0.035, 0.025];
     strength = [1, 0.7];
 
+%     % narrow non-overlapping spectra
+%     f_peak = [1/15, 1/7];
+%     bandwidth = [0.01, 0.01];
+%     strength = [1, 0.7];
+
+%     % one simple source
 %     f_peak = 0.125;
 %     bandwidth = 0.03;
 %     strength = 1;
     
     
-    %- different source types ---------------------------------------------    
-    %- location and width of a gaussian 'blob' ----------------------------
+    %- different source types --------------------------------------------- 
+    
+    % location and width of a gaussian 'blob'
     if(strcmp(source_type,'gaussian'))
+        
+%         % small setup, 2 sources 
 %         x_sourcem = [2.0e5, 1.0e5];
 %         z_sourcem = [2.0e5, 1.0e5];
 %         sourcearea_width = [0.4e5, 0.4e5];
 %         magnitude = [3.0, 2.0];
         
+        % large setup, 2 sources left of the array
         x_sourcem = [0.5e6, 0.6e6];
         z_sourcem = [0.8e6, 1.3e6];
         sourcearea_width = [2.0e5, 1.5e5];
         magnitude = [6.0, 5.0];
         
+%         % large steup, 1 source in the center of the array
 %         x_sourcem = [1.25e6];
 %         z_sourcem = [1.0e6];
 %         sourcearea_width = [1.5e5];
 %         magnitude = [3.0];
 
-    %- ring of sources ----------------------------------------------------
+    % ring of sources
     elseif(strcmp(source_type,'ring'))
         x_source_r = 1.0e6;
         z_source_r = 1.0e6;
@@ -58,7 +72,7 @@ function [noise_source_distribution] = make_noise_source(make_plots)
         taper_width = 20.0;
         taper_strength = 100;
     
-    %- picture translated sources -----------------------------------------
+    % picture translated sources
     elseif(strcmp(source_type,'picture'))
         filename = 'source.png';
         
@@ -76,21 +90,24 @@ function [noise_source_distribution] = make_noise_source(make_plots)
     for ns = 1:n_noise_sources
         noise_spectrum(:,ns) = strength(ns) * exp( -(abs(f_sample)-f_peak(ns)).^2 / bandwidth(ns)^2 );
         
-        if ( strcmp(make_plots,'yes') )
-            if(ns==1)
-                figure
-                set(gca,'FontSize',12)
-                hold on
-                cstring = [];
-            end
-            
-            plot(f_sample,noise_spectrum(:,ns),'Color',cmap(ns,:))
-            cstring{end+1} = ['source ' num2str(ns)];
-            xlabel('frequency [Hz]');
-            legend(cstring)
-        end
+%         if ( strcmp(make_plots,'yes') )
+%             if(ns==1)
+%                 figure
+%                 set(gca,'FontSize',12)
+%                 hold on
+%                 grid on
+%                 cstring = [];
+%             end
+%             
+%             plot(f_sample,noise_spectrum(:,ns),'Color',cmap(ns,:))
+%             cstring{end+1} = ['source ' num2str(ns)];
+%             xlabel('frequency [Hz]');
+%             legend(cstring)
+%             
+%             xlim([f_sample(1) f_sample(end)])
+%         end
+        
     end
-    
     
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,6 +124,9 @@ function [noise_source_distribution] = make_noise_source(make_plots)
         for ns = 1:n_noise_sources
             noise_source_distribution(:,:,ns) = noise_source_distribution(:,:,ns) ...
                 + magnitude(ns) * ( exp( -( (X-x_sourcem(ns)).^2 + (Z-z_sourcem(ns)).^2 ) / (sourcearea_width(ns))^2 ) )';
+            
+            % figure
+            % mesh(noise_source_distribution(:,:,ns))
         end
         
         
@@ -156,66 +176,60 @@ function [noise_source_distribution] = make_noise_source(make_plots)
     
     if ( strcmp(make_plots,'yes') )
         
-        figure
-        hold on
-        set(gca,'FontSize',12);
-        
         if( n_basis_fct == 0 )
             
-%             overlay = 'no';
-%             if(strcmp(overlay,'yes'))
-%                 [mu,~] = define_material_parameters(nx,nz,model_type);
-%                 pcolor(X,Z,(mu-4.8e10)'/max(max(abs(mu-4.8e10))))
-%                 
-%                 dist(ns,:) = pcolor(X,Z,(noise_source_distribution(:,:,ns)-1)'/max(max(max(abs(noise_source_distribution(:,:,ns)-1)))));
-%                 alpha(dist(ns,:),0.5)
-%                 cm = cbrewer('div','RdBu',100,'PCHIP');
-%                 colormap(cm);
-%                 cb = colorbar;
-%                 ylabel(cb,'normalized for overlay')
-%                 caxis([-1.0 1.0])
-%                 
-%             else
+            overlay = 'yes';
+            
+            figure
+            set(gca,'FontSize',12);
+            hold on
+            
+            if(strcmp(overlay,'yes'))
+                
+                [mu,~] = define_material_parameters(nx,nz,model_type);
+                pcolor(X,Z,(mu-4.8e10)'/max(max(abs(mu-4.8e10))))
+                
+                dist = pcolor(X, Z, sum(noise_source_distribution,3)' / max(max( sum(noise_source_distribution,3) )) );
+                alpha(dist,0.5)
+                cm = cbrewer('div','RdBu',100,'PCHIP');
+                colormap(cm);
+                cb = colorbar;
+                ylabel(cb,'normalized for overlay')
+                caxis([-1.0 1.0])
+                
+            else
 
-                pcolor(X, Z, sum(noise_source_distribution,3)' / sum(sum(noise_spectrum)) )
+                pcolor(X, Z, sum(noise_source_distribution,3)' )
                 load cm_psd
                 colormap(cm_psd)
-                % caxis([0.0 max(max(max(noise_source_distribution)))])
                 colorbar
                 
-%             end
+            end
             
             plot([width,Lx-width],[width,width],'k--')
             plot([width,Lx-width],[Lz-width,Lz-width],'k--')
             plot([width,width],[width,Lz-width],'k--')
             plot([Lx-width,Lx-width],[width,Lz-width],'k--')
-            
-            load('~/Desktop/runs/inversion/data/array_16_ref.mat')
-            plot(array(:,1),array(:,2),'ko')
-        
+                    
         else
             
-            fudge_factor = 40;
+            fudge_factor = 10;
+            
+            fig1 = figure;
+            set(fig1,'units','normalized','position',[.1 -.3 0.5 1.1])
+            set(gca,'FontSize',12);
+            hold on
+            
             int_limits = integration_limits(n_sample,n_basis_fct);
             
-%             normalize_basis = zeros(n_basis_fct,1);
-%             for ib = 1:n_basis_fct
-%                 indices = int_limits(ib,1):int_limits(ib,2);
-%                 normalize_basis(ib,1) = sum( sum( noise_spectrum(indices,:) ) );
-%             end
-%             normalize = max(normalize_basis);
-            
-            
-            for ib = 1:n_basis_fct
+            for ib = 8%1:n_basis_fct
                 
-                indices = int_limits(ib,1):int_limits(ib,2);
-                
-                noise_dist_basis = sum( noise_source_distribution(:,:,indices), 3 ); % / normalize_basis(ib) ;
-                h(ib) = mesh( X, Z, (ib-1)*fudge_factor + noise_dist_basis' );
+                noise_dist_basis = noise_source_distribution(:,:,int_limits(ib,1));
+                h(ib) = mesh(X, Z, ib*fudge_factor + noise_dist_basis' );
                 set(h(ib),'CData',noise_dist_basis');
                 
-                text(1e3,1e3, (ib-1)*fudge_factor + 1 + noise_dist_basis(1,1) , sprintf('%5.2f - %5.2f Hz',f_sample(int_limits(ib,1)),f_sample(int_limits(ib,2))) )
-                level = [(ib-1)*fudge_factor + 0.1 + noise_dist_basis(1,1), (ib-1)*fudge_factor + 0.1 + noise_dist_basis(1,1)];
+                text(1e3,1e3, ib*fudge_factor + 1 + noise_dist_basis(1,1) , sprintf('%5.2f - %5.2f Hz',f_sample(int_limits(ib,1)),f_sample(int_limits(ib,2))) )
+                level = [ib*fudge_factor + 0.1 + noise_dist_basis(1,1), ib*fudge_factor + 0.1 + noise_dist_basis(1,1)];
                 plot3([width,Lx-width],[width,width],level,'k--')
                 plot3([width,Lx-width],[Lz-width,Lz-width],level,'k--')
                 plot3([width,width],[width,Lz-width],level,'k--')
@@ -226,13 +240,17 @@ function [noise_source_distribution] = make_noise_source(make_plots)
             load cm_psd
             colormap(cm_psd)
             colorbar
+            c_lim = get(gca,'CLim');
             
-            view([0 0])
-            zlim([0 fudge_factor*n_basis_fct])
+            view([0 90])
+            zlim([0 fudge_factor*(n_basis_fct+1)])
             set(gca,'ZTick',[])
             zlabel('frequency bands')
             
         end
+        
+        load('~/Desktop/runs/inversion/data/array_16_ref.mat')
+        plot(array(:,1),array(:,2),'ko')
         
         shading interp
         grid on
