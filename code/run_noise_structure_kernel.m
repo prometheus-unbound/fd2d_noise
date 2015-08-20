@@ -1,4 +1,4 @@
-function [X,Z,K_rho,K_mu]=run_noise_structure_kernel(simulation_mode, i_ref, flip_sr)
+function [X,Z,K_rho_final,K_mu_final]=run_noise_structure_kernel(simulation_mode, i_ref, flip_sr)
 
 %==========================================================================
 % run simulation to compute sensitivity kernel for rho and mu
@@ -171,8 +171,8 @@ end
 
 
 %- accumulate kernel by looping over frequency
-K_rho = zeros(nx,nz);
-K_mu = zeros(nx,nz);
+K_rho = zeros(nx,nz) + 1i*zeros(nx,nz);
+K_mu = zeros(nx,nz) + 1i*zeros(nx,nz);
 for k=1:n_sample
     K_rho = K_rho - G_1(:,:,k) .* C_2(:,:,k) * dw;
     
@@ -180,8 +180,8 @@ for k=1:n_sample
     K_mu(:,1:nz-1) = K_mu(:,1:nz-1) + G_1_strain_dzv(:,:,k) .* C_2_dzv(:,:,k) / w_sample(k)^2 * dw;
 end
 
-K_rho = real(K_rho);
-K_mu = real(K_mu);
+K_rho_final = real(K_rho);
+K_mu_final = real(K_mu);
 
 
 %==========================================================================
