@@ -47,15 +47,15 @@ function [f, g, c_all] = get_obj_grad(x)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     
 
-    % get density, redirect optimization variable x, initialize kernel structures
-    [~,rho] = define_material_parameters(nx,nz,model_type);
+    % redirect optimization variable x and initialize kernel structures
+    
     if( strcmp(type,'source') )
         source_dist = x;
         f_sample = input_interferometry();
         K_all = zeros(nx, nz, length(f_sample));
         
     elseif( strcmp(type,'structure') )
-        % mu = 4.8e10 * (1+x);
+        [~,rho] = define_material_parameters(nx,nz,model_type);
         mu = rho .* v0^2 .* (1+x).^2;
         
         K_all = zeros(nx, nz);
@@ -160,7 +160,6 @@ function [f, g, c_all] = get_obj_grad(x)
     if( strcmp(type,'source') )
         g = reshape( K_all, [], 1 );
     elseif( strcmp(type,'structure') )
-        % g = 4.8e10 * reshape( K_all, [], 1 );
         g = 2 * rho .* v0^2 .* K_all .* (1+x);
     end
 
