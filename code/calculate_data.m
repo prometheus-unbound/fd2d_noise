@@ -49,6 +49,11 @@ for i = 1:nr_x
     end
 end
 
+% array = zeros(2,2);
+% array(1,1) = 1.5e5;
+% array(2,1) = 2.5e5;
+% array(:,2) = 2.0e5;
+
 
 %% select receivers that will be reference stations
 ref_stat = array;
