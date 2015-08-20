@@ -8,8 +8,8 @@ tic
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-type = 'source';
-% type = 'structure';
+% type = 'source';
+type = 'structure';
 
 measurement = 4;
 % 1 = 'log_amplitude_ratio';
@@ -57,7 +57,7 @@ for i = 1:size(ref_stat,1)
     fprintf('calculate green function\n')
     [~,~] = run_forward('forward_green',src,rec,i,flip_sr);
     fprintf('calculate correlation\n')
-    [c_uniform( (i-1)*nr + 1 : i*nr , :),t] = run_forward('correlation',src,rec,i,flip_sr);
+    [c_uniform( (i-1)*nr + 1 : i*nr , :),t] = run_forward('correlation',src,rec,i,flip_sr);    
     
     % make measurement and adjoint source time function
     if( strcmp(data_independent,'yes') )

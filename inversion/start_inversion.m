@@ -9,8 +9,8 @@ mode = 'monch';
 % mode = 'brutus';
 
 % type = 'source';
-type = 'source_constrained';
-% type = 'structure';
+% type = 'source_constrained';
+type = 'structure';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
