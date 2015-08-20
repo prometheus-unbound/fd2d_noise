@@ -14,7 +14,11 @@ function [displacement_seismograms,t,C_2_dxv,C_2_dzv] = run_forward_correlation_
 %
 % output:
 %--------
-% G_2: Green function of reference station
+% correlation recordings
+% t: time vector
+% C_2: correlation wavefield
+% C_2_dxv: stress component of correlation wavefield
+% C_2_dzv: stress component of correlation wavefield
 %
 %==========================================================================
 
