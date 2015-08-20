@@ -5,10 +5,10 @@ function [f, g, c_all] = get_obj_grad(x)
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    type = 'source';
-    % type = 'structure';
+    % type = 'source';
+    type = 'structure';
 
-    [~,~,nx,nz,dt,nt] = input_parameters();
+    [~,~,nx,nz,dt,nt,~,model_type] = input_parameters();
     
     if( strcmp(type,'source') )
         %%% SPECIFY WHICH STRUCTURE SHOULD BE ASSUMED %%%
@@ -16,13 +16,16 @@ function [f, g, c_all] = get_obj_grad(x)
         mu = 4.8e10*ones(nx*nz,1);
         
     elseif( strcmp(type,'structure') )
-        %%% SPECIFY WHICH SOURCE SHOULD BE ASSUMED %%%
+        %%%% SPECIFY V0 FOR RELATIVE PARAMETRIZATION %%%%
+        v0 = 4000;
+        
+        %%% SPECIFY WHICH SOURCE SHOULD BE ASSUMED %%%%%%
         source_dist = ones(nx*nz,1);
         % load('models/true_source_uniform_blob100.mat')
         % load('models/source_log_a_uniform_blob3.mat')
     end
     
-    measurement = 1;
+    measurement = 4;
     % 1 = 'log_amplitude_ratio';
     % 2 = 'amplitude_difference';
     % 3 = 'waveform_difference';
@@ -44,14 +47,17 @@ function [f, g, c_all] = get_obj_grad(x)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     
 
-    % redirect optimization variable x and initialize kernel structures
+    % get density, redirect optimization variable x, initialize kernel structures
+    [~,rho] = define_material_parameters(nx,nz,model_type);
     if( strcmp(type,'source') )
         source_dist = x;
         f_sample = input_interferometry();
         K_all = zeros(nx, nz, length(f_sample));
         
     elseif( strcmp(type,'structure') )
-        mu = 4.8e10 * (1+x);
+        % mu = 4.8e10 * (1+x);
+        mu = rho .* v0^2 .* (1+x).^2;
+        
         K_all = zeros(nx, nz);
     end
     
@@ -154,7 +160,8 @@ function [f, g, c_all] = get_obj_grad(x)
     if( strcmp(type,'source') )
         g = reshape( K_all, [], 1 );
     elseif( strcmp(type,'structure') )
-        g = 4.8e10 * reshape( K_all, [], 1 );
+        % g = 4.8e10 * reshape( K_all, [], 1 );
+        g = 2 * rho .* v0^2 .* K_all .* (1+x);
     end
 
       
