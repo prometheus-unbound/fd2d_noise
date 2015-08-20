@@ -128,18 +128,51 @@ myfilter = fspecial('gaussian',[15 15], 5);
 
 
 %% plot velocity kernel
+c = 1;
+cm = cbrewer('div','RdBu',100,'PCHIP');
+
 figure
-K_v = 2*rho.*sqrt(mu./rho).*K_mu_uniform;
+
+subplot(3,2,1)
+mesh(X,Z,imfilter(K_rho_all', myfilter, 'symmetric'))
+shading interp
+colormap(cm)
+m = max(max(abs(K_rho_all)));
+caxis([-c*m c*m])
+colorbar
+axis square
+view([0 90])
+
+subplot(3,2,3)
+mesh(X,Z,imfilter(K_v_all', myfilter, 'symmetric'))
+shading interp
+colormap(cm)
+m = max(max(abs(K_v_all)));
+caxis([-c*m c*m])
+colorbar
+axis square
+view([0 90])
+
+
+K_v = 2*rho.*sqrt(mu./rho).*K_v_all;
+K_rho = real(K_rho_all) + mu./rho .* K_v_all;
+
+subplot(3,2,2)
+mesh(X,Z,K_v')
+shading interp
+colormap(cm)
+m = max(max(abs(K_rho)));
+caxis([-c*m c*m])
+colorbar
+axis square
+view([0 90])
+
+subplot(3,2,4)
 mesh(X,Z,imfilter(K_v', myfilter, 'symmetric'))
 shading interp
 colormap(cm)
 m = max(max(abs(K_v)));
 caxis([-c*m c*m])
-
-figure
-mesh(X,Z,K_v')
-shading interp
-colormap(cm)
-m = max(max(abs(K_v)));
-caxis([-c*m c*m])
-
+colorbar
+axis square
+view([0 90])

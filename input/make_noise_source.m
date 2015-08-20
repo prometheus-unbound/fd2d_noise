@@ -18,15 +18,15 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
     % user input
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    n_noise_sources = 2;
+    n_noise_sources = 1;
     
     
     %- specify spectrum ---------------------------------------------------
     
     % two overlapping spectra
-    f_peak = [1/11, 1/7];
-    bandwidth = [0.035, 0.025];
-    strength = [1, 0.7];
+%     f_peak = [1/11, 1/7];
+%     bandwidth = [0.035, 0.025];
+%     strength = [1, 0.7];
 
 %     % narrow non-overlapping spectra
 %     f_peak = [1/15, 1/7];
@@ -34,9 +34,9 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
 %     strength = [1, 0.7];
 
 %     % one simple source
-%     f_peak = 0.125;
-%     bandwidth = 0.03;
-%     strength = 1;
+    f_peak = 0.125;
+    bandwidth = 0.03;
+    strength = 1;
     
     
     %- different source types --------------------------------------------- 
@@ -178,7 +178,7 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
         
         if( n_basis_fct == 0 )
             
-            overlay = 'yes';
+            overlay = 'no';
             
             figure
             set(gca,'FontSize',12);
@@ -240,7 +240,6 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
             load cm_psd
             colormap(cm_psd)
             colorbar
-            c_lim = get(gca,'CLim');
             
             view([0 90])
             zlim([0 fudge_factor*(n_basis_fct+1)])
@@ -249,9 +248,10 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
             
         end
         
-        load('~/Desktop/runs/inversion/data/array_16_ref.mat')
-        plot(array(:,1),array(:,2),'ko')
+%         load('~/Desktop/runs/inversion/data/array_16_ref.mat')
+%         plot(array(:,1),array(:,2),'ko')
         
+        c_lim = get(gca,'CLim');
         shading interp
         grid on
         box on

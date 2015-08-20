@@ -133,7 +133,7 @@ elseif (model_type==999)
     [Lx,Lz] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
-    % first structure: 4.0e9
+    % structure_1: 4.0e9
     % structure_2: 2.0e9
     % structure_3: 1.0e9
     for i=1:size(x_sourcem,2)
