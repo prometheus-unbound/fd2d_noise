@@ -3,53 +3,73 @@ clear all
 
 addpath(genpath('../../'))
 
-folder = '~/Desktop/runs/inversion/data/';
+folder_1 = '~/Desktop/runs/inversion/data/';
 
-u_h = load([folder 'data_16_ref_uniform_homog_structure.mat']);
-u_1 = load([folder 'data_16_ref_uniform_structure_1.mat']);
-u_2 = load([folder 'data_16_ref_uniform_structure_2.mat']);
-u_3 = load([folder 'data_16_ref_uniform_structure_3.mat']);
+u_h = load([folder_1 'data_16_ref_uniform_homog_structure.mat']);
+u_1 = load([folder_1 'data_16_ref_uniform_structure_1.mat']);
+u_2 = load([folder_1 'data_16_ref_uniform_structure_2.mat']);
+u_3 = load([folder_1 'data_16_ref_uniform_structure_3.mat']);
 
-b3_1 = load([folder 'data_16_ref_blob3_structure_1.mat']);
-b3_h = load([folder 'data_16_ref_blob3_homog_structure.mat']);
+b3_1 = load([folder_1 'data_16_ref_blob3_structure_1.mat']);
+b3_h = load([folder_1 'data_16_ref_blob3_homog_structure.mat']);
 
-ub3_1 = load([folder 'data_16_ref_uniform_blob3_structure_1.mat']);
-ub3_h = load([folder 'data_16_ref_uniform_blob3_homog_structure.mat']);
-ub3_r5 = load([folder 'data_16_ref_uniform_blob3_rand_5.mat']);
-ub3_r10 = load([folder 'data_16_ref_uniform_blob3_rand_10.mat']);
-ub3_r10m = load([folder 'data_16_ref_uniform_blob3_rand_10_muchos.mat']);
-ub3_r10d = load([folder 'data_16_ref_uniform_blob3_rand_10_demasiados.mat']);
-ub3_r20 = load([folder 'data_16_ref_uniform_blob3_rand_20.mat']);
-ub3_r30 = load([folder 'data_16_ref_uniform_blob3_rand_30.mat']);
-ub3_r40 = load([folder 'data_16_ref_uniform_blob3_rand_40.mat']);
+ub3_1 = load([folder_1 'data_16_ref_uniform_blob3_structure_1.mat']);
+ub3_h = load([folder_1 'data_16_ref_uniform_blob3_homog_structure.mat']);
+ub3_r5 = load([folder_1 'data_16_ref_uniform_blob3_rand_5.mat']);
+ub3_r10 = load([folder_1 'data_16_ref_uniform_blob3_rand_10.mat']);
+ub3_r10m = load([folder_1 'data_16_ref_uniform_blob3_rand_10_muchos.mat']);
+ub3_r10d = load([folder_1 'data_16_ref_uniform_blob3_rand_10_demasiados.mat']);
+ub3_r20 = load([folder_1 'data_16_ref_uniform_blob3_rand_20.mat']);
+ub3_r30 = load([folder_1 'data_16_ref_uniform_blob3_rand_30.mat']);
+ub3_r40 = load([folder_1 'data_16_ref_uniform_blob3_rand_40.mat']);
 
-u2b_3_1_1 = load([folder 'data_16_ref_uniform_2blob_3_1_structure_1.mat']);
+u2b_3_1_1 = load([folder_1 'data_16_ref_uniform_2blob_3_1_structure_1.mat']);
 
-ub20_1 = load([folder 'data_16_ref_uniform_blob20_structure_1.mat']);
-ub20_h = load([folder 'data_16_ref_uniform_blob20_homog_structure.mat']);
+ub20_1 = load([folder_1 'data_16_ref_uniform_blob20_structure_1.mat']);
+ub20_h = load([folder_1 'data_16_ref_uniform_blob20_homog_structure.mat']);
 
-ub100_1 = load([folder 'data_16_ref_uniform_blob100_structure_1.mat']);
-ub100_2 = load([folder 'data_16_ref_uniform_blob100_structure_2.mat']);
-ub100_3 = load([folder 'data_16_ref_uniform_blob100_structure_3.mat']);
-ub100_h = load([folder 'data_16_ref_uniform_blob100_homog_structure.mat']);
+ub100_1 = load([folder_1 'data_16_ref_uniform_blob100_structure_1.mat']);
+ub100_2 = load([folder_1 'data_16_ref_uniform_blob100_structure_2.mat']);
+ub100_3 = load([folder_1 'data_16_ref_uniform_blob100_structure_3.mat']);
+ub100_h = load([folder_1 'data_16_ref_uniform_blob100_homog_structure.mat']);
 
-ub1000_1 = load([folder 'data_16_ref_uniform_blob1000_structure_1.mat']);
-ub1000_h = load([folder 'data_16_ref_uniform_blob1000_homog_structure']);
-
-ub10000_1 = load([folder 'data_16_ref_uniform_blob10000_structure_1.mat']);
+ub1000_1 = load([folder_1 'data_16_ref_uniform_blob1000_structure_1.mat']);
+ub1000_h = load([folder_1 'data_16_ref_uniform_blob1000_homog_structure']);
 
 
-u_h_f = load([folder 'data_16_ref_uniform_freq_homog_structure.mat']);
-u2b_h_f = load([folder 'data_16_ref_uniform_2blob_freq_homog_structure.mat']);
 
 
-load([folder 'array_16_ref.mat'])
+folder_1 = '~/Desktop/runs/inversion/data/';
+
+u_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_homogeneous.mat');
+u_h_5 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_5_uniform_homogeneous.mat');
+u_h_10 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_10_uniform_homogeneous.mat');
+u_h_20 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_20_uniform_homogeneous.mat');
+
+u1_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform1_homogeneous.mat');
+u2_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform2_homogeneous.mat');
+
+u1b_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_1gaussian_homogeneous.mat');
+u2b_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_2gaussian_homogeneous.mat');
+
+
+ 
+load([folder_1 'array_16_ref.mat'])
 n_ref = size(ref_stat,1);
 n_rec = size(array,1)-1;
 t = u_h.t;
 distances = zeros(n_ref*n_rec,1);
 first = zeros(n_ref*n_rec,length(t));
 second = zeros(n_ref*n_rec,length(t));
+
+
+% veldis = 'vel';
+veldis = 'dis';
+
+f_min = 0.19 - 0.005;
+f_max = 0.19 + 0.005;
+
+
 for i = 1:n_ref
        
     % each reference station will act as a source once
@@ -62,15 +82,33 @@ for i = 1:n_ref
     % calculate misfit
     indices = (i-1)*n_rec + 1 : i*n_rec;
     
-    veldis = 'vel';
-%     veldis = 'dis';
-    first(indices,:) = u_h_f.c_data( indices , : );
-    second(indices,:) = u2b_h_f.c_data( indices , : );
+    first(indices,:) = u2_h_0.c_data( indices , : );
+    second(indices,:) = u2b_h_0.c_data( indices , : );
     
-    [misfit( (i-1)*n_rec + 1 : i*n_rec, :),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
-%     [misfit( (i-1)*n_rec + 1 : i*n_rec, :),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);
-%     [misfit( (i-1)*n_rec + 1 : i*n_rec, :),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
-%     [misfit( (i-1)*n_rec + 1 : i*n_rec, :),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'waveform_difference', src, rec);
+    first_save = first;
+    second_save = second;
+    
+%     for j = 1:length(indices)
+%         first(indices(j),:)  = fliplr(butterworth_lp( fliplr(first(indices(j),:)), t, 5, f_max, 'silent'));
+%         first(indices(j),:)  = butterworth_lp( first(indices(j),:), t, 5, f_max, 'silent');
+%         
+%         first(indices(j),:)  = fliplr(butterworth_hp( fliplr(first(indices(j),:)), t, 3, f_min, 'silent'));
+%         first(indices(j),:)  = butterworth_hp( first(indices(j),:), t, 3, f_min, 'silent');
+%         
+%         second(indices(j),:) = fliplr(butterworth_lp( fliplr(second(indices(j),:)), t, 5, f_max, 'silent'));
+%         second(indices(j),:) = butterworth_lp( second(indices(j),:), t, 5, f_max, 'silent');
+%         
+%         second(indices(j),:) = fliplr(butterworth_hp( fliplr(second(indices(j),:)), t, 3, f_min, 'silent'));
+%         second(indices(j),:) = butterworth_hp( second(indices(j),:), t, 3, f_min, 'silent');
+%     end
+
+%     first(indices,:) = filter_data( first(indices,:), t, f_min, f_max );
+%     second(indices,:) = filter_data( second(indices,:), t, f_min, f_max );
+    
+    [misfit( (i-1)*n_rec + 1 : i*n_rec ), adjoint( (i-1)*n_rec + 1 : i*n_rec, :)] = misfits(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
+%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);
+%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
+%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = misfits(first(indices,:), second(indices,:), t, veldis, 'waveform_difference', src, rec);
     
 end
 
@@ -92,10 +130,11 @@ fprintf('%f\n',sum(abs(misfit),1))
 
 
 % % index = 165:180;
-% index = 1:n_ref*n_rec;
-% plot_recordings_all_windows(first(index,:),t,'vel','k',0,left(index),right(index));
-% % % plot_recordings_all_windows(second(index,:),t,'dis','r',0,left(index),right(index));
-% plot_recordings_all(second(index,:),t,'vel','r',0);
+index = 1:n_ref*n_rec;
+% plot_recordings_windows(first(index,:),t,veldis,'k',false,left(index),right(index));
+% plot_recordings_windows(second(index,:),t,veldis,'g',false,left(index),right(index));
+% plot_recordings(first_save(index,:),t,veldis,'b',true);
+% plot_recordings(second_save(index,:),t,veldis,'r',true);
 
 
 rmpath(genpath('../../'))

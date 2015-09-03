@@ -13,13 +13,13 @@ addpath(genpath('../'))
 
 
 %% set up model
-[Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
+[Lx,Lz,nx,nz,dt,nt,order,model_type,~,n_basis_fct] = input_parameters();
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 [width] = absorb_specs();
 
 
 %% get source and material
-[source_dist] = make_noise_source();
+[source_dist,spectrum] = make_noise_source();
 [mu,rho] = define_material_parameters(nx,nz,model_type);
 if(model_type==666)
     A = imread('../models/rand_10_demasiados.png');
@@ -133,7 +133,7 @@ parfor i = 1:n_ref
     
     % use mex-functions
     [G_2] = run_forward_green_fast_mex(mu, src);
-    [c_it(i,:,:), ~] = run_forward_correlation_fast_mex(G_2, source_dist, mu, rec, 0);
+    [c_it(i,:,:), ~] = run_forward_correlation_fast_mex(G_2, source_dist, spectrum, mu, rec, 0);
     
 end
 
@@ -155,7 +155,7 @@ end
 
 %% save array and data for inversion
 save( sprintf('../output/interferometry/array_%i_ref.mat',n_ref), 'array', 'ref_stat')
-save( sprintf('../output/interferometry/data_%i_ref.mat',n_ref), 'c_data', 't')
+save( sprintf('../output/interferometry/data_%i_ref_%i.mat',n_ref,n_basis_fct), 'c_data', 't')
 
 
 %% close matlabpool and clean up path

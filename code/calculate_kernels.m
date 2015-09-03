@@ -189,8 +189,7 @@ elseif( strcmp(type,'structure') )
         K_mu_all = K_mu_all + K_mu_1(:,:,i) + K_mu_2(:,:,i);        
         
         % plot kernels        
-        plot_noise_structure_kernels_test
-        % plot_noise_structure_kernels(X,Z,K_rho_all)
+        plot_noise_structure_kernels(X,Z,K_rho_all)
         
     end
     
