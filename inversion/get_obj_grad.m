@@ -87,7 +87,7 @@ function [f, g, c_all] = get_obj_grad(x)
     
     
     %- TEST FILTERING OF DATA --------------------------------------------- 
-    c_data = filter_data( c_data, t, f_min, f_max );
+    c_data = filter_correlations( c_data, t, f_min, f_max );
     %- END TEST FILTERING OF DATA -----------------------------------------
     
     
@@ -121,7 +121,7 @@ function [f, g, c_all] = get_obj_grad(x)
         
         
         %- TEST FILTERING OF DATA -----------------------------------------
-        c_it(i,:,:) = filter_data( reshape(c_it(i,:,:),[],nt), t, f_min, f_max );
+        c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, f_min, f_max );
         %- END TEST FILTERING OF DATA -------------------------------------
         
         

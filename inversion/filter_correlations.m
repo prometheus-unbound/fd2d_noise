@@ -1,5 +1,5 @@
 
-function [c_data] = filter_data(c_data,t,f_min,f_max)
+function [c_data] = filter_correlations(c_data,t,f_min,f_max)
     
     for i = 1:size(c_data,1)
         
