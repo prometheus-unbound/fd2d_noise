@@ -1,10 +1,10 @@
 
 addpath(genpath('../../'))
 
-% G_2, C_2, C_2_dxv, C_2_dzv
+% G_2, C_2_dxv, C_2_dzv
 i1 = coder.typeof(complex(zeros(2,2,2)),[inf,inf,inf],1);
 
-% mu, adstf
+% mu, adstf, spectrum
 i2 = coder.typeof(zeros(2,2),[inf,inf],1);
 
 % src, rec
@@ -20,14 +20,11 @@ i5 = coder.typeof(zeros(2,2,2),[inf,inf,inf],1);
 % run_forward_green_fast(mu,src)
 codegen run_forward_green_fast.m -args {i2,i3}
 
-% run_forward_correlation_fast(G_2, source_dist, mu, rec)
-codegen run_forward_correlation_fast.m -args {i1,i5,i2,i3,i4}
+% run_forward_correlation_fast(G_2, source_dist, spectrum, mu, rec)
+codegen run_forward_correlation_fast.m -args {i1,i5,i2,i2,i3,i4}
 
 % run_noise_source_kernel_fast(G_2,mu,stf,adsrc)
 codegen run_noise_source_kernel_fast.m -args {i1,i2,i2,i3}
-
-% run_noise_structure_kernel_fast(C_2, C_2_dxv, C_2_dzv, mu, stf, adsrc)
-codegen run_noise_structure_kernel_fast.m -args {i1,i1,i1,i2,i2,i3}
 
 % run_noise_mu_kernel_fast(C_2_dxv, C_2_dzv, mu, stf, adsrc)
 codegen run_noise_mu_kernel_fast.m -args {i1,i1,i2,i2,i3}
