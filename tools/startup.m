@@ -5,3 +5,5 @@ addpath(genpath('../inversion'))
 addpath(genpath('../models'))
 addpath(genpath('../output'))
 addpath(genpath('../tools'))
+
+rmpath(genpath('../tools/compare_influence'))

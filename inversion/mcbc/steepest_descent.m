@@ -30,13 +30,15 @@ theta=0.6;
 sig = 1;
 
 xj=x0;
-[f,g]=feval(fg,xj);
+[f,g,c]=feval(fg,xj);
 s=g;
 nmg0=norm(g);
 nmg=nmg0;
-it=0;
 
 % main loop
+it=0;
+save(sprintf('models/model_%i.mat',it),'x0','g','c')
+
 while (norm(g)>tol*max(0,nmg0))
  it=it+1;
  
@@ -56,7 +58,7 @@ while (norm(g)>tol*max(0,nmg0))
  %%%% xn=xj-sig*s;
  
  fprintf(1,'it=%3.d   f=%e   ||g||=%e  ||g||/||g0||=%e  sig=%5.3f\n',it,f,norm(g),norm(g)/nmg0,sig);
- save(sprintf('model_%i.mat',it),'xn','gn','cn')
+ save(sprintf('models/model_%i.mat',it),'xn','gn','cn')
  
  xj=xn;
  

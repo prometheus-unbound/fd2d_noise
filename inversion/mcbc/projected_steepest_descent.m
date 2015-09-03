@@ -33,12 +33,11 @@ verbose = true;
 
 xj=project_model(x0, xl, xu);
 
-[f,g]=feval(fg,xj);
+[f,g,c]=feval(fg,xj);
 s=g;
 gp = project_gradient(g, xj, xl, xu);
 nmg0=norm(gp);
 nmg=nmg0;
-it=0;
 
 if (verbose)
    norm(max(xl-xj,0) + max(xj-xu,0) ) 
@@ -49,7 +48,10 @@ if (verbose)
 %    find(xj==xu)
 end
 
+
 % main loop
+it=0;
+save(sprintf('models/model_%i.mat',it),'xj','g','c')
 
 while (nmg>tol*max(0,nmg0))
  it=it+1;
@@ -63,7 +65,7 @@ while (nmg>tol*max(0,nmg0))
  %%%% xn=xj-sig*s;
  
  fprintf(1,'it=%3.d   f=%e   ||g||=%e  ||g||/||g0||=%e  sig=%5.3f\n',it,f,nmg,nmg/nmg0,sig);
- save(sprintf('model_%i.mat',it),'xn','gn','cn')
+ save(sprintf('models/model_%i.mat',it),'xn','gn','cn')
  
  xj=xn;
  

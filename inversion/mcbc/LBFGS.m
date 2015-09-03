@@ -1,4 +1,4 @@
-function [xn]=LBFGS(x0,fg,tol,lmax)
+function [xn,cn] = LBFGS(x0,fg,tol,lmax)
 %
 %
 % S. Ulbrich, F. Kruse, C. Boehm, 2012
@@ -37,7 +37,7 @@ l=0;
 gak=1;
 
 xj=x0;
-[f,g]=feval(fg,xj);
+[f,g,c]=feval(fg,xj);
 nmg0=norm(g);
 nmg=nmg0;
 it=0;
@@ -46,6 +46,9 @@ l=0;
 ln=1;
 
 % main loop
+
+save(sprintf('models/model_%i.mat',it),'xj','g','c')
+
 % while (norm(g)>tol*max(1,nmg0))
 while (norm(g)>tol*max(0,nmg0))
  it=it+1;
@@ -89,11 +92,11 @@ while (norm(g)>tol*max(0,nmg0))
 %xj
 %s
 %g
- [sig,xn,fn,gn]=stepsize_wolfe(xj,s,stg,fg,f,del,theta,sig);
+ [sig,xn,fn,gn,cn]=stepsize_wolfe(xj,s,stg,fg,f,del,theta,sig);
  % xn=xj-sig*s;
 
- fprintf(1,'it=%3.d   f=%e   ||g||=%e   sig=%6.5f   step=%s\n',it,f,norm(g),sig,step);
- save(sprintf('model_%i.mat',it),'xn','gn')
+ fprintf(1,'it=%3.d   f=%e   ||g||=%e  ||g||/||g0||=%e  sig=%5.3f   step=%s\n',it,f,nmg,nmg/nmg0,sig,step);
+ save(sprintf('models/model_%i.mat',it),'xn','gn','cn')
  % [fn,gn]=feval(fg,xn);
 %xn
 %gn
