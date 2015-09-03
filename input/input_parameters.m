@@ -32,8 +32,8 @@ order=4;            % finite-difference order (2 or 4)
 % model type
 %==========================================================================
 
-% model_type = 1;
-model_type = 999;
+model_type = 1;
+% model_type = 999;
 
 % 1=homogeneous 
 % 2=homogeneous with localised density perturbation
@@ -54,5 +54,5 @@ source_type = 'homogeneous';
 % source_type = 'gaussian';
 
 % number of frequency bands
-n_basis_fct = 0;
+n_basis_fct = 10;
 

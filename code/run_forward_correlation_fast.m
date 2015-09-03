@@ -1,4 +1,4 @@
-function [displacement_seismograms,t,C_2_dxv,C_2_dzv] = run_forward_correlation_fast(G_2, source_dist, mu, rec, mode)
+function [displacement_seismograms,t,C_2_dxv,C_2_dzv] = run_forward_correlation_fast(G_2, source_dist, noise_spectrum, mu, rec, mode)
 
 %==========================================================================
 % run forward correlation
@@ -39,7 +39,19 @@ mu = reshape(mu, nx, nz);
 
 
 % reshape source distribution ---------------------------------------------
-noise_source_distribution = reshape(source_dist, nx, nz, n_sample);
+n_noise_sources = size(noise_spectrum,2);
+
+if( n_basis_fct == 0 )
+    noise_source_distribution = reshape(source_dist, nx, nz, n_noise_sources);
+else
+    noise_source_distribution = reshape(source_dist, nx, nz, n_basis_fct);
+end
+
+
+% get integration boundaries for frequency bands -------------------------- 
+if( n_basis_fct ~= 0 )
+    [int_limits] = integration_limits(n_sample,n_basis_fct);
+end
 
 
 %- compute indices for receiver locations ---------------------------------
@@ -86,7 +98,6 @@ szy = zeros(nx,nz-1);
 
 
 %- initialise seismograms -------------------------------------------------
-displacement_seismograms = zeros(n_receivers,nt);
 velocity_seismograms = zeros(n_receivers,nt);
 
 
@@ -110,7 +121,7 @@ for n = 1:length(t)
         
         
         %- transform on the fly to the time domain        
-        S = zeros(nx,nz) + 1i*zeros(nx,nz);
+        S = zeros(nx,nz,n_noise_sources) + 1i*zeros(nx,nz,n_noise_sources);
         
         
 %         % noise source for coupled spectra and distributions
@@ -124,12 +135,32 @@ for n = 1:length(t)
 %             
 %         end
         
-           
-        for k = 1:n_sample
-            S(:,:) = S(:,:) + noise_source_distribution(:,:,k) .* G_2(:,:,k) * ifft_coeff(n,k);
-        end
+
+%         % general source version  
+%         for k = 1:n_sample
+%             S(:,:) = S(:,:) + noise_source_distribution(:,:,k) .* G_2(:,:,k) * ifft_coeff(n,k);
+%         end
+%         DS = DS + real(S);
         
-        DS = DS + real(S);
+        
+        % nicer implementation
+        for ns = 1:n_noise_sources
+            
+            for k = 1:n_sample
+                
+                if( n_basis_fct ~= 0 )
+                    ib = find( k >= int_limits(:,1) & k <= int_limits(:,2) );
+                else
+                    ib = ns;
+                end
+                
+                S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * noise_source_distribution(:,:,ib) .* G_2(:,:,k) * ifft_coeff(n,k);
+                
+            end
+            
+            DS = DS + real(S(:,:,ns));
+            
+        end
         
     end
     

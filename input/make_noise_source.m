@@ -1,5 +1,5 @@
 
-function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
+function [noise_source_distribution,noise_spectrum] = make_noise_source(make_plots)
 
     % define make_plots if not specified
     if( nargin < 1 )
@@ -18,15 +18,15 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
     % user input
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    n_noise_sources = 1;
+    n_noise_sources = 2;
     
     
     %- specify spectrum ---------------------------------------------------
     
     % two overlapping spectra
-%     f_peak = [1/11, 1/7];
-%     bandwidth = [0.035, 0.025];
-%     strength = [1, 0.7];
+    f_peak = [1/11, 1/7];
+    bandwidth = [0.035, 0.025];
+    strength = [1, 0.7];
 
 %     % narrow non-overlapping spectra
 %     f_peak = [1/15, 1/7];
@@ -34,9 +34,9 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
 %     strength = [1, 0.7];
 
 %     % one simple source
-    f_peak = 0.125;
-    bandwidth = 0.03;
-    strength = 1;
+%     f_peak = 0.125;
+%     bandwidth = 0.03;
+%     strength = 1;
     
     
     %- different source types --------------------------------------------- 
@@ -90,22 +90,22 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
     for ns = 1:n_noise_sources
         noise_spectrum(:,ns) = strength(ns) * exp( -(abs(f_sample)-f_peak(ns)).^2 / bandwidth(ns)^2 );
         
-%         if ( strcmp(make_plots,'yes') )
-%             if(ns==1)
-%                 figure
-%                 set(gca,'FontSize',12)
-%                 hold on
-%                 grid on
-%                 cstring = [];
-%             end
-%             
-%             plot(f_sample,noise_spectrum(:,ns),'Color',cmap(ns,:))
-%             cstring{end+1} = ['source ' num2str(ns)];
-%             xlabel('frequency [Hz]');
-%             legend(cstring)
-%             
-%             xlim([f_sample(1) f_sample(end)])
-%         end
+        if ( strcmp(make_plots,'yes') )
+            if(ns==1)
+                figure
+                set(gca,'FontSize',12)
+                hold on
+                grid on
+                cstring = [];
+            end
+            
+            plot(f_sample,noise_spectrum(:,ns),'Color',cmap(ns,:))
+            cstring{end+1} = ['source ' num2str(ns)];
+            xlabel('frequency [Hz]');
+            legend(cstring)
+            
+            xlim([f_sample(1) f_sample(end)])
+        end
         
     end
     
@@ -166,7 +166,10 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
     % run_forward
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    [noise_source_distribution] = general_source( noise_spectrum, noise_source_distribution );
+    if( n_basis_fct ~= 0 )
+        [noise_source_distribution] = general_source( noise_spectrum, noise_source_distribution );
+        noise_spectrum = ones(n_sample,1);
+    end
     
     
     
@@ -222,9 +225,9 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
             
             int_limits = integration_limits(n_sample,n_basis_fct);
             
-            for ib = 8%1:n_basis_fct
+            for ib = 1:n_basis_fct
                 
-                noise_dist_basis = noise_source_distribution(:,:,int_limits(ib,1));
+                noise_dist_basis = noise_source_distribution(:,:,ib);
                 h(ib) = mesh(X, Z, ib*fudge_factor + noise_dist_basis' );
                 set(h(ib),'CData',noise_dist_basis');
                 
@@ -241,17 +244,16 @@ function [noise_source_distribution,c_lim] = make_noise_source(make_plots)
             colormap(cm_psd)
             colorbar
             
-            view([0 90])
+            view([22 4])
             zlim([0 fudge_factor*(n_basis_fct+1)])
             set(gca,'ZTick',[])
             zlabel('frequency bands')
             
         end
         
-%         load('~/Desktop/runs/inversion/data/array_16_ref.mat')
-%         plot(array(:,1),array(:,2),'ko')
+        % load('~/Desktop/runs/inversion/data/array_16_ref.mat')
+        % plot(array(:,1),array(:,2),'ko')        
         
-        c_lim = get(gca,'CLim');
         shading interp
         grid on
         box on

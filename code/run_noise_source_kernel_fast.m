@@ -32,7 +32,6 @@ mu = reshape(mu,nx,nz);
 
 %- time axis --------------------------------------------------------------    
 t = -(nt-1)*dt:dt:(nt-1)*dt;
-nt = length(t);
     
 
 %- compute indices for adjoint source locations ---------------------------

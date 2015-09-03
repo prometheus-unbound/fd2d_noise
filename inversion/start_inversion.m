@@ -1,16 +1,19 @@
 
+global type;
+global v0;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% mode = 'local'
+% mode = 'local';
 mode = 'monch';
 % mode = 'euler';
 % mode = 'brutus';
 
-% type = 'source';
+type = 'source';
 % type = 'source_constrained';
-type = 'structure';
+% type = 'structure'; v0=4000;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -58,29 +61,33 @@ end
 
 % run source inversion
 if( strcmp(type,'source') )
-    % x0 = ones(nx*nz*n_sample,1);
+    
     x0 = make_noise_source();
     x0 = reshape(x0,[],1);
     
-    [x,c_final] = steepest_descent(x0,'get_obj_grad',0.05,0);
+    % [x,c_final] = steepest_descent(x0,'get_obj_grad',0.05,0);
+    [x,c_final] = LBFGS(x0,'get_obj_grad',0.001,5);
 
 % run source inversion with lower and upper bounds
 elseif( strcmp(type,'source_constrained') )
-    % x0 = ones(nx*nz*n_sample,1);
+    
+    type = 'source';
+    
     x0 = make_noise_source();
     x0 = reshape(x0,[],1);
     
-    xl = zeros(nx*nz*n_sample,1);
-    xu = inf(nx*nz*n_sample,1);
+    xl = 0 * x0;
+    xu = inf * x0;
     
     [x,c_final] = projected_steepest_descent(x0,xl,xu,'get_obj_grad',0.05,0);
 
 % run structure inversion
 elseif( strcmp(type,'structure') )
+    
     x0 = zeros(nx*nz, 1);
-    % [x] = LBFGS(x0,'get_obj_grad',0.05,5);
     [x,c_final] = steepest_descent(x0,'get_obj_grad',0.05,0);
-    x = 4.8e10 * ( 1 + x );
+    x =v0 * ( 1 + x );
+    
 end
 
 

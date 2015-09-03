@@ -1,3 +1,4 @@
+
 %- compute source-time function -------------------------------------------
 
 if strcmp(simulation_mode,'forward_green')
@@ -19,6 +20,7 @@ else
     stf = butterworth_hp(stf,t,3,f_min,'silent');
     
 end
+
 
 %- plot -------------------------------------------------------------------
 

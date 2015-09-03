@@ -173,6 +173,7 @@ end
 %- accumulate kernel by looping over frequency
 K_rho = zeros(nx,nz) + 1i*zeros(nx,nz);
 K_mu = zeros(nx,nz) + 1i*zeros(nx,nz);
+
 for k=1:n_sample
     K_rho = K_rho - G_1(:,:,k) .* C_2(:,:,k) * dw;
     

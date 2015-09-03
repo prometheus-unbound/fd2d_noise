@@ -33,7 +33,6 @@ mu = reshape(mu,nx,nz);
 
 %- time axis -------------------------------------------------------------- 
 t = -(nt-1)*dt:dt:(nt-1)*dt;
-nt = length(t);
 
 
 %- reverse adjoint source time function -----------------------------------
@@ -70,7 +69,7 @@ szy = zeros(nx,nz-1);
 % iterate
 %==========================================================================
 
-for n=1:length(t)
+for n = 1:length(t)
     
     %- compute divergence of current stress tensor ------------------------    
     DS = div_s(sxy,szy,dx,dz,nx,nz,order);
