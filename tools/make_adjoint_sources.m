@@ -99,7 +99,7 @@ for n=1:n_receivers
     ylabel('displacement [m]')
    
     
-    %- select time windows and taper seismograms --------------------------   
+    %- select time windows ------------------------------------------------   
     % disp('select left window');
     % [left,~] = ginput(1)
     % disp('select_right_window');
@@ -125,46 +125,42 @@ for n=1:n_receivers
 
     end
 
-    width = t(end)/10;
-    u_sel = taper(u(n,:),t,left,right,width);
-    u_0_sel = taper(u_0(n,:),t,left,right,width);
+    
+    win = get_window(t,left,right,'cos_taper');
     
     
     %- compute misfit and adjoint source time function --------------------    
     if strcmp(measurement,'waveform_difference')
-        [misfit_n,adstf(n,:)] = waveform_difference(u_sel,u_0_sel,t);
         
-    elseif strcmp(measurement,'cc_time_shift')
-        [misfit_n_caus,adstf_caus(1,:)] = cc_time_shift(u_sel,u_0_sel,t);
+        [misfit_n,adstf(n,:)] = waveform_difference(u(n,:),u_0(n,:),win,t);
         
-        tmp = left;
-        left = -right;
-        right = -tmp;
-        clear tmp;
         
-        u_sel = taper(u(n,:),t,left,right,width);
-        u_0_sel = taper(u_0(n,:),t,left,right,width);
+    elseif strcmp(measurement,'cc_time_shift') 
         
-        [misfit_n_acaus,adstf_acaus(1,:)] = cc_time_shift(u_sel,u_0_sel,t);
+        [misfit_n_caus,adstf_caus(1,:)] = cc_time_shift(u(n,:),u_0(n,:),win,t);
+        
+        [left,right] = swap(-left,-right);
+        win = get_window(t,left,right,'cos_taper');       
+        [misfit_n_acaus,adstf_acaus(1,:)] = cc_time_shift(u(n,:),u_0(n,:),win,t);
+        
         misfit_n = misfit_n_caus + misfit_n_acaus;
         adstf(n,:) = adstf_caus + adstf_acaus;
         
-    elseif strcmp(measurement,'amplitude_difference')        
-        [misfit_n_caus,adstf_caus(1,:)] = amp_diff(u_sel,u_0_sel,t);
         
-        tmp = left;
-        left = -right;
-        right = -tmp;
-        clear tmp;
+    elseif strcmp(measurement,'amplitude_difference')       
         
-        u_sel = taper(u(n,:),t,left,right,width);
-        u_0_sel = taper(u_0(n,:),t,left,right,width);
+        [misfit_n_caus,adstf_caus(1,:)] = amp_diff(u(n,:),u_0(n,:),win,t);
         
-        [misfit_n_acaus,adstf_acaus(1,:)] = amp_diff(u_sel,u_0_sel,t);
+        [left,right] = swap(-left,-right);
+        win = get_window(t,left,right,'cos_taper');       
+        [misfit_n_acaus,adstf_acaus(1,:)] = amp_diff(u(n,:),u_0(n,:),win,t);
+        
         misfit_n = misfit_n_caus + misfit_n_acaus;
         adstf(n,:) = adstf_caus + adstf_acaus;
         
-    elseif strcmp(measurement,'log_amplitude_ratio')
+        
+    elseif strcmp(measurement,'log_amplitude_ratio')    
+        
         win = get_window(t,left,right,'hann');
         [misfit_n,adstf(n,:)] = log_amp_ratio(u(n,:),u_0(n,:),win,t);
         
