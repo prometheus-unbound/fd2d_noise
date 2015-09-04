@@ -57,11 +57,7 @@ while (norm(g)>tol*max(0,nmg0))
    return
  end
  
- if(it==1)
-     sig = 16;
- else
-     sig=1;
- end
+ sig = 1;
  
 % compute BFGS-step s=B*g;
  q=g;
