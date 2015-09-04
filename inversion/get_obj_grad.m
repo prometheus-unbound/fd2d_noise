@@ -15,21 +15,21 @@ function [f, g, c_all] = get_obj_grad(x)
     % (for NOW: use 'dis')
     veldis = 'dis';
     
-    % frequency band
-    f_min = 0.19 - 0.005;
-    f_max = 0.19 + 0.005;
+    % filter correlations for inversion; if yes, specify f_min and f_max
+    apply_filter = 'yes';
+    f_min = 1/7 - 0.005;
+    f_max = 1/7 + 0.005;
     
     % load array with reference stations and data
     load('../output/interferometry/array_16_ref.mat');
     load('../output/interferometry/data_16_ref_0_uniform_2gaussian_homogeneous.mat');
     
-    % design filter for smoothing of kernel
-    % myfilter = fspecial('gaussian',[40 40], 20);
+    % specify percentile for clipping of kernel      ( = 0 to turn it off )
+    percentile = 0;                                 
+    
+    % desing gaussian filter for smoothing of kernel ( = 0 to turn it off )
+    % myfilter = 0;
     myfilter = fspecial('gaussian',[75 75], 30);
-    % myfilter = fspecial('gaussian',[100 100], 40);
-        
-    % save correlations of each run of get_obj_grad.m
-    save_correlations = 'no';
     
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -85,12 +85,6 @@ function [f, g, c_all] = get_obj_grad(x)
     c_it = zeros(n_ref,n_rec,nt);
     
     
-    
-    %- TEST FILTERING OF DATA --------------------------------------------- 
-    c_data = filter_correlations( c_data, t, f_min, f_max );
-    %- END TEST FILTERING OF DATA -----------------------------------------
-    
-    
     parfor i = 1:n_ref
         
         
@@ -120,22 +114,23 @@ function [f, g, c_all] = get_obj_grad(x)
         end
         
         
-        %- TEST FILTERING OF DATA -----------------------------------------
-        c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, f_min, f_max );
-        %- END TEST FILTERING OF DATA -------------------------------------
+        % filter correlations if wanted
+        if( strcmp(apply_filter,'yes') )
+            c_data_iref = filter_correlations( c_data( (i-1)*n_rec + 1 : i*n_rec, : ), t, f_min, f_max );
+            c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, f_min, f_max );
+        end
         
         
         % calculate misfit and adjoint source function
-        indices = (i-1)*n_rec + 1 : i*n_rec; 
         switch measurement
             case 1
-                [f_n,adstf] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data(indices,:), t, veldis, 'log_amplitude_ratio', src, rec );
+                [f_n,adstf] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data_iref, t, veldis, 'log_amplitude_ratio', src, rec );
             case 2
-                [f_n,adstf] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data(indices,:), t, veldis, 'amplitude_difference', src, rec );
+                [f_n,adstf] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data_iref, t, veldis, 'amplitude_difference', src, rec );
             case 3
-                [f_n,adstf] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data(indices,:), t, veldis, 'waveform_difference', src, rec );
+                [f_n,adstf] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data_iref, t, veldis, 'waveform_difference', src, rec );
             case 4
-                [f_n,adstf] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data(indices,:), t, veldis, 'cc_time_shift', src, rec );
+                [f_n,adstf] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data_iref, t, veldis, 'cc_time_shift', src, rec );
             otherwise
                 error('\nspecify correct measurement!\n\n')
         end
@@ -172,22 +167,14 @@ function [f, g, c_all] = get_obj_grad(x)
     end
     
     
-    %- save correlations for monitoring progress
-    if( strcmp( save_correlations, 'yes' ))
-        time = datetime;
-        formatOut = 'YYYY-MM-dd-HH-mm-ss';
-        save(['correlations/' datestr(time,formatOut,'local') '.mat'],'c_all','t')
-    end
-    
-    
-    %- sum frequencies of source kernel
+    %- sum source kernel (all frequencies or in frequency bands)
     if( strcmp(type,'source') )
-        K_all = sum_source_kernel( K_all );
+        K_all = sum_source_kernel(K_all);
     end
     
     
-    %- smooth final kernel
-    K_all = imfilter( K_all, myfilter, 'replicate' );
+    %- kernel treatment, i.e. clipping/smoothing
+    K_all = treat_kernel( K_all, type, myfilter, percentile );
     
     
     %- reshape kernel to column vector 
