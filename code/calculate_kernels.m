@@ -85,11 +85,11 @@ if (strcmp(make_plots,'yes'))
     figure
     hold on
     if( strcmp(data_independent,'yes') )
-        h(1,:) = plot_recordings_all(c_uniform,t,'vel','r-',0);
+        h(1,:) = plot_recordings(c_uniform,t,'vel','r-',true);
         legend(h,'uniform')
     else
-        h(1,:) = plot_recordings_all(c_data,t,'vel','k-',0);
-        h(2,:) = plot_recordings_all(c_uniform,t,'vel','r-',0);
+        h(1,:) = plot_recordings(c_data,t,'vel','k-',true);
+        h(2,:) = plot_recordings(c_uniform,t,'vel','r-',true);
         legend(h,'data','uniform')
     end
     drawnow
