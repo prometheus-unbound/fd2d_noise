@@ -44,7 +44,7 @@ for i = 1:nr_x
         array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
         
-%         array( (i-1)*nr_x + j, 1 ) = 1.5e5 + ( i-1 )*0.4e5;
+%         array( (i-1)*nr_x + j, 1 ) = 2.0e5 + ( i-1 )*0.4e5;
 %         array( (i-1)*nr_z + j, 2 ) = 1.5e5 + ( j-1 )*0.4e5;
     end
 end
@@ -68,42 +68,15 @@ if( strcmp(make_plots,'yes') )
     xlim([0 Lx])
     ylim([0 Lz])
     drawnow
-
+    
     plot_model
 end
 
 
 %% start matlabpool and set up path
-if( strcmp(mode,'monch') )
+if( ~strcmp(mode,'local') )
     addpath(genpath('../'))
-    
-    jobid = getenv('SLURM_JOB_ID');
-    mkdir(jobid);
-    cluster = parallel.cluster.Generic('JobStorageLocation', jobid);
-    set(cluster, 'HasSharedFilesystem', true);
-    set(cluster, 'ClusterMatlabRoot', '/apps/common/matlab/r2015a/');
-    set(cluster, 'OperatingSystem', 'unix');
-    set(cluster, 'IndependentSubmitFcn', @independentSubmitFcn);
-    set(cluster, 'CommunicatingSubmitFcn', @communicatingSubmitFcn);
-    set(cluster, 'GetJobStateFcn', @getJobStateFcn);
-    set(cluster, 'DeleteJobFcn', @deleteJobFcn);
-
-    parobj = parpool(cluster,16);
-    
-elseif( strcmp(mode,'euler') || strcmp(mode,'brutus') )
-    addpath(genpath('../'))
-    if( strcmp(mode,'euler') )
-        cluster = parcluster('EulerLSF8h');
-    elseif( strcmp(mode,'brutus') )
-        cluster = parcluster('BrutusLSF8h');
-    end
-        
-    jobid = getenv('LSB_JOBID');
-    mkdir(jobid);
-    cluster.JobStorageLocation = jobid;
-    cluster.SubmitArguments = '-W 12:00 -R "rusage[mem=3072]"';
-    parobj = parpool(cluster,16);
-    
+    parobj = start_cluster(mode,'',16);
 end
 
 
@@ -148,7 +121,7 @@ end
 %% plot data
 if( strcmp(make_plots,'yes') )
     figure
-    plot_recordings_all(c_data,t,'vel','k-',0);
+    plot_recordings(c_data,t,'vel','k-',true);
     legend('data')
 end
 

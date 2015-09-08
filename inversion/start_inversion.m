@@ -21,42 +21,10 @@ type = 'source';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % start matlabpool and set up path
-if( strcmp(mode,'monch') )
+if( ~strcmp(mode,'local') )
     addpath(genpath('../'))
-    
-    jobid = getenv('SLURM_JOB_ID');
-    mkdir(jobid);
-    cluster = parallel.cluster.Generic('JobStorageLocation', jobid);
-    set(cluster, 'HasSharedFilesystem', true);
-    set(cluster, 'ClusterMatlabRoot', '/apps/common/matlab/r2015a/');
-    set(cluster, 'OperatingSystem', 'unix');
-    set(cluster, 'IndependentSubmitFcn', @independentSubmitFcn);
-    set(cluster, 'CommunicatingSubmitFcn', @communicatingSubmitFcn);
-    set(cluster, 'GetJobStateFcn', @getJobStateFcn);
-    set(cluster, 'DeleteJobFcn', @deleteJobFcn);
-
-    parobj = parpool(cluster,16);
-    
-elseif( strcmp(mode,'euler') || strcmp(mode,'brutus') )
-    addpath(genpath('../'))
-    if( strcmp(mode,'euler') )
-        cluster = parcluster('EulerLSF8h');
-    elseif( strcmp(mode,'brutus') )
-        cluster = parcluster('BrutusLSF8h');
-    end
-        
-    jobid = getenv('LSB_JOBID');
-    mkdir(jobid);
-    cluster.JobStorageLocation = jobid;
-    cluster.SubmitArguments = '-W 12:00 -R "rusage[mem=3072]"';
-    parobj = parpool(cluster,16);
-    
+    parobj = start_cluster(mode,'',16);
 end
-
-
-% get model dimensions
-[~,~,nx,nz] = input_parameters();
-[~,n_sample] = input_interferometry();
 
 
 % run source inversion
@@ -84,7 +52,9 @@ elseif( strcmp(type,'source_constrained') )
 % run structure inversion
 elseif( strcmp(type,'structure') )
     
+    [~,~,nx,nz] = input_parameters();
     x0 = zeros(nx*nz, 1);
+    
     [x,c_final] = steepest_descent(x0,'get_obj_grad',0.05,0);
     x =v0 * ( 1 + x );
     
