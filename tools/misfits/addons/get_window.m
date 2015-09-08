@@ -1,9 +1,14 @@
 
 function win = get_window(t, t_min, t_max, type)
-
-    win = ones(1,length(t));
-
-
+    
+    % initialization
+    win = ones(1,length(t)); 
+    if(t_min > t_max)
+        [t_min,t_max] = swap(t_min,t_max);
+    end
+    
+    
+    % calculate window
     if strcmp(type,'box')
 
         win = win .* (t>t_min) .* (t<t_max);

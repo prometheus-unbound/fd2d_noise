@@ -13,9 +13,6 @@ function [f_sample,n_sample,w_sample,dw] = input_interferometry()
 
 %- It is sufficient to consider the positive frequency axis. 
 
-% f_sample=0.05:0.004:0.2;
-% f_sample=0.05:0.002:0.2;
-
 f_sample=0.02:0.002:0.2;
 
 n_sample = length(f_sample);
