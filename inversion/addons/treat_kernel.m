@@ -3,7 +3,7 @@ function [K] = treat_kernel(K_raw,type,myfilter,percentile)
     
 
     [~,~,~,~,~,~,~,~,~,n_basis_fct] = input_parameters();
-    
+    K = K_raw;
     
     %% clip kernel if desired
     if( percentile ~= 0 )
@@ -12,7 +12,6 @@ function [K] = treat_kernel(K_raw,type,myfilter,percentile)
             n_basis_fct = 1;
         end
         
-        K = K_raw;
         clip_value = zeros(1,n_basis_fct);
         for k = 1:n_basis_fct
         
