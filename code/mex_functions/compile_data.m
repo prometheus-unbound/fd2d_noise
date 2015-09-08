@@ -1,6 +1,7 @@
 
 addpath(genpath('../../'))
 
+
 % G_2, C_2, C_2_dxv, C_2_dzv
 i1 = coder.typeof(complex(zeros(2,2,2)),[inf,inf,inf],1);
 
@@ -24,8 +25,3 @@ codegen run_forward_correlation_fast.m -args {i1,i5,i2,i2,i3,i4}
 
 
 rmpath(genpath('../../'))
-clear i1
-clear i2
-clear i3
-clear i4
-clear i5

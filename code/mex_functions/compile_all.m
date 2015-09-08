@@ -1,6 +1,7 @@
 
 addpath(genpath('../../'))
 
+
 % G_2, C_2_dxv, C_2_dzv
 i1 = coder.typeof(complex(zeros(2,2,2)),[inf,inf,inf],1);
 
@@ -29,9 +30,5 @@ codegen run_noise_source_kernel_fast.m -args {i1,i2,i2,i3}
 % run_noise_mu_kernel_fast(C_2_dxv, C_2_dzv, mu, stf, adsrc)
 codegen run_noise_mu_kernel_fast.m -args {i1,i1,i2,i2,i3}
 
+
 rmpath(genpath('../../'))
-clear i1
-clear i2
-clear i3
-clear i4
-clear i5
