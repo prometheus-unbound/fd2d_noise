@@ -1,8 +1,8 @@
-% plot_recordings_all(u,t,veldis,color,a)
+% plot_recordings(u,t,veldis,color,normalize)
 %
 % u: displacement recordings
 % t: time axis
-% mode: 'dis' for displacement, 'vel' for velocity
+% veldis: 'dis' for displacement, 'vel' for velocity
 % color
 % normalize, true or false
 

@@ -1,3 +1,12 @@
+% plot_recordings_windows(u,t,veldis,color,normalize,left,right)
+%
+% u: displacement recordings
+% t: time axis
+% veldis: 'dis' for displacement, 'vel' for velocity
+% color
+% normalize: true or false
+% left: time of left border of window
+% rigth: time of right border of window
 
 function plot_recordings_windows(u,t,veldis,color,normalize,left,right)
 
@@ -42,10 +51,7 @@ for k=1:size(u,1)
     plot([left(k,1) left(k,1)], [spacing*(k-2+a)+0.5 spacing*(k+a)-0.5],'b--')
     plot([right(k,1) right(k,1)], [spacing*(k-2+a)+0.5 spacing*(k+a)-0.5],'b--')
     
-    tmp = left;
-    left = -right;
-    right = -tmp;
-    clear tmp;
+    [left,right] = swap(left,right);
     
     plot([left(k,1) left(k,1)], [spacing*(k-2+a)+0.5 spacing*(k+a)-0.5],'b--')
     plot([right(k,1) right(k,1)], [spacing*(k-2+a)+0.5 spacing*(k+a)-0.5],'b--')
