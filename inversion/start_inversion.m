@@ -8,6 +8,7 @@ usr_par.cluster = 'monch';
 % 'euler';
 % 'brutus';
 
+
 usr_par.type = 'source';
 % 'source_constrained';
 % 'structure';
@@ -27,25 +28,32 @@ usr_par.measurement = 'log_amplitude_ratio';
 % 'waveform_difference';
 % 'cc_time_shift';
 
+
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')
 usr_par.veldis = 'dis';
+
 
 % filter correlations for inversion; if yes, specify f_min and f_max
 usr_par.filter.apply_filter = 'no';
 usr_par.filter.f_min = 1/11 - 0.005;
 usr_par.filter.f_max = 1/11 + 0.005;
 
+
 % load array with reference stations and data
 usr_par.network = load('../output/interferometry/array_16_ref.mat');
 usr_par.data = load('../output/interferometry/data_16_ref_0.mat');
 
+
 % specify percentile for clipping of kernel      ( = 0 to turn it off )
 usr_par.kernel.percentile = 0;
+
 
 % desing gaussian filter for smoothing of kernel ( = 0 to turn it off )
 % usr_par.kernel.smoothing = 0;
 usr_par.kernel.smoothing = fspecial('gaussian',[75 75], 30);
 
+
+% debug mode
 usr_par.debug.switch = 'no';
 usr_par.debug.df = 0;
 
@@ -56,7 +64,7 @@ usr_par.debug.df = 0;
 
 options.tolerance = 1e-3;
 options.max_iterations = 1000;
-options.init_step_length = 8192.0; 
+options.init_step_length = 1.0; 
 options.wolfe_try_to_increase_step_length = true;
 options.verbose = true;
 
@@ -82,10 +90,11 @@ if( strcmp( usr_par.type, 'source' ) )
     
     [flag, mfinal, usr_par] = optlib_lbfgs(m0, options, usr_par);
 
+    
 % run source inversion with lower and upper bounds
 elseif( strcmp( usr_par.type, 'source_constrained' ) )
     
-    type = 'source';
+    usr_par.type = 'source';
     
     m0 = make_noise_source();
     m0 = reshape(m0,[],1);

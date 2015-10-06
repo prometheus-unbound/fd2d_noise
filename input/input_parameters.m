@@ -50,8 +50,8 @@ model_type = 1;
 % source type
 %==========================================================================
 
-source_type = 'homogeneous';
-% source_type = 'gaussian';
+% source_type = 'homogeneous';
+source_type = 'gaussian';
 
 % number of frequency bands
 n_basis_fct = 0;

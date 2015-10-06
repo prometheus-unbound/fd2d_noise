@@ -23,7 +23,7 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
     % user input
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    n_noise_sources = 2;
+    n_noise_sources = 1;
 
     
     %- specify spectrum ---------------------------------------------------
