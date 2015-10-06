@@ -1,5 +1,5 @@
 
-function [K_s] = sum_source_kernel(K_all)
+function [K_s] = sum_source_kernel( K_all )
     
     [~,~,nx,nz,~,~,~,~,~,n_basis_fct] = input_parameters();
     [~,n_sample] = input_interferometry();
@@ -8,8 +8,7 @@ function [K_s] = sum_source_kernel(K_all)
     % same update for all frequencies
     if( n_basis_fct == 0 )
         
-        K_s = sum(K_all,3) / n_sample;
-        
+        K_s = K_all;
         
     % updates in different frequency bands
     else

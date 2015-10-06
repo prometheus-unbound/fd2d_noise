@@ -1,14 +1,14 @@
 
-function [K] = treat_kernel(K_raw,type,myfilter,percentile)
+function [K] = treat_kernel( K_raw, usr_par )
     
 
     [~,~,~,~,~,~,~,~,~,n_basis_fct] = input_parameters();
-    K = K_raw;
     
-    %% clip kernel if desired
-    if( percentile ~= 0 )
+    
+    % clip kernel if desired
+    if( usr_par.kernel.percentile ~= 0 )
         
-        if( n_basis_fct == 0 || strcmp(type,'structure') )
+        if( n_basis_fct == 0 || strcmp( usr_par.type, 'structure') )
             n_basis_fct = 1;
         end
         
@@ -21,14 +21,17 @@ function [K] = treat_kernel(K_raw,type,myfilter,percentile)
             K(i,j,k) = clip_value(k);
         
         end
-        
-    end
+            
     
-    
-    %% apply filter according to myfilter 
-    if( myfilter ~= 0 )
+    % apply filter according to myfilter 
+    elseif( usr_par.kernel.smoothing ~= 0 )
         
-        K = imfilter( K_raw, myfilter, 'replicate' );
+        K = imfilter( K_raw, usr_par.kernel.smoothing, 'replicate' );
+        
+        
+    else
+        
+        K = K_raw;
         
     end
     

@@ -1,5 +1,5 @@
 
-load 'propagation/cm_model.mat';
+load 'cm_model.mat';
 
 figure
 set(gca,'FontSize',14)

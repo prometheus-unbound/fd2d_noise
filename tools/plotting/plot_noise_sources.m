@@ -72,7 +72,7 @@ function [clim] = plot_noise_sources(noise_source_distribution,array,cm_psd,clim
             h(ib) = mesh(X, Z, ib*fudge_factor + noise_source_distribution(:,:,ib)' );
             set(h(ib),'CData',noise_source_distribution(:,:,ib)');
 
-            text(1e3,1e3, ib*fudge_factor + 1 + noise_source_distribution(1,1,ib) , sprintf('%5.2f - %5.2f Hz',f_sample(int_limits(ib,1)),f_sample(int_limits(ib,2))) )
+            text(1e3,1e3, ib*fudge_factor + 1 + noise_source_distribution(1,1,ib) , sprintf('%5.3f - %5.3f Hz',f_sample(int_limits(ib,1)),f_sample(int_limits(ib,2))) )
             level = [ib*fudge_factor + 0.1 + noise_source_distribution(1,1,ib), ib*fudge_factor + 0.1 + noise_source_distribution(1,1,ib)];
             plot3([width,Lx-width],[width,width],level,'k--')
             plot3([width,Lx-width],[Lz-width,Lz-width],level,'k--')
