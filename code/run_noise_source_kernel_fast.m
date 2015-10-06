@@ -1,4 +1,4 @@
-function [X,Z,K_s] = run_noise_source_kernel_fast(G_2,mu,stf,adsrc)
+function [K_s] = run_noise_source_kernel_fast( G_2, mu, spectrum, stf, adsrc )
 
 %==========================================================================
 % run simulation to compute sensitivity kernel for noise power-spectral
@@ -14,7 +14,6 @@ function [X,Z,K_s] = run_noise_source_kernel_fast(G_2,mu,stf,adsrc)
 %
 % output:
 %--------
-% X, Z: coordinate axes
 % K_s: sensitivity kernel
 %
 %==========================================================================
@@ -26,9 +25,10 @@ function [X,Z,K_s] = run_noise_source_kernel_fast(G_2,mu,stf,adsrc)
 
 %- material and domain ----------------------------------------------------
 [Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
-[X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
+[~,~,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 [~,rho] = define_material_parameters(nx,nz,model_type); 
 mu = reshape(mu,nx,nz);
+
 
 %- time axis --------------------------------------------------------------    
 t = -(nt-1)*dt:dt:(nt-1)*dt;
@@ -45,10 +45,13 @@ end
 
 
 %- initialise interferometry ----------------------------------------------       
-[~,n_sample,w_sample] = input_interferometry();
+[~,n_sample,w_sample,dw,nt_freq] = input_interferometry();
+K_s = zeros(nx,nz);
 
-G_1 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
-K_s = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
+ifft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
+for k = 1:n_sample
+    ifft_coeff(:,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t' ) * dw;
+end
            
 
 %- dynamic fields and absorbing boundary field ----------------------------
@@ -65,10 +68,12 @@ szy = zeros(nx,nz-1);
 % iterate
 %==========================================================================
 
+u = zeros(nx,nz);
+
 for n=1:length(t)
     
     %- compute divergence of current stress tensor ------------------------    
-    DS=div_s(sxy,szy,dx,dz,nx,nz,order);
+    DS = div_s(sxy,szy,dx,dz,nx,nz,order);
     
     
     %- add point sources --------------------------------------------------    
@@ -86,28 +91,21 @@ for n=1:length(t)
     
     
     %- compute derivatives of current velocity and update stress tensor ---    
-    sxy = sxy + dt*mu(1:nx-1,:) .* dx_v(v,dx,dz,nx,nz,order);
-    szy = szy + dt*mu(:,1:nz-1) .* dz_v(v,dx,dz,nx,nz,order);
+    sxy = sxy + dt * mu(1:nx-1,:) .* dx_v(v,dx,dz,nx,nz,order);
+    szy = szy + dt * mu(:,1:nz-1) .* dz_v(v,dx,dz,nx,nz,order);
      
     
-    %- accumulate Fourier transform of the velocity field -----------------
-    if( mod(n,5) == 1 )
-        for k=1:n_sample
-            G_1(:,:,k) = G_1(:,:,k) + v(:,:) * exp(-1i*w_sample(k)*t(n))*dt;
+    %- accumulate kernel --------------------------------------------------
+    u = u + v;
+    
+    M_tn = zeros(nx,nz) + 1i*zeros(nx,nz);    
+    if( mod(n,nt_freq)==0 && t(end-n+1)<0.0 )
+        for k = 1:n_sample
+            M_tn(:,:) = M_tn(:,:) + spectrum(k) * conj(G_2(:,:,k)) * ifft_coeff(end-n+1, k);
         end
-    end    
-
+        
+        K_s = K_s + real( M_tn .* u * dt );
+    end
+    
 end
-
-
-%==========================================================================
-% compute noise source kernels as function of frequency 
-%==========================================================================
-
-%- multiply Fourier transformed Greens functions
-for k=1:n_sample
-    K_s(:,:,k) = G_1(:,:,k) .* conj(G_2(:,:,k)) / (1i*w_sample(k)+eps);
-end
-
-K_s = real(K_s);
 

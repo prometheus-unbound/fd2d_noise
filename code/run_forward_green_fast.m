@@ -2,6 +2,7 @@ function [G_2] = run_forward_green_fast(mu,src)
 
 %==========================================================================
 % run forward simulation
+% fast means ready for conversion to mex-files
 %
 % input:
 %--------
@@ -10,7 +11,7 @@ function [G_2] = run_forward_green_fast(mu,src)
 %
 % output:
 %--------
-% G_2: Green function of reference station
+% G_2: displacement Green function for reference station
 %
 %==========================================================================
 
@@ -27,7 +28,7 @@ mu = reshape(mu,nx,nz);
 
 
 %- initialise interferometry ----------------------------------------------
-[~,n_sample,w_sample] = input_interferometry();
+[~,n_sample,w_sample,~,nt_freq] = input_interferometry();
 
 
 %- time axis --------------------------------------------------------------
@@ -51,10 +52,10 @@ stf = 1.0e9*ones(1,length(t));
 G_2 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
 
 
-% prepare coefficients for Fourier transform
+%- prepare coefficients for Fourier transform -----------------------------
 fft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
 for k = 1:n_sample
-    fft_coeff(:,k) = exp(-1i*w_sample(k)*t')*dt;
+    fft_coeff(:,k) = 1/sqrt(2*pi) * exp(-1i*w_sample(k)*t') * dt;
 end
 
 
@@ -72,6 +73,9 @@ szy = zeros(nx,nz-1);
 % iterate
 %==========================================================================
 
+%%% TEST TIME DOMAIN VERSION %%%
+% G_2_test = zeros(nx,nz,2*nt-1);
+
 for n = 1:length(t)
     
     %- compute divergence of current stress tensor ------------------------    
@@ -85,29 +89,32 @@ for n = 1:length(t)
         
     
     %- update velocity field ----------------------------------------------
-    v = v + dt*DS./rho;
+    v = v + dt * DS./rho;
     
     
     %- apply absorbing boundary taper -------------------------------------    
-    v = v.*absbound;
+    v = v .* absbound;
     
     
     %- compute derivatives of current velocity and update stress tensor ---
     strain_dxv = dx_v(v,dx,dz,nx,nz,order);
     strain_dzv = dz_v(v,dx,dz,nx,nz,order);
     
-    sxy = sxy + dt*mu(1:nx-1,:) .* strain_dxv;
-    szy = szy + dt*mu(:,1:nz-1) .* strain_dzv;
+    sxy = sxy + dt * mu(1:nx-1,:) .* strain_dxv;
+    szy = szy + dt * mu(:,1:nz-1) .* strain_dzv;
     
     
     %- accumulate Fourier transform of the displacement Greens function ---
-    if( mod(n,5) == 1)         
+    if( mod(n,nt_freq) == 0 )         
         
-        for k=1:n_sample
-            G_2(:,:,k) = G_2(:,:,k) + v(:,:) * fft_coeff(n,k);
+        for k = 1:n_sample
+            G_2(:,:,k) = G_2(:,:,k) + v * fft_coeff(n,k);
         end
         
     end
+    
+    %%% TEST TIME DOMAIN VERSION %%%
+    % G_2_test(:,:,nt-1+n) = v;
     
 end
 

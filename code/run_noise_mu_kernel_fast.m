@@ -1,4 +1,4 @@
-function [X,Z,K_mu_final] = run_noise_mu_kernel_fast(C_2_dxv, C_2_dzv, mu, stf, adsrc)
+function [K_mu_final] = run_noise_mu_kernel_fast( C_2_dxu, C_2_dzu, mu, stf, adsrc )
 
 %==========================================================================
 % run simulation to compute sensitivity kernel for rho and mu
@@ -7,7 +7,7 @@ function [X,Z,K_mu_final] = run_noise_mu_kernel_fast(C_2_dxv, C_2_dzv, mu, stf, 
 %
 % input:
 %--------
-% C_2_dxv & C_2_dzv: strain of correlation wavefield
+% C_2_dxu & C_2_dzu: strain of correlation wavefield
 % mu [N/m^2]
 % stf: adjoint source time function
 % adsrc: adjoint source positions
@@ -26,7 +26,7 @@ function [X,Z,K_mu_final] = run_noise_mu_kernel_fast(C_2_dxv, C_2_dzv, mu, stf, 
 
 %- material and domain ----------------------------------------------------
 [Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
-[X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
+[~,~,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 [~,rho] = define_material_parameters(nx,nz,model_type);
 mu = reshape(mu,nx,nz);
 
@@ -36,7 +36,7 @@ t = -(nt-1)*dt:dt:(nt-1)*dt;
 
 
 %- reverse adjoint source time function -----------------------------------
-stf = fliplr(stf);
+% stf = fliplr(stf);
 
 
 %- compute indices for adjoint source locations ---------------------------    
@@ -49,11 +49,20 @@ end
 
 
 %- initialise interferometry ----------------------------------------------        
-[~,n_sample,w_sample,dw] = input_interferometry();
+[~,n_sample,w_sample,dw,nt_freq] = input_interferometry();
 
-G_1_dxv = zeros(nx-1,nz,n_sample) + 1i*zeros(nx-1,nz,n_sample);
-G_1_dzv = zeros(nx,nz-1,n_sample) + 1i*zeros(nx,nz-1,n_sample);
-            
+G_1_dxu = zeros(nx-1,nz,n_sample) + 1i*zeros(nx-1,nz,n_sample);
+G_1_dzu = zeros(nx,nz-1,n_sample) + 1i*zeros(nx,nz-1,n_sample);
+
+
+%- prepare coefficients for Fourier transform and its inverse -------------
+fft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
+ifft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
+for k = 1:n_sample
+    fft_coeff(:,k) = 1/sqrt(2*pi) * exp( -1i*w_sample(k)*t' ) * dt;
+    ifft_coeff(:,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t' ) * dw;
+end
+
 
 %- dynamic fields and absorbing boundary field ----------------------------
 v = zeros(nx,nz);
@@ -68,6 +77,8 @@ szy = zeros(nx,nz-1);
 %==========================================================================
 % iterate
 %==========================================================================
+
+u = zeros(nx,nz);
 
 for n = 1:length(t)
     
@@ -93,19 +104,35 @@ for n = 1:length(t)
     strain_dxv = dx_v(v,dx,dz,nx,nz,order);
     strain_dzv = dz_v(v,dx,dz,nx,nz,order);
     
-    sxy = sxy + dt*mu(1:nx-1,:) .* strain_dxv;
-    szy = szy + dt*mu(:,1:nz-1) .* strain_dzv;
+    sxy = sxy + dt * mu(1:nx-1,:) .* strain_dxv;
+    szy = szy + dt * mu(:,1:nz-1) .* strain_dzv;
+    
+    
+    %- calculate displacement and respective strain -----------------------
+    u = u + v * dt;
+    strain_dxu = dx_v(u,dx,dz,nx,nz,order);
+    strain_dzu = dz_v(u,dx,dz,nx,nz,order);
      
     
     %- accumulate Fourier transform of the velocity field -----------------
-    if( mod(n,5) == 1 )
-        for k=1:n_sample           
-            G_1_dxv(:,:,k) = G_1_dxv(:,:,k) + strain_dxv(:,:) * exp(-1i*w_sample(k)*t(n)) * dt;
-            G_1_dzv(:,:,k) = G_1_dzv(:,:,k) + strain_dzv(:,:) * exp(-1i*w_sample(k)*t(n)) * dt;
+    if( mod(n,nt_freq) == 0 )
+        for k = 1:n_sample           
+            G_1_dxu(:,:,k) = G_1_dxu(:,:,k) + strain_dxu * fft_coeff(n,k);
+            G_1_dzu(:,:,k) = G_1_dzu(:,:,k) + strain_dzu * fft_coeff(n,k);
         end
     end
 
+    
+    %%% TEST TIME DOMAIN VERSION %%%
+    % G_1_dxu_time(:,:,n) = strain_dxu;
+    % G_1_dzu_time(:,:,n) = strain_dzu;
+
 end
+
+
+% time = datetime('now');
+% formatOut = 'yyyy-mm-dd-HH-MM-SS';
+% save( sprintf('stress_adjoint_state_%s.mat',datestr(time,formatOut,'local')), 'G_1_dxu', 'G_1_dzu')
 
 
 %==========================================================================
@@ -114,9 +141,23 @@ end
 
 %- accumulate kernel by looping over frequency
 K_mu = zeros(nx,nz) + 1i*zeros(nx,nz);
-for k=1:n_sample   
-    K_mu(1:nx-1,:) = K_mu(1:nx-1,:) + G_1_dxv(:,:,k) .* C_2_dxv(:,:,k) / w_sample(k)^2 * dw;
-    K_mu(:,1:nz-1) = K_mu(:,1:nz-1) + G_1_dzv(:,:,k) .* C_2_dzv(:,:,k) / w_sample(k)^2 * dw;
+for k = 1:n_sample
+    K_mu(1:nx-1,:) = K_mu(1:nx-1,:) - conj(G_1_dxu(:,:,k)) .* C_2_dxu(:,:,k);
+    K_mu(:,1:nz-1) = K_mu(:,1:nz-1) - conj(G_1_dzu(:,:,k)) .* C_2_dzu(:,:,k);
 end
 K_mu_final = real(K_mu);
+
+
+%%% TEST TIME DOMAIN VERSION %%%
+% G_1_dxu_time_flip = flip( G_1_dxu_time, 3 );
+% G_1_dzu_time_flip = flip( G_1_dzu_time, 3 );
+% 
+% K_mu = zeros(nx,nz);
+% for n = 1:length(t)
+%     K_mu(1:nx-1,:) = K_mu(1:nx-1,:) - G_1_dxu_time_flip(:,:,n) .* C_2_dxu(:,:,n);
+%     K_mu(:,1:nz-1) = K_mu(:,1:nz-1) - G_1_dzu_time_flip(:,:,n) .* C_2_dzu(:,:,n);
+% end
+% 
+% K_mu_final = real(K_mu);
+
 

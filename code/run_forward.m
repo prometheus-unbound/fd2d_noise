@@ -91,7 +91,7 @@ if (strcmp(simulation_mode,'forward') || strcmp(simulation_mode,'forward_green')
         % prepare coefficients for Fourier transform
         fft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
         for k = 1:n_sample
-            fft_coeff(:,k) = exp(-1i*w_sample(k)*t')*dt;
+            fft_coeff(:,k) = 1/sqrt(2*pi) * exp(-1i*w_sample(k)*t')*dt;
         end
         
     end
@@ -126,8 +126,8 @@ elseif strcmp(simulation_mode,'correlation')
     ifft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
     for k = 1:n_sample
         G_2(:,:,k) = conj(G_2(:,:,k));
-        fft_coeff(:,k) = exp( -1i*w_sample(k)*t' )*dt;
-        ifft_coeff(:,k) = dw*exp( 1i*w_sample(k)*t' )/(2*pi);
+        fft_coeff(:,k) = 1/sqrt(2*pi) * exp( -1i*w_sample(k)*t' ) * dt;
+        ifft_coeff(:,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t' ) * dw;
     end
     
     
@@ -199,7 +199,7 @@ for n = 1:length(t)
 %             t_ifft_start = tic;
 %             
 %             for k = 1:n_sample
-%                 % S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * conj(G_2(:,:,k)) * exp( 1i*w_sample(k)*t(n) );
+%                 % S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * conj(G_2(:,:,k)) * 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t(n) );
 %                 S(:,:,ns) = S(:,:,ns) + noise_spectrum(k,ns) * G_2(:,:,k) * ifft_coeff(n,k);
 %             end
 %             % S(:,:,ns) = dw*S(:,:,ns)/pi; 
@@ -268,7 +268,7 @@ for n = 1:length(t)
         t_fft_start = tic;           
         
         for k=1:n_sample
-            % G_2(:,:,k) = G_2(:,:,k) + v(:,:) * exp(-1i*w_sample(k)*t(n))*dt;
+            % G_2(:,:,k) = G_2(:,:,k) + v(:,:) * 1/sqrt(2*pi) * exp(-1i*w_sample(k)*t(n))*dt;
             G_2(:,:,k) = G_2(:,:,k) + v(:,:) * fft_coeff(n,k);
         end
         
@@ -281,7 +281,7 @@ for n = 1:length(t)
         t_fft_start = tic; 
         
         for k=1:n_sample
-            % C_2(:,:,k) = C_2(:,:,k) + v(:,:) * exp(-1i*w_sample(k)*t(n))*dt;
+            % C_2(:,:,k) = C_2(:,:,k) + v(:,:) * 1/sqrt(2*pi) * exp(-1i*w_sample(k)*t(n))*dt;
             C_2(:,:,k) = C_2(:,:,k) + v(:,:) * fft_coeff(n,k);
             
             C_2_dxv(:,:,k) = C_2_dxv(:,:,k) + strain_dxv(:,:) * fft_coeff(n,k);

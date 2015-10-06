@@ -71,10 +71,13 @@ end
 
 %- initialise interferometry ----------------------------------------------       
 [~, n_sample, w_sample] = input_interferometry();
-
-G_1 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
-K_s = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
+G_1_vel = zeros(nx,nz,length(t));
            
+ifft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
+for k = 1:n_sample
+    ifft_coeff(:,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t' ) * dw;
+end
+
 
 %- dynamic fields and absorbing boundary field ----------------------------
 v = zeros(nx,nz);
@@ -121,12 +124,8 @@ for n=1:length(t)
     szy = szy + dt*mu(:,1:nz-1) .* dz_v(v,dx,dz,nx,nz,order);
      
     
-    %- accumulate Fourier transform of the velocity field -----------------
-    if( mod(n,5) == 1 )
-        for k=1:n_sample
-            G_1(:,:,k) = G_1(:,:,k) + v(:,:) * exp(-1i*w_sample(k)*t(n))*dt;
-        end
-    end    
+    %- save adjoint state -------------------------------------------------
+    G_1_vel(:,:,n) = v;
     
     
     %- plot velocity field ------------------------------------------------
@@ -138,19 +137,30 @@ end
 
 
 %==========================================================================
-% compute noise source kernels as function of frequency 
+% compute noise source kernels
 %==========================================================================
+
+G_1_dis = flip( cumsum(G_1_vel,3), 3) * dt;
+
 
 %- load Fourier transformed Greens function from forward simulation
 load(['../output/interferometry/G_2_' num2str(i_ref) '.mat']);
 
 
-%- multiply Fourier transformed Greens functions
-for k=1:n_sample
-    K_s(:,:,k) = G_1(:,:,k) .* conj(G_2(:,:,k)) / (1i*w_sample(k)+eps);
+K_s = zeros(nx,nz);
+for n = 1:length(t)
+    
+    M_tn = zeros(nx,nz) + 1i*zeros(nx,nz);
+    
+    if( mod(n,5)==0 && t(n)<0.0 )
+        for k = 1:n_sample
+            M_tn(:,:) = M_tn(:,:) + spectrum(k) * conj(G_2(:,:,k)) * ifft_coeff(n,k);
+        end
+        
+        K_s = K_s + real( M_tn .* G_1_dis(:,:,n) );
+    end
+    
 end
-
-K_s = real(K_s);
 
 
 %==========================================================================

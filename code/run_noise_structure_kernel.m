@@ -139,9 +139,9 @@ for n=1:length(t)
     %- accumulate Fourier transform of the velocity field -----------------
     if( mod(n,5) == 1 )
         for k=1:n_sample
-            G_1(:,:,k) = G_1(:,:,k) + v(:,:) * exp(-1i*w_sample(k)*t(n)) * dt;            
-            G_1_strain_dxv(:,:,k) = G_1_strain_dxv(:,:,k) + strain_dxv(:,:) * exp(-1i*w_sample(k)*t(n)) * dt;
-            G_1_strain_dzv(:,:,k) = G_1_strain_dzv(:,:,k) + strain_dzv(:,:) * exp(-1i*w_sample(k)*t(n)) * dt;
+            G_1(:,:,k) = G_1(:,:,k) + v(:,:) * 1/sqrt(2*pi) * exp(-1i*w_sample(k)*t(n)) * dt;            
+            G_1_strain_dxv(:,:,k) = G_1_strain_dxv(:,:,k) + strain_dxv(:,:) * 1/sqrt(2*pi) * exp(-1i*w_sample(k)*t(n)) * dt;
+            G_1_strain_dzv(:,:,k) = G_1_strain_dzv(:,:,k) + strain_dzv(:,:) * 1/sqrt(2*pi) * exp(-1i*w_sample(k)*t(n)) * dt;
         end
     end
     
