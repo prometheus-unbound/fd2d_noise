@@ -101,28 +101,10 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
     
     noise_spectrum = zeros(length(f_sample),n_noise_sources);
     
-    cmap = hsv(6);
     for ns = 1:n_noise_sources
-        noise_spectrum(:,ns) = strength(ns) * exp( -(abs(f_sample)-f_peak(ns)).^2 / bandwidth(ns)^2 );
-        
-        if ( strcmp(make_plots,'yes') && n_basis_fct == 0 )
-            if(ns==1)
-                figure
-                set(gca,'FontSize',12)
-                hold on
-                grid on
-                cstring = [];
-            end
-            
-            plot(f_sample,noise_spectrum(:,ns),'Color',cmap(ns,:))
-            cstring{end+1} = ['source ' num2str(ns)];
-            xlabel('frequency [Hz]');
-            legend(cstring)
-            
-            xlim([f_sample(1) f_sample(end)])
-        end
-        
+        noise_spectrum(:,ns) = strength(ns) * exp( -(abs(f_sample)-f_peak(ns)).^2 / bandwidth(ns)^2 );       
     end
+    
     
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -186,13 +168,41 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
     
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % plot noise distribution
+    % plot noise source configuration
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     if ( strcmp(make_plots,'yes') )
+        
+        if ( n_basis_fct == 0 )
+            
+            cmap = hsv(n_noise_sources);
+            for ns = 1:n_noise_sources
+                
+                if(ns==1)
+                    figure
+                    set(gca,'FontSize',12)
+                    hold on
+                    grid on
+                    cstring = [];
+                end
+                
+                plot(f_sample,noise_spectrum(:,ns),'Color',cmap(ns,:))
+                cstring{end+1} = ['source ' num2str(ns)];
+                xlabel('frequency [Hz]');
+                legend(cstring)
+                
+                xlim([f_sample(1) f_sample(end)])
+                
+            end
+            
+        end
+        
         clim = plot_noise_sources(noise_source_distribution,[],[],[]);
+        
     else
+        
         clim = [];
+        
     end
     
     

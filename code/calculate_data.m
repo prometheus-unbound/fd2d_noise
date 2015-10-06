@@ -1,4 +1,6 @@
 
+tic
+
 clear all
 % close all
 
@@ -49,14 +51,17 @@ for i = 1:nr_x
     end
 end
 
+% %% small test array, only two receivers close to each other
 % array = zeros(2,2);
-% array(1,1) = 1.5e5;
-% array(2,1) = 2.5e5;
+% array(1,1) = 1.9e5;
+% array(2,1) = 2.1e5;
 % array(:,2) = 2.0e5;
 
 
 %% select receivers that will be reference stations
 ref_stat = array;
+n_ref = size(ref_stat,1);
+n_rec = size(array,1)-1;
 
 
 %% plot configuration
@@ -76,13 +81,11 @@ end
 %% start matlabpool and set up path
 if( ~strcmp(mode,'local') )
     addpath(genpath('../'))
-    parobj = start_cluster(mode,'',16);
+    parobj = start_cluster(mode,'', n_ref);
 end
 
 
 %% calculate correlations
-n_ref = size(ref_stat,1);
-n_rec = size(array,1)-1;
 t = -(nt-1)*dt:dt:(nt-1)*dt;
 c_it = zeros(n_ref,n_rec,length(t));
 
@@ -101,12 +104,12 @@ parfor i = 1:n_ref
     rec = array( find(~ismember(array,src,'rows') ) , :);
     
     % calculate the correlation for each pair
-%     [~,~] = run_forward('forward_green',src,rec,i,flip_sr);
-%     [c_it(i,:,:),~] = run_forward('correlation',src,rec,i,flip_sr);
+    % [~,~] = run_forward('forward_green',src,rec,i,flip_sr);
+    % [c_it(i,:,:),~] = run_forward('correlation',src,rec,i,flip_sr);
     
     % use mex-functions
     [G_2] = run_forward_green_fast_mex(mu, src);
-    [c_it(i,:,:), ~] = run_forward_correlation_fast_mex(G_2, source_dist, spectrum, mu, rec, 0);
+    [c_it(i,:,:), ~] = run_forward_correlation_fast_mex(G_2, source_dist, spectrum, mu, rec, 0, 0);
     
 end
 
@@ -138,3 +141,4 @@ if( ~strcmp(mode,'local') )
 end
 
 
+toc

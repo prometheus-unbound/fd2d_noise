@@ -12,7 +12,7 @@ function [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_pa
 % nz = 300;           % grid points in z-direction
 % 
 % dt = 0.09;          % time step [s]
-% nt = 900;           % number of iterations
+% nt = 50;            % number of iterations
 
 
 Lx = 2.0e6;         % model extension in x-direction [m]
@@ -54,5 +54,5 @@ source_type = 'homogeneous';
 % source_type = 'gaussian';
 
 % number of frequency bands
-n_basis_fct = 10;
+n_basis_fct = 0;
 
