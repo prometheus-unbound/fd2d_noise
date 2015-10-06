@@ -28,7 +28,7 @@ mu = reshape(mu,nx,nz);
 
 
 %- initialise interferometry ----------------------------------------------
-[~,n_sample,w_sample,~,nt_freq] = input_interferometry();
+[~,n_sample,w_sample,~,freq_samp] = input_interferometry();
 
 
 %- time axis --------------------------------------------------------------
@@ -105,7 +105,7 @@ for n = 1:length(t)
     
     
     %- accumulate Fourier transform of the displacement Greens function ---
-    if( mod(n,nt_freq) == 0 )         
+    if( mod(n,freq_samp) == 0 )         
         
         for k = 1:n_sample
             G_2(:,:,k) = G_2(:,:,k) + v * fft_coeff(n,k);

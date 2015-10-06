@@ -49,7 +49,7 @@ end
 
 
 %- initialise interferometry ----------------------------------------------        
-[~,n_sample,w_sample,dw,nt_freq] = input_interferometry();
+[~,n_sample,w_sample,dw,freq_samp] = input_interferometry();
 
 G_1_dxu = zeros(nx-1,nz,n_sample) + 1i*zeros(nx-1,nz,n_sample);
 G_1_dzu = zeros(nx,nz-1,n_sample) + 1i*zeros(nx,nz-1,n_sample);
@@ -115,7 +115,7 @@ for n = 1:length(t)
      
     
     %- accumulate Fourier transform of the velocity field -----------------
-    if( mod(n,nt_freq) == 0 )
+    if( mod(n,freq_samp) == 0 )
         for k = 1:n_sample           
             G_1_dxu(:,:,k) = G_1_dxu(:,:,k) + strain_dxu * fft_coeff(n,k);
             G_1_dzu(:,:,k) = G_1_dzu(:,:,k) + strain_dzu * fft_coeff(n,k);

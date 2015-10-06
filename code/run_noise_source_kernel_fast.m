@@ -45,7 +45,7 @@ end
 
 
 %- initialise interferometry ----------------------------------------------       
-[~,n_sample,w_sample,dw,nt_freq] = input_interferometry();
+[~,n_sample,w_sample,dw,freq_samp] = input_interferometry();
 K_s = zeros(nx,nz);
 
 ifft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
@@ -99,7 +99,7 @@ for n=1:length(t)
     u = u + v;
     
     M_tn = zeros(nx,nz) + 1i*zeros(nx,nz);    
-    if( mod(n,nt_freq)==0 && t(end-n+1)<0.0 )
+    if( mod(n,freq_samp)==0 && t(end-n+1)<0.0 )
         for k = 1:n_sample
             M_tn(:,:) = M_tn(:,:) + spectrum(k) * conj(G_2(:,:,k)) * ifft_coeff(end-n+1, k);
         end

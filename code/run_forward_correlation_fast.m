@@ -36,7 +36,7 @@ mu = reshape(mu, nx, nz);
 
 
 %- initialise interferometry ----------------------------------------------
-[~,n_sample,w_sample,dw,nt_freq] = input_interferometry();
+[~,n_sample,w_sample,dw,freq_samp] = input_interferometry();
 
 
 %- reshape source distribution --------------------------------------------
@@ -139,7 +139,7 @@ for n = 1:length(t)
     
     
     %- add sources of the correlation field -------------------------------    
-    if( mod(n,nt_freq)==0 && t(n)<=0.0 )       
+    if( mod(n,freq_samp)==0 && t(n)<=0.0 )       
         
         %- transform on the fly to the time domain        
         S = zeros(nx,nz,n_noise_sources) + 1i*zeros(nx,nz,n_noise_sources);
@@ -220,7 +220,7 @@ for n = 1:length(t)
     
 
     %- accumulate Fourier transform of the correlation displacement field -    
-    if( mode==1 && mod(n,nt_freq)==0 )
+    if( mode==1 && mod(n,freq_samp)==0 )
         
         for k = 1:n_sample            
             C_2_dxu(:,:,k) = C_2_dxu(:,:,k) + strain_dxu * fft_coeff(n,k);
