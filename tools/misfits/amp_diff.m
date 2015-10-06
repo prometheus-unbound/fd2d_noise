@@ -7,6 +7,7 @@
 %--------
 % u: synthetic displacement seismogram
 % u_0: observed displacement seismogram
+% win: specified window
 % t: time axis
 %
 % output:

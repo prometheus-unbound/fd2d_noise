@@ -7,6 +7,7 @@
 %--------
 % u: synthetic displacement seismogram
 % u_0: observed displacement seismogram
+% win_caus: window around surface wave train on causal branch
 % t: time axis
 %
 % output:
