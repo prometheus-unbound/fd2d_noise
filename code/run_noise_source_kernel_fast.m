@@ -24,7 +24,7 @@ function [K_s] = run_noise_source_kernel_fast( G_2, mu, spectrum, stf, adsrc )
 %==========================================================================
 
 %- material and domain ----------------------------------------------------
-[Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
+[Lx,Lz,nx,nz,dt,nt,order,model_type,~,n_basis_fct] = input_parameters();
 [~,~,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 [~,rho] = define_material_parameters(nx,nz,model_type); 
 mu = reshape(mu,nx,nz);
@@ -46,13 +46,24 @@ end
 
 %- initialise interferometry ----------------------------------------------       
 [~,n_sample,w_sample,dw,freq_samp] = input_interferometry();
-K_s = zeros(nx,nz);
+
+if( n_basis_fct == 0 )
+    n_basis_fct = 1;
+end
+K_s = zeros(nx,nz,n_basis_fct);
+
 
 ifft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
 for k = 1:n_sample
     ifft_coeff(:,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t' ) * dw;
 end
-           
+
+
+%- get integration boundaries for frequency bands -------------------------
+% if( n_basis_fct ~= 0 )
+    [int_limits] = integration_limits(n_sample,n_basis_fct);
+% end
+
 
 %- dynamic fields and absorbing boundary field ----------------------------
 v = zeros(nx,nz);
@@ -98,13 +109,29 @@ for n=1:length(t)
     %- accumulate kernel --------------------------------------------------
     u = u + v;
     
-    M_tn = zeros(nx,nz) + 1i*zeros(nx,nz);    
-    if( mod(n,freq_samp)==0 && t(end-n+1)<0.0 )
+
+    M_tn = zeros(nx,nz,n_basis_fct) + 1i*zeros(nx,nz,n_basis_fct);
+    tmp = zeros(nx,nz) + 1i*zeros(nx,nz);
+    if( mod(n,freq_samp)==0 && t(end-n+1)<=0.0 )
+        
         for k = 1:n_sample
-            M_tn(:,:) = M_tn(:,:) + spectrum(k) * conj(G_2(:,:,k)) * ifft_coeff(end-n+1, k);
+            
+            if( n_basis_fct ~= 0 )
+                ib = find( k >= int_limits(:,1) & k <= int_limits(:,2) );
+            else
+                ib = 1;
+            end
+            
+            % funny construction with tmp variable needed for mex generation
+            tmp = repmat( spectrum(k) * conj(G_2(:,:,k)) * ifft_coeff(end-n+1, k), 1, 1, n_basis_fct);
+            M_tn(:,:,ib) = M_tn(:,:,ib) + tmp(:,:,ib);
+            
         end
         
-        K_s = K_s + real( M_tn .* u * dt );
+        for ib = 1:n_basis_fct
+            K_s(:,:,ib) = K_s(:,:,ib) + real( M_tn(:,:,ib) .* u * dt );
+        end
+        
     end
     
 end

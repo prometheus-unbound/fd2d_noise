@@ -229,6 +229,7 @@ for n = 1:length(t)
 
     end
     
+    
     %%% TEST TIME DOMAIN VERSION %%%
     % C_2_dxu_time(:,:,n) = strain_dxu;
     % C_2_dzu_time(:,:,n) = strain_dzu;
