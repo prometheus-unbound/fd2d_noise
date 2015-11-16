@@ -31,5 +31,9 @@ function [misfit, adstf] = waveform_difference( u, u_0, win, t )
     % time reverse adjoint source time function ---------------------------  
     adstf = fliplr(adstf);
     
+    
+%     adstf = fliplr( u - u_0 );
+%     misfit = sum(adstf.*adstf) * (t(2)-t(1));
+    
         
 end

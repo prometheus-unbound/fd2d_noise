@@ -122,6 +122,11 @@ for n=1:n_receivers
         if( right > t(end) )
             right = t(end);
         end
+        
+        % error if time series is not long enough
+        if( left > t(end) )
+            error('time series too short?')
+        end
 
     end
 
