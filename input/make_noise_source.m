@@ -31,18 +31,22 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
     % two overlapping spectra
     f_peak = [1/11, 1/7];
     bandwidth = [0.035, 0.025];
-    strength = [1, 0.7];
+    strength = [0.3, 1];
+    
+%     f_peak = [1/7];
+%     bandwidth = [0.025];
+%     strength = [0.7];
 
-%     % narrow non-overlapping spectra
+
+    % narrow non-overlapping spectra
 %     f_peak = [1/15, 1/7];
 %     bandwidth = [0.01, 0.01];
-%     strength = [1, 0.7];
+%     strength = [1, 1];
 
-%     % one simple source
-%     f_peak = 0.125;
-%     bandwidth = 0.03;
-%     strength = 1;
-    
+%     f_peak = [1/7];
+%     bandwidth = [0.01];
+%     strength = [1];
+   
     
     %- different source types --------------------------------------------- 
     
@@ -60,16 +64,23 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
         % large setup, 2 sources left of the array
         elseif( strcmp(size,'big') )
             
+            % original setup
             x_sourcem = [0.5e6, 0.6e6];
             z_sourcem = [0.8e6, 1.3e6];
             sourcearea_width = [2.0e5, 1.5e5];
-            magnitude = [6.0, 5.0];
+            magnitude = [5.0, 5.0];
             
-            % large setup, 1 source in the center of the array
-            % x_sourcem = [1.25e6];
-            % z_sourcem = [1.0e6];
-            % sourcearea_width = [1.5e5];
-            % magnitude = [3.0];
+            % setup for coverage test
+%             x_sourcem = [0.6e6, 0.6e6];
+%             z_sourcem = [0.8e6, 1.3e6];
+%             sourcearea_width = [2.0e5, 1.5e5];
+%             magnitude = [6.0, 5.0];
+            
+            % lr_nover
+%             x_sourcem = [0.4e6, 1.6e6];
+%             z_sourcem = [1.0e6, 1.0e6];
+%             sourcearea_width = [1.2e5, 1.2e5];
+%             magnitude = [6.0, 6.0];
 
         end
 
@@ -105,7 +116,10 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
         noise_spectrum(:,ns) = strength(ns) * exp( -(abs(f_sample)-f_peak(ns)).^2 / bandwidth(ns)^2 );       
     end
     
-    
+%     if( strcmp(source_type, 'homogeneous') )
+%         noise_spectrum = sum(noise_spectrum,2);
+%         n_noise_sources = 1;
+%     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % geographic power-spectral density distribution
@@ -197,7 +211,11 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
             
         end
         
-        clim = plot_noise_sources(noise_source_distribution,[],[],[]);
+%         load ../output/interferometry/array_16_ref_coverage_orig.mat
+        array = [];
+        load clim.mat
+        clim = plot_noise_sources(noise_source_distribution,array,[],[clim(1) 0.3*clim(2)]);
+%         clim = plot_noise_sources(noise_source_distribution,array,[],[]);
         
     else
         

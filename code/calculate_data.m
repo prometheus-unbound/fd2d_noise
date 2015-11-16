@@ -5,8 +5,8 @@ clear all
 % close all
 
 
-% mode = 'local';
-mode = 'monch';
+mode = 'local';
+% mode = 'monch';
 % mode = 'euler';
 % mode = 'brutus';
 
@@ -23,10 +23,18 @@ addpath(genpath('../'))
 %% get source and material
 [source_dist,spectrum] = make_noise_source();
 [mu,rho] = define_material_parameters(nx,nz,model_type);
+
 if(model_type==666)
-    A = imread('../models/rand_10_demasiados.png');
+    
+    A = imread('../models/rand_20_one_sided1.png');
     mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
     mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
+    
+elseif(model_type==888)
+    
+    cali = load('california.mat');
+    mu = (cali.v).^2 .* rho;
+    
 end
 
 
@@ -38,24 +46,37 @@ end
 
 
 %% define receiver array
-nr_x = 4;
-nr_z = 4;
-array = zeros(nr_x*nr_z,2);
-for i = 1:nr_x
-    for j = 1:nr_z        
-        array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
-        array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
-        
-%         array( (i-1)*nr_x + j, 1 ) = 2.0e5 + ( i-1 )*0.4e5;
-%         array( (i-1)*nr_z + j, 2 ) = 1.5e5 + ( j-1 )*0.4e5;
-    end
-end
+% nr_x = 4;
+% nr_z = 4;
+% array = zeros(nr_x*nr_z,2);
+% for i = 1:nr_x
+%     for j = 1:nr_z        
+%         array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
+%         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
+%         
+% %         array( (i-1)*nr_x + j, 1 ) = 0.7e6 + ( i-1 )*0.2e6;
+% %         array( (i-1)*nr_z + j, 2 ) = 0.7e6 + ( j-1 )*0.2e6;
+%         
+% %         array( (i-1)*nr_x + j, 1 ) = 0.3e6 + ( i-1 )*1.4e6/(nr_x-1);
+% %         array( (i-1)*nr_z + j, 2 ) = 0.3e6 + ( j-1 )*1.4e6/(nr_z-1);
+%     end
+% end
 
-% %% small test array, only two receivers close to each other
-% array = zeros(2,2);
+
+%% small test array, only two receivers close to each other
+array = zeros(2,2);
 % array(1,1) = 1.9e5;
 % array(2,1) = 2.1e5;
 % array(:,2) = 2.0e5;
+
+array(1,1) = 2.5e4;
+array(2,1) = 3.5e4;
+array(:,2) = 3.0e4;
+
+
+%% California setup
+% array(:,1) = cali.rec_x(1:40);
+% array(:,2) = cali.rec_z(1:40);
 
 
 %% select receivers that will be reference stations
@@ -73,8 +94,11 @@ if( strcmp(make_plots,'yes') )
     xlim([0 Lx])
     ylim([0 Lz])
     drawnow
-    
+    axis square
+       
     plot_model
+    
+%     return
 end
 
 
@@ -92,8 +116,7 @@ c_it = zeros(n_ref,n_rec,length(t));
 fprintf('\n')
 flip_sr = 'no';
 
-
-parfor i = 1:n_ref
+for i = 1:n_ref
     
     if( strcmp(verbose,'yes') )
         fprintf('reference station: %i\n',i)
@@ -108,8 +131,11 @@ parfor i = 1:n_ref
     % [c_it(i,:,:),~] = run_forward('correlation',src,rec,i,flip_sr);
     
     % use mex-functions
-    [G_2] = run_forward_green_fast_mex(mu, src);
-    [c_it(i,:,:), ~] = run_forward_correlation_fast_mex(G_2, source_dist, spectrum, mu, rec, 0, 0);
+    fprintf('%i: calculate Green function\n',i)
+    [G_2] = run_forward_green_fast(mu, src);
+    fprintf('%i: calculate correlation\n',i)
+    [c_it(i,:,:), ~] = run_forward_correlation_fast(G_2, source_dist, spectrum, mu, rec, 0, 0);
+    fprintf('%i: done\n',i)
     
 end
 
