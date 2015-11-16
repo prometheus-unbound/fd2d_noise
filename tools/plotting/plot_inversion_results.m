@@ -10,24 +10,32 @@ if(n_basis_fct == 0)
 end
 
 
-% path = '~/Desktop/runs/inversion_basis_fct/source/d0_u2g_h_filtered/i10_u_h/loga_c/f2_lbfgs_unfiltered/';
-% path = '~/Desktop/runs/inversion_basis_fct/source/d0_u2g_h_filtered/i10_u_h/loga_c/f2_lbfgs/';
-% path = '~/Desktop/runs/inversion_basis_fct/source/d0_u2g_h/i10_u_h/loga_c/';
+% path = '~/Desktop/runs/inversion_newest/source/2h2g_lr_nover_f1_bam/log_a/';
+% path = '~/Desktop/runs/inversion_newest/source/2h2g_f1_bam_richtig/log_a/';
+% path = '~/Desktop/runs/inversion_newest/coverage/49_full/';
+% path = '~/Desktop/runs/inversion_newest/tradeoff/rand20/';
+% path = '~/Desktop/runs/inversion_newest/point1/1h/wd_freqsamp5_nosmoo/';
+path = '~/Desktop/';
 
 % n_models = length( dir([path 'model_*']) );
-% model_final = load([path 'model_' num2str(n_models-1) '.mat']);
-% dist_inverted = reshape(model_final.xn,nx,nz,n_basis_fct);
+n_models = 42;
 
-
-model_final = load('~/Desktop/model_1.mat');
-dist_inverted = reshape(model_final.xn,nx,nz,n_basis_fct);
+model_final = load([path 'model_' num2str(n_models-1) '.mat']);
+dist_inverted = reshape(model_final.model.m,nx,nz,n_basis_fct);
+% dist_inverted = reshape(model_final.m,nx,nz,n_basis_fct);
+% dist_inverted = 4000 * (1+dist_inverted);
 
 % cm = cbrewer('div','RdBu',100,'PCHIP');
 % m = max(max(max(dist_inverted)));
-% clim = [-m m];
+% clim = [-1*m 1*m];
 
+% mine = fspecial('gaussian',[75 75], 30);
+% mine = fspecial('gaussian',[50 50], 20);
+% mine = fspecial('gaussian',[25 25], 10);
+% dist_inverted = imfilter( dist_inverted, mine, 'replicate' );
 
 [dist_true,~,clim] = make_noise_source('yes');
+% load ../output/interferometry/array_49_ref_coverage.mat
 
 if( ~exist('cm','var') )
     cm = [];

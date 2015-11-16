@@ -37,21 +37,42 @@ clear all
 
 
 
-folder_1 = '~/Desktop/runs/inversion/data/';
+% folder_1 = '~/Desktop/runs/inversion/data/';
+% 
+% u_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_homogeneous.mat');
+% u_h_5 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_5_uniform_homogeneous.mat');
+% u_h_10 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_10_uniform_homogeneous.mat');
+% u_h_20 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_20_uniform_homogeneous.mat');
+% 
+% u1_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform1_homogeneous.mat');
+% u2_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform2_homogeneous.mat');
+% 
+% u1b_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_1gaussian_homogeneous.mat');
+% u2b_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_2gaussian_homogeneous.mat');
+% 
+% load([folder_1 'array_16_ref.mat'])
+% t = u_h_0.t;
 
-u_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_homogeneous.mat');
-u_h_5 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_5_uniform_homogeneous.mat');
-u_h_10 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_10_uniform_homogeneous.mat');
-u_h_20 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_20_uniform_homogeneous.mat');
 
-u1_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform1_homogeneous.mat');
-u2_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform2_homogeneous.mat');
 
-u1b_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_1gaussian_homogeneous.mat');
-u2b_h_0 = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_2gaussian_homogeneous.mat');
+folder_1 = '~/Desktop/runs/inversion_newest/data/';
+
+u_0_h = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_1h.mat');
+u_0_h1g = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_1h1g.mat');
+u_0_h2g = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_2h2g.mat');
+u_0_h2g_n = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_2h2g_lr_nover.mat');
+u_0_r5os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_5_one_sided1.mat');
+u_0_r10os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_10_one_sided1.mat');
+u_0_r15os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_15_one_sided1.mat');
+u_0_r20os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_20_one_sided1.mat');
+
+u_0_h1g_p_fs1 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h1g_point1_freqsamp1.mat');
+u_0_h1g_p_fs5 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h1g_point1_freqsamp5.mat');
+u_0_h_p_fs1 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h_point1_freqsamp1.mat');
+u_0_h_p_fs5 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h_point1_freqsamp5.mat');
 
 load([folder_1 'array_16_ref.mat'])
-t = u_h_0.t;
+t = u_0_h.t;
 
 
 
@@ -65,8 +86,8 @@ second = zeros(n_ref*n_rec,length(t));
 % veldis = 'vel';
 veldis = 'dis';
 
-f_min = 1/7 - 0.005;
-f_max = 1/7 + 0.005;
+f_min = 1/15 - 0.01;
+f_max = 1/15 + 0.01;
 
 misfit = 0;
 for i = 1:n_ref
@@ -84,17 +105,17 @@ for i = 1:n_ref
     % first(indices,:) = u2_h_0.c_data( indices , : );
     % second(indices,:) = u2b_h_0.c_data( indices , : );
     
-    first(indices,:) = u_h_0.c_data( indices , : );
-    second(indices,:) = u_h_5.c_data( indices , : );
+    first(indices,:) = u_0_h.c_data( indices , : );
+    second(indices,:) = u_0_h1g_p_fs5.c_data( indices , : );
     
 %     first_save = first;
 %     second_save = second;  
 %     first(indices,:) = filter_correlations( first(indices,:), t, f_min, f_max );
 %     second(indices,:) = filter_correlations( second(indices,:), t, f_min, f_max );
     
-    [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
+%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
 %     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);
-%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
+    [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
 %     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'waveform_difference', src, rec);
     
     
@@ -122,5 +143,5 @@ fprintf('%f\n',sum(abs(misfit)))
 index = 1:n_ref*n_rec;
 % plot_recordings_windows(first(index,:),t,veldis,'k',false,left(index),right(index));
 % plot_recordings_windows(second(index,:),t,veldis,'g',false,left(index),right(index));
-plot_recordings(first(index,:),t,veldis,'b',false);
-plot_recordings(second(index,:),t,veldis,'r',false);
+plot_recordings(first(index,:),t,veldis,'b',true);
+plot_recordings(second(index,:),t,veldis,'r',true);

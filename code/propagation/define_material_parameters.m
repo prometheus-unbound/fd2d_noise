@@ -100,7 +100,7 @@ elseif ( model_type==666 )
     
 %     mu(300:310,300:310) = 5.0e10;
     
-%     A = imread('../models/rand_10.png');
+%     A = imread('../models/rand_10_one_sided.png');
 %     mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
 %     mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
     
@@ -158,22 +158,79 @@ elseif (model_type==100)
     rho = 3000.0*ones(nx,nz);
     mu = 4.8e10*ones(nx,nz);
     
-    mu(350:370,350:370) = mu(350:370,350:370) + 4.0e9;
+    mu(377:388,287:298) = mu(377:388,287:298) + 4.0e9;
     
     [Lx,Lz] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
     if( strcmp(make_plots,'yes') )
-        figure(1)
-        clf
+        figure
         mesh(X,Z,sqrt(mu./rho)')
+        view([0 90])
+        set(gca,'FontSize',12);
+        hold on
+        % load ../output/interferometry/array_16_ref.mat
+        % plot3(array(:,1),array(:,2),4050 + 0*array(:,2),'wo')
         disp([ num2str( max(max( abs( sqrt(mu./rho)-4000) ))/4000 * 100) ' % perturbation'])
         shading interp
         axis square
         colorbar
         cm = cbrewer('div','RdBu',100,'PCHIP');
         colormap(cm)
+        load clim.mat
+        caxis(clim)        
+        xlabel('x [m]')
+        ylabel('z [m]')
+        
     end
+    
+elseif (model_type==200)
+    
+    rho = 3000.0*ones(nx,nz);
+    mu = 4.8e10*ones(nx,nz);
+    
+    mu(307:318,227:238) = mu(307:318,227:238) + 4.0e9;
+    mu(377:388,227:238) = mu(377:388,227:238) + 4.0e9;
+    mu(377:388,227:238) = mu(377:388,227:238) + 4.0e9;
+    
+    x_sourcem = [1.275e6 1.45e6];
+    z_sourcem = [1.1e6 1.0e6];
+    x_width = [1.4e5 1.1e5];
+    z_width = [0.8e5 2.5e5];
+    
+    [Lx,Lz] = input_parameters();
+    [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
+    
+    for i=1:1%size(x_sourcem,2)
+        mu = mu + (-1)^i * 4.0e9 * exp( -( (X-x_sourcem(i)).^2 ) / x_width(i)^2 )' .* exp( -( (Z-z_sourcem(i)).^2 ) / z_width(i)^2 )' ;
+    end
+       
+    if( strcmp(make_plots,'yes') )
+        figure
+        mesh(X,Z,sqrt(mu./rho)')
+        view([0 90])
+        set(gca,'FontSize',12);
+        hold on
+        load ../output/interferometry/array_16_ref.mat
+        plot3(array(:,1),array(:,2),4050 + 0*array(:,2),'ko')
+        disp([ num2str( max(max( abs( sqrt(mu./rho)-4000) ))/4000 * 100) ' % perturbation'])
+        shading interp
+        axis square
+        colorbar
+        cm = cbrewer('div','RdBu',100,'PCHIP');
+        colormap(cm)
+%         load clim.mat
+%         caxis(clim)
+        xlabel('x [m]')
+        ylabel('z [m]')
+        
+    end
+    
+    
+elseif (model_type==888)
+    
+    rho = 3000.0*ones(nx,nz);
+    mu = 4.8e10*ones(nx,nz);
     
 else
 

@@ -15,17 +15,21 @@ function [clim] = plot_noise_sources(noise_source_distribution,array,cm_psd,clim
     [Lx,Lz,nx,nz,~,~,~,model_type,~,n_basis_fct] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     [width] = absorb_specs();
-
+    X = X/1000; Lx = Lx/1000;
+    Z = Z/1000; Lz = Lz/1000;
+    width = width/1000;
     
     % if no colormap is given, load standard one
     if( isempty(cm_psd) )
-        load('cm_psd')
+        % load('cm_psd')
+        cm = cbrewer('div','RdBu',120,'PCHIP');
+        cm_psd = cm(52:120,:);
     end
  
     
     % open figure, set size, etc.
     fig1 = figure;
-    set(fig1,'units','normalized','position',[.1 -.3 0.5 1.1])
+    % set(fig1,'units','normalized','position',[.1 -.3 0.5 1.1])
     set(gca,'FontSize',12);
     hold on
     
@@ -49,16 +53,28 @@ function [clim] = plot_noise_sources(noise_source_distribution,array,cm_psd,clim
             caxis([-1.0 1.0])
 
         else
-
-            pcolor(X, Z, sum(noise_source_distribution,3)' )
-            colorbar
+            
+            if( size(noise_source_distribution,3) > 1 )
+                pcolor(X, Z, sum(noise_source_distribution,3)'-1 )
+            else
+                pcolor(X, Z, sum(noise_source_distribution,3)' )
+            end
+            cb = colorbar;
+            ylabel(cb,'relative source strength')
 
         end
 
-        plot([width,Lx-width],[width,width],'k--')
-        plot([width,Lx-width],[Lz-width,Lz-width],'k--')
-        plot([width,width],[width,Lz-width],'k--')
-        plot([Lx-width,Lx-width],[width,Lz-width],'k--')
+        if( ~isempty(clim) )
+            caxis(clim)
+        else
+            caxis([0.0 7.0])
+            clim = get(gca,'CLim');
+        end
+        
+%         plot([width,Lx-width],[width,width],'k--')
+%         plot([width,Lx-width],[Lz-width,Lz-width],'k--')
+%         plot([width,width],[width,Lz-width],'k--')
+%         plot([Lx-width,Lx-width],[width,Lz-width],'k--')
 
         
     % plot maps for different frequency maps
@@ -101,15 +117,20 @@ function [clim] = plot_noise_sources(noise_source_distribution,array,cm_psd,clim
     if( ~isempty(array) )
         plot(array(:,1),array(:,2),'ko')
     end
-
+    
+    xlabels = [0 1000 2000];
+    ylabels = [0 1000 2000];
+    set(gca, 'XTick', xlabels);
+    set(gca, 'YTick', ylabels);
+    
     shading interp   
     colormap(cm_psd);
     grid on
     box on
     axis square
     title('power-spectral density distribution');
-    xlabel('x [m]')
-    ylabel('z [m]')
+    xlabel('x [km]')
+    ylabel('z [km]')
     xlim([0 Lx])
     ylim([0 Lz])
 
