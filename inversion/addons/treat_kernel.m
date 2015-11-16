@@ -22,12 +22,10 @@ function [K] = treat_kernel( K_raw, usr_par )
         
         end
             
-    
     % apply filter according to myfilter 
     elseif( usr_par.kernel.smoothing ~= 0 )
         
         K = imfilter( K_raw, usr_par.kernel.smoothing, 'replicate' );
-        
         
     else
         
