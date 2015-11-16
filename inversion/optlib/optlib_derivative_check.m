@@ -4,6 +4,7 @@ function [dcheck, dcheck_struct] = optlib_derivative_check(m,dm,hpmin,hpmax,step
 %
 
 [j, g] = eval_objective_and_gradient(m, optlib_generate_random_string(8), usr_par);
+
 % test_gradient
 % stuff = load('jh_vec.mat');
 % jh_vec = stuff.jh_vec;
@@ -40,7 +41,7 @@ for hp=hpmin:step:hpmax
 end
 
 
-save('jh_vec.mat','jh_vec','j')
+% save('jh_vec.mat','jh_vec','j')
 
 
 h1 = figure;

@@ -42,7 +42,11 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
     end
 
     
-    if( ~isfield( usr_par, 'apply_filter') )
+    if( isfield(usr_par,'filter') )
+        if( ~isfield( usr_par.filter, 'apply_filter') )
+            usr_par.filter.apply_filter = 'no';
+        end
+    else
         usr_par.filter.apply_filter = 'no';
     end
 

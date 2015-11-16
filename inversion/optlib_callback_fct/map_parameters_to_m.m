@@ -19,8 +19,8 @@ if( strcmp( usr_par.type, 'source') )
     
 elseif( strcmp( usr_par.type, 'structure') )
     
-    m = reshape( sqrt( m_parameters ./ (usr_par.structure_inversion.v0^2 * usr_par.structure_inversion.rho ) ) - 1, [], 1 );
-    % m = reshape( m_parameters, [], 1);
+%     m = reshape( sqrt( m_parameters ./ (usr_par.structure_inversion.v0^2 * usr_par.structure_inversion.rho ) ) - 1, [], 1 );
+    m = reshape( m_parameters, [], 1);
     
 end
 

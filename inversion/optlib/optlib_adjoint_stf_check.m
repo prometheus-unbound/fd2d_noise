@@ -34,10 +34,17 @@ for hp=hpmin:step:hpmax
 end
 
 h1 = figure;
-loglog(dcheck(:,1),dcheck(:,5))
-xlabel('h','Interpreter','Latex')
-ylabel('error','Interpreter','Latex')
-title('check adjoint stf - relative error')
+set(gca,'FontSize',12);
+loglog(dcheck(:,1),dcheck(:,5)*100)
+xlabel('h')
+ylabel('error [%]')
+title('check - adjoint source time function','FontSize',14)
+
+% xlabels = get(gca,'XTick');
+% ylabels = get(gca,'YTick');
+% set(gca,'XTick',downsample(xlabels,2));
+% set(gca,'YTick',downsample(ylabels,2));
+
 j
 jh_vec
 

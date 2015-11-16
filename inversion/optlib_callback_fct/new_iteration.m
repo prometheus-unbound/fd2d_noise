@@ -21,11 +21,16 @@ end
 
 
 %- some output - a bit puristic at the moment -----------------------------
-fprintf('\n%i\t misfit = %e\t norm(g)/norm(g0)=%e\n', it, model.objective, model.normg_frac)
+fprintf('\n%i\t misfit = %e\t norm(g)/norm(g0)=%e\n', ...
+    it, model.objective, model.normg_frac)
 
 
 %- save model structure in usr_par strucuture -----------------------------
 usr_par.model(it+1) = orderfields( model );
+
+
+%- save model in case inversion does not convergece -----------------------
+save( sprintf('models/model_%i.mat',it), 'model' )
 
 
 end

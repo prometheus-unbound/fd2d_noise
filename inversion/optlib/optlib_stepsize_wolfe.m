@@ -7,23 +7,23 @@ stg=-stg;
 
 sig=sig0;
  xn=xj-sig*s;
- [fn] = eval_objective(xn, usr_par);
+ [fn] = eval_objective(xn, 'yo', usr_par);
  %[fn]=feval(fct,xn);
 % Determine maximal sig=sig0/2^k satisfying Armijo
  while (f-fn<delta*sig*stg)
   sig=0.5*sig;
   xn=xj-sig*s;
-  [fn] = eval_objective(xn, usr_par);
+  [fn] = eval_objective(xn, 'yo', usr_par);
   %[fn]=feval(fct,xn);
  end
- [gn] = eval_grad_objective(xn, usr_par);
+ [gn] = eval_grad_objective(xn, 'yo', usr_par);
 
 % If sig=sig0 satisfies Armijo then try sig=2^k*sig0
 % until sig satisfies also the Wolfe condition
 % or until sigp=2^(k+1)*sig0 violates the Armijo condition
  if (sig==sig0)
   xnn=xj-2*sig*s;
-  [fnn,gnn] = eval_objective_and_gradient(xnn, usr_par);
+  [fnn,gnn] = eval_objective_and_gradient(xnn, 'yo', usr_par);
   %[fnn,gnn]=feval(fct,xnn);
   while (gn'*s>theta*stg)&(f-fnn>=2*delta*sig*stg)
    sig=2*sig;
@@ -31,7 +31,7 @@ sig=sig0;
    fn=fnn;
    gn=gnn;
    xnn=xj-2*sig*s;
-   [fnn,gnn] = eval_objective_and_gradient(xnn, usr_par);
+   [fnn,gnn] = eval_objective_and_gradient(xnn, 'yo', usr_par);
    %[fnn,gnn]=feval(fct,xnn);
   end
  end
@@ -41,7 +41,7 @@ sig=sig0;
  while (gn'*s>theta*stg)
   sigb=0.5*(sig+sigp);
   xb=xj-sigb*s;
-  [fnn,gnn] = eval_objective_and_gradient(xnn, usr_par);
+  [fnn,gnn] = eval_objective_and_gradient(xb, 'yo', usr_par);
   %[fnn,gnn]=feval(fct,xb);
   if (f-fnn>=delta*sigb*stg)
    sig=sigb;

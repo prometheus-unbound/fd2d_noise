@@ -18,7 +18,7 @@ function [options] = optlib_init_default_parameters_lbfgs(options)
     end
 
     if (~isfield (options, 'wolfe_try_to_increase_step_length') )
-        options.wolfe_try_to_increase_step_length = false;
+        options.wolfe_try_to_increase_step_length = true;
     end
      
     if (~isfield (options, 'sufficient_decrease_angle') )
@@ -34,7 +34,7 @@ function [options] = optlib_init_default_parameters_lbfgs(options)
     end
     
     if (~isfield (options, 'verbose') )
-        options.verbose = false;
+        options.verbose = true;
     end
 
     if (~isfield (options, 'output_file') )
@@ -47,6 +47,14 @@ function [options] = optlib_init_default_parameters_lbfgs(options)
 
     if (~isfield (options, 'tolerance') )
         options.tolerance = 1e-3;
+    end
+    
+    if (~isfield (options, 'successive_change') )
+        options.successive_change = 1e0;
+    end
+    
+    if (~isfield (options, 'successive_iterations') )
+        options.successive_iterations = 5;
     end
 
 end

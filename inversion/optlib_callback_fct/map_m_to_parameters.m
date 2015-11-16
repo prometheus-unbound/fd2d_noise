@@ -13,19 +13,23 @@ function [m_parameters] = map_m_to_parameters(m, usr_par)
 % See also MAP_PARAMETERS_TO_M and MAP_GRADPARAMETERS_TO_GRADM.
 
 
-[~,~,nx,nz] = input_parameters();
+[~,~,nx,nz,~,~,~,~,~,n_basis_fct] = input_parameters();
 
 
 if( strcmp( usr_par.type, 'source') )
     
-    m_parameters = reshape( m, nx, nz );
+    if( n_basis_fct ~= 0 )
+        m_parameters = reshape( m, nx, nz, n_basis_fct );
+    else
+        m_parameters = reshape( m, nx, nz );
+    end
     
 elseif( strcmp( usr_par.type, 'structure') )
     
     % in this case, m_parameters is mu, we don't consider rho at the moment
-    m_parameters = reshape( usr_par.structure_inversion.v0^2 * reshape( usr_par.structure_inversion.rho, [], 1) .* (1+m).^2, nx, nz );
+%     m_parameters = reshape( usr_par.structure_inversion.v0^2 * reshape( usr_par.structure_inversion.rho, [], 1) .* (1+m).^2, nx, nz );
     
-    % m_parameters = reshape( m, nx, nz );
+    m_parameters = reshape( m, nx, nz );
     
 end
 

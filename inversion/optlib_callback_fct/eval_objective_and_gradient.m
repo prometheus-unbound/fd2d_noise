@@ -5,7 +5,7 @@ if( nargin < 4 )
     only_objective = false;
 end
 
-[~,~,nx,nz,~,~,~,model_type] = input_parameters();
+[~,~,nx,nz,~,~,~,model_type,~,n_basis_fct] = input_parameters();
 
 %- redirect optimization variable x and initialize kernel structures
 if( strcmp( usr_par.type, 'source') )
@@ -37,9 +37,14 @@ n_ref = size( usr_par.network.ref_stat, 1 );
 n_rec = size( usr_par.network.array, 1 ) - 1;
 
 c_it = zeros( n_ref, n_rec, nt );
-grad_parameters = zeros( nx, nz );
 
-for i = 1:n_ref
+if(n_basis_fct == 0)
+    n_basis_fct = 1;
+end
+grad_parameters = zeros( nx, nz, n_basis_fct);
+
+
+parfor i = 1:n_ref
     
     
     % each reference station will act as a source once
@@ -52,7 +57,7 @@ for i = 1:n_ref
         G_2 = load_G_2( ['../output/interferometry/G_2_' num2str(i) '.mat'] );
         
     else
-        [G_2] = run_forward_green_fast_mex(mu, src);
+        [G_2] = run_forward_green_fast(mu, src);
         
         if( strcmp( usr_par.type, 'source') )
             parsave( ['../output/interferometry/G_2_' num2str(i) '.mat'], G_2 )
@@ -62,19 +67,27 @@ for i = 1:n_ref
     
     % calculate correlation
     if( strcmp( usr_par.type, 'source') )
-        [c_it(i,:,:)] = run_forward_correlation_fast_mex( G_2, source_dist, spectrum, mu, rec, 0, usr_par.debug.df );
+        [c_it(i,:,:)] = run_forward_correlation_fast( G_2, source_dist, spectrum, mu, rec, 0, usr_par.debug.df );
         
     elseif( strcmp( usr_par.type, 'structure') )
-        [c_it(i,:,:), ~, C_2_dxv, C_2_dzv] = run_forward_correlation_fast_mex( G_2, source_dist, spectrum, mu, rec, 1, usr_par.debug.df );
+        [c_it(i,:,:), ~, C_2_dxv, C_2_dzv] = run_forward_correlation_fast( G_2, source_dist, spectrum, mu, rec, 1, usr_par.debug.df );
         
     end
     
     
     % filter correlations if wanted
     if( strcmp( usr_par.filter.apply_filter, 'yes') )
-        c_data_iref = filter_correlations( usr_par.data.c_data( (i-1)*n_rec + 1 : i*n_rec, : ), t, usr_par.filter.f_min, usr_par.filter.f_max );
-        c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, usr_par.filter.f_min, usr_par.filter.f_max );
         
+        c_data_iref = filter_correlations( usr_par.data.c_data( (i-1)*n_rec + 1 : i*n_rec, : ), t, usr_par.filter.f_min, usr_par.filter.f_max );
+%         c_data_iref = filter_correlations( c_data_iref, t, usr_par.filter.f_min, usr_par.filter.f_max );
+%         c_data_iref = filter_correlations( c_data_iref, t, usr_par.filter.f_min, usr_par.filter.f_max );
+%         c_data_iref = filter_correlations( c_data_iref, t, usr_par.filter.f_min, usr_par.filter.f_max );
+        
+        c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, usr_par.filter.f_min, usr_par.filter.f_max );
+%         c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, usr_par.filter.f_min, usr_par.filter.f_max );
+%         c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, usr_par.filter.f_min, usr_par.filter.f_max );
+%         c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, usr_par.filter.f_min, usr_par.filter.f_max );
+               
     else
         c_data_iref = usr_par.data.c_data( (i-1)*n_rec + 1 : i*n_rec, : );
         
@@ -90,12 +103,12 @@ for i = 1:n_ref
         % calculate source kernel
         if( strcmp( usr_par.type, 'source') )
 
-            grad_parameters_i = run_noise_source_kernel_fast_mex( G_2, mu, spectrum, adstf, rec );
+            grad_parameters_i = run_noise_source_kernel_fast( G_2, mu, spectrum, adstf, rec );
             
         % calculate structure kernel
         elseif( strcmp( usr_par.type, 'structure') )
             
-            grad_parameters_i = run_noise_mu_kernel_fast_mex( C_2_dxv, C_2_dzv, mu, adstf, rec );
+            grad_parameters_i = run_noise_mu_kernel_fast( C_2_dxv, C_2_dzv, mu, adstf, rec );
             
         end                
         
@@ -125,12 +138,6 @@ end
 if( only_objective == true )
     g = 0;
     return    
-end
-
-
-%- sum source kernel (all frequencies or in frequency bands)
-if( strcmp( usr_par.type, 'source') )
-    grad_parameters = sum_source_kernel( grad_parameters );
 end
 
 

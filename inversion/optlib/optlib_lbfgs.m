@@ -76,6 +76,12 @@ end
 while (model.normg > options.tolerance *normg0 && ...
        it < options.max_iterations)
     
+    if( it >= options.successive_iterations )
+        if( abs(usr_par.model(it+1).objective - usr_par.model(it+1-options.successive_iterations).objective) < options.successive_change )
+            break
+        end
+    end
+   
     it=it+1;
 
     % compute BFGS-step s=B*g;
@@ -165,14 +171,16 @@ while (model.normg > options.tolerance *normg0 && ...
     usr_par = new_iteration(it, model, usr_par);
 
 end
-
-
+    
 if (model.normg<=options.tolerance*normg0)
     fprintf(fid,'Successful termination with ||g||<%e*min(1,||g0||):\n',options.tolerance);
     flag = 0;
-else
+elseif(it >= options.max_iterations)
     fprintf(fid,'Maximum number of iterations reached.\n');
-    flag = 1;
+    flag = 1;    
+else
+    fprintf(fid,'Improvement of misfit over %i iterations smaller than %f.\n',options.successive_iterations,options.successive_change);
+    flag = 2;
 end
 
 % return final model and flag
