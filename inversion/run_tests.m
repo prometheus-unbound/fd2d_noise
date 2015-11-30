@@ -24,14 +24,14 @@ clear all
 % rec = rec(rec_id,:);
 % 
 % % specify type of measurement and units of correlation
-% usr_par.measurement = 'waveform_difference';
+% usr_par.measurement = 'amplitude_difference';
 % usr_par.veldis = 'dis';
 % 
 % 
 % [dcheck, dcheck_struct] = optlib_adjoint_stf_check(u.c_data(index,:),u0.c_data(index,:),du,u.t,src,rec,-10,-2,0.01,usr_par);
 % return
-% % keyboard
-% % clear all
+% keyboard
+% clear all
 
 
 
@@ -65,10 +65,12 @@ clear all
 % dm = 0.1 * m;
 
 [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
-[mu,~] = define_material_parameters(nx,nz,model_type);
 [usr_par] = usr_par_init_default_parameters_lbfgs([]);
+usr_par.use_mex = 'no';
+[mu,rho] = define_material_parameters(nx,nz,model_type);
 m = map_parameters_to_m(mu,usr_par);
-dm = m * 0.1;
+% m = map_parameters_to_m(rho,usr_par);
+dm = m + 0.1;
 
-[dcheck, dcheck_struct] = optlib_derivative_check( m, dm, -10, -2, 1, usr_par);
+[dcheck, dcheck_struct] = optlib_derivative_check( m, dm, -10, -1, 1, usr_par);
 

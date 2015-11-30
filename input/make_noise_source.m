@@ -70,13 +70,13 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
             sourcearea_width = [2.0e5, 1.5e5];
             magnitude = [5.0, 5.0];
             
-            % setup for coverage test
+%             % setup for coverage test
 %             x_sourcem = [0.6e6, 0.6e6];
 %             z_sourcem = [0.8e6, 1.3e6];
 %             sourcearea_width = [2.0e5, 1.5e5];
 %             magnitude = [6.0, 5.0];
-            
-            % lr_nover
+           
+%             % lr_nover
 %             x_sourcem = [0.4e6, 1.6e6];
 %             z_sourcem = [1.0e6, 1.0e6];
 %             sourcearea_width = [1.2e5, 1.2e5];
@@ -211,11 +211,12 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
             
         end
         
-%         load ../output/interferometry/array_16_ref_coverage_orig.mat
+%         load ../output/interferometry/array_1_ref.mat
+%         load ~/Desktop/array_1_ref.mat
         array = [];
-        load clim.mat
-        clim = plot_noise_sources(noise_source_distribution,array,[],[clim(1) 0.3*clim(2)]);
-%         clim = plot_noise_sources(noise_source_distribution,array,[],[]);
+%         load clim.mat
+%         clim = plot_noise_sources(noise_source_distribution,array,[],[clim(1) 0.3*clim(2)]);
+        clim = plot_noise_sources(noise_source_distribution,array,[],[]);
         
     else
         
