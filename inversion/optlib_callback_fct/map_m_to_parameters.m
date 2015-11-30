@@ -27,9 +27,8 @@ if( strcmp( usr_par.type, 'source') )
 elseif( strcmp( usr_par.type, 'structure') )
     
     % in this case, m_parameters is mu, we don't consider rho at the moment
-%     m_parameters = reshape( usr_par.structure_inversion.v0^2 * reshape( usr_par.structure_inversion.rho, [], 1) .* (1+m).^2, nx, nz );
-    
-    m_parameters = reshape( m, nx, nz );
+    % m_parameters = reshape( usr_par.structure_inversion.v0^2 * reshape( usr_par.structure_inversion.rho, [], 1) .* (1+m).^2, nx, nz );
+    m_parameters = 4.8e10 * ( 1 + reshape( m, nx, nz ) );
     
 end
 

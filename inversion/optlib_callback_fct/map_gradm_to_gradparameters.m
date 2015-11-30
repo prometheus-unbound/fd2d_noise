@@ -27,8 +27,8 @@ if( strcmp( usr_par.type, 'source') )
     
 elseif( strcmp( usr_par.type, 'structure') )
     
-%     grad_parameters = reshape( grad_m ./ ( 2 * reshape(usr_par.structure_inversion.rho,[],1) * usr_par.structure_inversion.v0^2 .* (1+m) ) , nx, nz);
-    grad_parameters = reshape( grad_m, nx, nz );
+    % grad_parameters = reshape( grad_m ./ ( 2 * reshape(usr_par.structure_inversion.rho,[],1) * usr_par.structure_inversion.v0^2 .* (1+m) ) , nx, nz);
+    grad_parameters = reshape( grad_m, nx, nz ) / 4.8e10;
     
 end
 
