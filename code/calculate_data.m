@@ -10,6 +10,7 @@ mode = 'local';
 % mode = 'euler';
 % mode = 'brutus';
 
+use_mex = 'no';
 
 addpath(genpath('../'))
 
@@ -21,8 +22,11 @@ addpath(genpath('../'))
 
 
 %% get source and material
-[source_dist,spectrum] = make_noise_source();
-[mu,rho] = define_material_parameters(nx,nz,model_type);
+[source_dist, spectrum] = make_noise_source();
+[mu, rho] = define_material_parameters(nx,nz,model_type);
+
+% mu = mu + 1e9;
+% source_dist = source_dist + 1;
 
 if(model_type==666)
     
@@ -46,32 +50,28 @@ end
 
 
 %% define receiver array
-% nr_x = 4;
-% nr_z = 4;
-% array = zeros(nr_x*nr_z,2);
-% for i = 1:nr_x
-%     for j = 1:nr_z        
-%         array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
-%         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
-%         
-% %         array( (i-1)*nr_x + j, 1 ) = 0.7e6 + ( i-1 )*0.2e6;
-% %         array( (i-1)*nr_z + j, 2 ) = 0.7e6 + ( j-1 )*0.2e6;
-%         
-% %         array( (i-1)*nr_x + j, 1 ) = 0.3e6 + ( i-1 )*1.4e6/(nr_x-1);
-% %         array( (i-1)*nr_z + j, 2 ) = 0.3e6 + ( j-1 )*1.4e6/(nr_z-1);
-%     end
-% end
+nr_x = 4;
+nr_z = 4;
+array = zeros(nr_x*nr_z,2);
+for i = 1:nr_x
+    for j = 1:nr_z        
+        array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
+        array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
+        
+%         array( (i-1)*nr_x + j, 1 ) = 0.7e6 + ( i-1 )*0.2e6;
+%         array( (i-1)*nr_z + j, 2 ) = 0.7e6 + ( j-1 )*0.2e6;
+        
+%         array( (i-1)*nr_x + j, 1 ) = 0.3e6 + ( i-1 )*1.4e6/(nr_x-1);
+%         array( (i-1)*nr_z + j, 2 ) = 0.3e6 + ( j-1 )*1.4e6/(nr_z-1);
+    end
+end
 
 
 %% small test array, only two receivers close to each other
-array = zeros(2,2);
-% array(1,1) = 1.9e5;
-% array(2,1) = 2.1e5;
-% array(:,2) = 2.0e5;
-
-array(1,1) = 2.5e4;
-array(2,1) = 3.5e4;
-array(:,2) = 3.0e4;
+% array = zeros(2,2);
+% array(1,1) = 2.5e4;
+% array(2,1) = 3.5e4;
+% array(:,2) = 3.0e4;
 
 
 %% California setup
@@ -80,7 +80,7 @@ array(:,2) = 3.0e4;
 
 
 %% select receivers that will be reference stations
-ref_stat = array;
+ref_stat = array;%(1,:);
 n_ref = size(ref_stat,1);
 n_rec = size(array,1)-1;
 
@@ -95,10 +95,10 @@ if( strcmp(make_plots,'yes') )
     ylim([0 Lz])
     drawnow
     axis square
-       
-    plot_model
     
-%     return
+    return
+
+    plot_model    
 end
 
 
@@ -114,9 +114,8 @@ t = -(nt-1)*dt:dt:(nt-1)*dt;
 c_it = zeros(n_ref,n_rec,length(t));
 
 fprintf('\n')
-flip_sr = 'no';
 
-for i = 1:n_ref
+parfor i = 1:n_ref
     
     if( strcmp(verbose,'yes') )
         fprintf('reference station: %i\n',i)
@@ -126,15 +125,21 @@ for i = 1:n_ref
     src = ref_stat(i,:);
     rec = array( find(~ismember(array,src,'rows') ) , :);
     
-    % calculate the correlation for each pair
-    % [~,~] = run_forward('forward_green',src,rec,i,flip_sr);
-    % [c_it(i,:,:),~] = run_forward('correlation',src,rec,i,flip_sr);
     
-    % use mex-functions
     fprintf('%i: calculate Green function\n',i)
-    [G_2] = run_forward_green_fast(mu, src);
+    if( strcmp(use_mex,'yes') )
+        [G_2] = run_forward1_green_mex(mu, rho, src, 1);
+    else
+        [G_2] = run_forward1_green(mu, rho, src, 1);
+    end
+    
     fprintf('%i: calculate correlation\n',i)
-    [c_it(i,:,:), ~] = run_forward_correlation_fast(G_2, source_dist, spectrum, mu, rec, 0, 0);
+    if( strcmp(use_mex,'yes') )
+        [c_it(i,:,:)] = run_forward2_correlation_mex(mu, rho, G_2, spectrum, source_dist, rec, 1, 0);
+    else
+        [c_it(i,:,:)] = run_forward2_correlation(mu, rho, G_2, spectrum, source_dist, rec, 1, 0);
+    end
+    
     fprintf('%i: done\n',i)
     
 end

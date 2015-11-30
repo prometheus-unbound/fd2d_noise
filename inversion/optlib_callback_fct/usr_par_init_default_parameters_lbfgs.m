@@ -10,6 +10,9 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
         usr_par.type = 'structure';
     end
     
+    if( ~isfield( usr_par, 'use_mex') )
+        usr_par.use_mex = 'yes';
+    end
     
     if( strcmp( usr_par.type, 'structure' ) )
         if( isfield( usr_par, 'structure_inversion') )

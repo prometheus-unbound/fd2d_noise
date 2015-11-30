@@ -11,8 +11,10 @@ usr_par.cluster = 'monch';
 % 'euler';
 % 'brutus';
 
+usr_par.use_mex = 'yes';
 
-usr_par.type = 'source';
+
+usr_par.type = 'structure';
 % 'source_constrained';
 % 'structure';
 
@@ -45,7 +47,7 @@ usr_par.filter.f_max = 1/7 + 0.01;
 
 % load array with reference stations and data
 usr_par.network = load('../output/interferometry/array_16_ref.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_5_2h2g_right.mat');
+usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_point2.mat');
 
 
 % specify percentile for clipping of kernel      ( = 0 to turn it off )
@@ -140,7 +142,8 @@ elseif( strcmp( usr_par.type, 'structure' ) )
     m0 = zeros(nx*nz, 1);
     
     % do inversion
-    [flag, mfinal, usr_par] = optlib_steepest_descent(m0, options, usr_par);
+    % [flag, mfinal, usr_par] = optlib_steepest_descent(m0, options, usr_par);
+    [flag, mfinal, usr_par] = optlib_lbfgs(m0, options, usr_par);
     
     % save solution
     save('../output/solution.mat', 'flag', 'mfinal', 'usr_par')    

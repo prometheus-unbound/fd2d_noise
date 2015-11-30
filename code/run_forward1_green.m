@@ -1,17 +1,18 @@
-function [G_2] = run_forward_green_fast(mu,src)
+function [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green(mu, rho, src, mode)
 
 %==========================================================================
-% run forward simulation
-% fast means ready for conversion to mex-files
+% compute Green function for reference station
 %
 % input:
 %--------
 % mu [N/m^2]
-% src: source, i.e. reference station
+% rho [kg/m^3]
+% src: source position, i.e. the reference station
 %
 % output:
 %--------
-% G_2: displacement Green function for reference station
+% G_2: Fourier transformed displacement Green function of reference station
+% G__dxu_time & G__dzu_time: strain of displacemen Green function
 %
 %==========================================================================
 
@@ -21,9 +22,9 @@ function [G_2] = run_forward_green_fast(mu,src)
 %==========================================================================
 
 %- material and domain ----------------------------------------------------
-[Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
+[Lx,Lz,nx,nz,dt,nt,order,~,~,~,fw_nth] = input_parameters();
 [~,~,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
-[~,rho] = define_material_parameters(nx,nz,model_type);
+rho = reshape(rho,nx,nz);
 mu = reshape(mu,nx,nz);
 
 
@@ -32,7 +33,7 @@ mu = reshape(mu,nx,nz);
 
 
 %- time axis --------------------------------------------------------------
-t = 0:dt:dt*(nt-1);
+t = 0:dt:(nt-1)*dt;
 
 
 %- compute indices for source locations -----------------------------------
@@ -45,24 +46,51 @@ end
 
 
 %- make source time function ----------------------------------------------
-stf = 1.0e9*ones(1,length(t));
+stf = 1.0e9*ones(1,nt);
 
 
-%- Fourier transform of the forward Greens function
+%- Fourier transform of the forward Greens function -----------------------
 G_2 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
 
 
 %- prepare coefficients for Fourier transform -----------------------------
-fft_coeff = zeros(length(t),n_sample) + 1i*zeros(length(t),n_sample);
-for k = 1:n_sample
-    fft_coeff(:,k) = 1/sqrt(2*pi) * exp(-1i*w_sample(k)*t') * dt;
+n_ftc = 0;
+for n = nt:(2*nt-1)
+    if( mod(n,freq_samp) == 0 )
+        n_ftc = n_ftc + 1;
+    end
+end
+
+fft_coeff = zeros(n_ftc,n_sample) + 1i*zeros(n_ftc,n_sample);
+i_ftc = 1;
+for n = nt:(2*nt-1)
+    if( mod(n,freq_samp) == 0 )
+        
+        for k = 1:n_sample
+            fft_coeff(i_ftc,k) = 1/sqrt(2*pi) * exp(-1i*w_sample(k)*t(n-nt+1)) * dt;
+        end
+        i_ftc = i_ftc + 1;
+        
+    end
 end
 
 
-%- dynamic fields and absorbing boundary field ----------------------------
+%- allocate dynamic fields ------------------------------------------------
 v = zeros(nx,nz);
 sxy = zeros(nx-1,nz);
 szy = zeros(nx,nz-1);
+
+n_fw = 0;
+for n = nt:(2*nt-1)
+    if( mod(n,fw_nth) == 0 )
+        n_fw = n_fw + 1;
+    end
+end
+
+G_2_dxu_time = zeros(nx-1,nz,n_fw,'single');
+G_2_dzu_time = zeros(nx,nz-1,n_fw,'single');
+strain_dxv = zeros(nx-1,nz);
+strain_dzv = zeros(nx,nz-1);
 
 
 %- initialise absorbing boundary taper a la Cerjan ------------------------
@@ -73,10 +101,18 @@ szy = zeros(nx,nz-1);
 % iterate
 %==========================================================================
 
-%%% TEST TIME DOMAIN VERSION %%%
-% G_2_test = zeros(nx,nz,2*nt-1);
-
-for n = 1:length(t)
+i_ftc = 1;
+i_fw = 1;
+for n = 1:nt
+    
+    
+    if( mode == 1 && mod(n+nt-1, fw_nth) == 0 )
+        G_2_dxu_time(:,:,i_fw) = single(strain_dxv);
+        G_2_dzu_time(:,:,i_fw) = single(strain_dzv);
+        
+        i_fw = i_fw + 1;
+    end
+    
     
     %- compute divergence of current stress tensor ------------------------    
     DS = div_s(sxy,szy,dx,dz,nx,nz,order);
@@ -105,18 +141,22 @@ for n = 1:length(t)
     
     
     %- accumulate Fourier transform of the displacement Greens function ---
-    if( mod(n,freq_samp) == 0 )         
+    if( mod(n+nt-1, freq_samp) == 0 )         
         
         for k = 1:n_sample
-            G_2(:,:,k) = G_2(:,:,k) + v * fft_coeff(n,k);
+            G_2(:,:,k) = G_2(:,:,k) + v * fft_coeff(i_ftc,k);
         end
+        i_ftc = i_ftc + 1;
         
     end
+
     
-    
-    %%% TEST TIME DOMAIN VERSION %%%
-    % G_2_test(:,:,nt-1+n) = v;
-    
+end
+
+
+%% return the time reversed Green function
+for k = 1:n_sample
+    G_2(:,:,k) = conj(G_2(:,:,k));
 end
 
 
