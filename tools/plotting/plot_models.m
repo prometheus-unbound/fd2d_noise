@@ -8,44 +8,52 @@
 %
 % optional: leave empty if not wanted
 
-function [clim] = plot_noise_sources(noise_source_distribution,array,cm_psd,clim,overlay)
+function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overlay)
 
-    % get configuration
+    %% configuration
     [f_sample,n_sample] = input_interferometry();
     [Lx,Lz,nx,nz,~,~,~,model_type,~,n_basis_fct] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     [width] = absorb_specs();
-    X = X/1000; Lx = Lx/1000;
-    Z = Z/1000; Lz = Lz/1000;
+    
+    % convert to km
+    X = X / 1000;  Lx = Lx / 1000;
+    Z = Z / 1000;  Lz = Lz / 1000;
     width = width/1000;
     
-    % if no colormap is given, load standard one
+    
+    %% colormap
     if( isempty(cm_psd) )
-%         % load('cm_psd')
-%         cm = cbrewer('div','RdBu',120,'PCHIP');
-%         cm_psd = cm;
-
-        cm = cbrewer('div','BrBG',120,'PCHIP');
-%         cm_psd = cm(41:120,:);
-        cm_psd = cm(50:120,:);
+        
+        if( mean(mean(noise_source_distribution)) > 1e9 )
+            cm = cbrewer('div','RdBu',120,'PCHIP');
+            cm_psd = cm;
+        else
+            % cm = cbrewer('div','BrBG',120,'PCHIP');
+            cm = cbrewer('div','RdBu',120,'PCHIP');
+            cm_psd = cm(50:120,:);
+        end
 
     end
  
     
-    % open figure, set size, etc.
+    %% open figure, set size, etc.
     fig1 = figure;
     set(fig1,'units','normalized','position',[.1 -.3 0.28 0.5])
     set(gca,'FontSize',18);
     hold on
     
-    % plot array if given
+    
+    %% plot array if given
     if( ~isempty(array) )
-        plot3(array(:,1)/1000,array(:,2)/1000,10+0*array(:,2),'kd','MarkerFaceColor','k','MarkerSize',5)
-%         legend('array')
+        array = array / 1000;
+        plot3(array(:,1),array(:,2),10+0*array(:,2),'kd','MarkerFaceColor','k','MarkerSize',5)
+        legend('array')
     end
     
-    % plot for n_basis_fct == 0, i.e. only one map
-    if( n_basis_fct == 0 )
+    
+    %% plot for n_basis_fct == 0, i.e. only one map, or structure model
+    if( n_basis_fct == 0 || mean(mean(noise_source_distribution)) > 1e9)
         
         if( nargin < 5 || isempty(overlay) )
             overlay = 'no';
@@ -67,26 +75,33 @@ function [clim] = plot_noise_sources(noise_source_distribution,array,cm_psd,clim
             if( size(noise_source_distribution,3) > 1 )
                 pcolor(X, Z, sum(noise_source_distribution,3)'-1 )
             else
-                pcolor(X, Z, sum(noise_source_distribution,3)' )
+                mesh(X, Z, noise_source_distribution' )
             end
             
             % cb = colorbar('SouthOutside');
             cb = colorbar;
             
-%             ylabel(cb,'[N/m^2]')
-%             set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
-
-            ylabel(cb,'[kg^2/m^2/s^2]')
-            % set(cb,'YTick',[0 1 2 3 4])
-            set(cb,'YTick',[0 2 4 6])
+            if( mean(mean(noise_source_distribution)) > 1e9 )
+                ylabel(cb,'[N/m^2]')
+                set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
+%                 set(cb,'YTick',[4.75 4.8 4.85]*1e10)
+            else
+                ylabel(cb,'[kg^2/m^2/s^2]')
+                % set(cb,'YTick',[0 1 2 3 4])
+                set(cb,'YTick',[0 2 4 6])
+            end
     
         end
 
+        
         if( ~isempty(clim) )
             caxis(clim)
         else
-%             caxis([4.4 5.2]*1e10)
-            caxis([0 7])
+            if( mean(mean(noise_source_distribution)) > 1e9 )
+                caxis([4.4 5.2]*1e10)
+            else
+                caxis([0 7])
+            end
             
             clim = get(gca,'CLim');
         end
@@ -97,7 +112,7 @@ function [clim] = plot_noise_sources(noise_source_distribution,array,cm_psd,clim
 %         plot([Lx-width,Lx-width],[width,Lz-width],'k--')
 
         
-    % plot maps for different frequency maps
+    %% plot maps for different frequency maps
     else
 
         fudge_factor = 10;
@@ -139,19 +154,21 @@ function [clim] = plot_noise_sources(noise_source_distribution,array,cm_psd,clim
     set(gca, 'XTick', xlabels);
     set(gca, 'YTick', ylabels);
     
+%     view([22 4])
+    
     shading interp   
-%     colormap(flipud(colormap(cm_psd)));
     colormap(cm_psd);
     grid on
-    box on
-    ax = gca;
-    ax.LineWidth = 2;
+%     box on
+%     ax = gca;
+%     ax.LineWidth = 2;
     axis square
-%     title('power-spectral density distribution');
     xlabel('x [km]')
     ylabel('z [km]')
     xlim([0 Lx])
     ylim([0 Lz])
+    
+    % title('')
 
     
 end
