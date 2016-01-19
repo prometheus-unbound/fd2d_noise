@@ -13,8 +13,7 @@ function [m_parameters] = map_m_to_parameters(m, usr_par)
 % See also MAP_PARAMETERS_TO_M and MAP_GRADPARAMETERS_TO_GRADM.
 
 
-[Lx,Lz,nx,nz,~,~,~,~,~,n_basis_fct] = input_parameters();
-[~,~,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
+[~,~,nx,nz,~,~,~,~,~,n_basis_fct] = input_parameters();
 
 
 if( strcmp( usr_par.type, 'source') )

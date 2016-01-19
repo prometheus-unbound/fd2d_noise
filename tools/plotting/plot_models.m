@@ -47,7 +47,7 @@ function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overla
     %% plot array if given
     if( ~isempty(array) )
         array = array / 1000;
-        plot3(array(:,1),array(:,2),10+0*array(:,2),'kd','MarkerFaceColor','k','MarkerSize',5)
+        plot3(array(:,1),array(:,2),2+0*array(:,2),'kd','MarkerFaceColor','k','MarkerSize',5)
         legend('array')
     end
     

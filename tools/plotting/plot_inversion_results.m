@@ -9,23 +9,10 @@ if(n_basis_fct == 0)
     n_basis_fct = 1;
 end
 
-% for i = 1:31
+usr_par.type = 'source';
+usr_par.kernel.imfilter = fspecial('gaussian',[50 50], 20);
 
-% path = '~/Desktop/mu_point4.mat';
-
-path = '~/Desktop/model_4.mat';
-
-% path = '~/Desktop/model_55_point2_equal_wd.mat';
-% path = '~/Desktop/model_61_point2_logas_wd.mat';
-% path = '~/Desktop/model_60_point2_trues_wd.mat';
-
-% path = '~/Desktop/model_20_point2_equal_wd.mat';
-% path = '~/Desktop/model_20_point2_logas_wd.mat';
-
-% path = '~/Desktop/point_tests/point3/model_36_point3_trues_wd.mat';
-
-% path = '~/Desktop/point_tests/point4/model_2_point4_trues_cc.mat';
-
+path = '~/Desktop/model_1.mat';
 
 
 % path = sprintf('~/Desktop/models/model_%i.mat',i);
@@ -56,28 +43,16 @@ path = '~/Desktop/model_4.mat';
 
 
 % model_final = load([path 'model_' num2str(n_models-1) '.mat']);
-model_final = load(path);
-% model_initial = load('~/Desktop/model_0.mat');
-
-dist_inverted = reshape(model_final.model.m,nx,nz,n_basis_fct);
-% dist_inverted = reshape(model_final.model.m-model_initial.model.m,nx,nz,n_basis_fct);
-% dist_inverted = reshape(model_final.mu,nx,nz,n_basis_fct);
-% dist_inverted = reshape(model_final.m,nx,nz,n_basis_fct);
-% dist_inverted = reshape(model_final.xn,nx,nz,n_basis_fct);
-% dist_inverted = reshape(model_final.mu,nx,nz,n_basis_fct);
-
-
-% clip_value = prctile( abs(reshape(dist_inverted,[],1)), 99.7 );
-% [i,j] = find( abs(dist_inverted) >= clip_value );
-% dist_inverted(i,j) = 0;
-
-dist_inverted = 4.8e10 * (1+dist_inverted);
+load(path);
+m_parameters = reshape( map_m_to_parameters(model.m, usr_par), nx, nz, n_basis_fct );
 
 
 % [dist_true,~,clim] = make_noise_source('yes');
 % load ~/Desktop/runs/inversion_newest/data/coverage/array_16_ref_coverage_orig.mat
 % load ~/Desktop/runs/inversion_newest/data/coverage/array_16_ref_coverage.mat
 % load ~/Desktop/runs/inversion_newest/data/coverage/array_49_ref_coverage.mat
+
+
 
 load ~/Desktop/runs/inversion_new_world/data/array_16_ref.mat
 
@@ -91,15 +66,13 @@ if( ~exist('cm','var') )
 end
 
 if( exist('clim','var') )
-    plot_models(dist_inverted,array,cm,[clim(1) clim(2)]);
+    plot_models( m_parameters, array, cm, [clim(1) clim(2)] );
 else
-    plot_models(dist_inverted,array,cm,[]);
-    plot_models(dist_inverted,array,cm,[4.75 4.85]*1e10);
+    plot_models( m_parameters, array, cm, [] );
 end
 
-pause(0.1)
 
-% end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'

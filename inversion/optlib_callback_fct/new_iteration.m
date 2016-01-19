@@ -31,6 +31,7 @@ usr_par.model(it+1) = orderfields( model );
 
 %- save model -------------------------------------------------------------
 model.type = usr_par.type;
+model.imfilter = usr_par.kernel.imfilter;
 save( sprintf('models/model_%i.mat',it), 'model' )
 
 
