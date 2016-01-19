@@ -22,12 +22,12 @@ usr_par.data_independent = 'yes';
 
 usr_par.use_mex = 'no';
 
-[usr_par] = usr_par_init_default_parameters_lbfgs([]);
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % initialize run
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[usr_par] = usr_par_init_default_parameters_lbfgs([]);
 
 % set up model
 [~,~,nx,nz,dt,nt,~,model_type,~,n_basis_fct] = input_parameters();
