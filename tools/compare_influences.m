@@ -57,19 +57,22 @@ clear all
 
 folder_1 = '~/Desktop/runs/inversion_newest/data/';
 
-u_0_h = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_1h.mat');
-u_0_h1g = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_1h1g.mat');
-u_0_h2g = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_2h2g.mat');
-u_0_h2g_n = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_2h2g_lr_nover.mat');
-u_0_r5os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_5_one_sided1.mat');
-u_0_r10os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_10_one_sided1.mat');
-u_0_r15os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_15_one_sided1.mat');
-u_0_r20os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_20_one_sided1.mat');
+% u_0_h = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_1h.mat');
+% u_0_h1g = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_1h1g.mat');
+% u_0_h2g = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_2h2g.mat');
+% u_0_h2g_n = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_2h2g_lr_nover.mat');
+% u_0_r5os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_5_one_sided1.mat');
+% u_0_r10os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_10_one_sided1.mat');
+% u_0_r15os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_15_one_sided1.mat');
+% u_0_r20os = load('~/Desktop/runs/inversion_newest/data/data_16_ref_0_rand_20_one_sided1.mat');
+% 
+% u_0_h1g_p_fs1 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h1g_point1_freqsamp1.mat');
+% u_0_h1g_p_fs5 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h1g_point1_freqsamp5.mat');
+% u_0_h_p_fs1 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h_point1_freqsamp1.mat');
+% u_0_h_p_fs5 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h_point1_freqsamp5.mat');
 
-u_0_h1g_p_fs1 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h1g_point1_freqsamp1.mat');
-u_0_h1g_p_fs5 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h1g_point1_freqsamp5.mat');
-u_0_h_p_fs1 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h_point1_freqsamp1.mat');
-u_0_h_p_fs5 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h_point1_freqsamp5.mat');
+u_0_h = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h_iugg.mat');
+u_0_h1g = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h1g_iugg.mat');
 
 load([folder_1 'array_16_ref.mat'])
 t = u_0_h.t;
@@ -106,16 +109,16 @@ for i = 1:n_ref
     % second(indices,:) = u2b_h_0.c_data( indices , : );
     
     first(indices,:) = u_0_h.c_data( indices , : );
-    second(indices,:) = u_0_h1g_p_fs5.c_data( indices , : );
+    second(indices,:) = u_0_h1g.c_data( indices , : );
     
 %     first_save = first;
 %     second_save = second;  
 %     first(indices,:) = filter_correlations( first(indices,:), t, f_min, f_max );
 %     second(indices,:) = filter_correlations( second(indices,:), t, f_min, f_max );
     
-%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
+    [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
 %     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);
-    [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
+%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
 %     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'waveform_difference', src, rec);
     
     

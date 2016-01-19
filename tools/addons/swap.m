@@ -1,5 +1,5 @@
 
-function [y,x]=swap(x,y)
+function [y,x] = swap(x,y)
 
 end
 

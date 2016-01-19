@@ -193,8 +193,8 @@ elseif (model_type==200)
     
     x_sourcem = [1.275e6];
     z_sourcem = [0.975e6];
-    x_width = [0.5e5];
-    z_width = [0.5e5];
+    x_width = [0.2e5];
+    z_width = [0.2e5];
     
     [Lx,Lz] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
@@ -205,7 +205,8 @@ elseif (model_type==200)
        
     if( strcmp(make_plots,'yes') )
         figure
-        mesh(X,Z,sqrt(mu./rho)')
+%         mesh(X,Z,sqrt(mu./rho)')
+        mesh(X,Z,mu')
         view([0 90])
         set(gca,'FontSize',12);
         hold on
