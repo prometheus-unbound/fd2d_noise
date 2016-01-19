@@ -26,7 +26,8 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
         fprintf( 'testing step length %f...\n', sig);
     end
     
-    [fn] = eval_objective(xn, xn_string, usr_par);
+    % [fn] = eval_objective(xn, xn_string, usr_par);
+    [fn,gn,cn] = eval_objective_and_gradient(xb, xb_string, usr_par);
      
     % Determine maximal sig=sig0/2^k satisfying Armijo
     while (f-fn<del*sig*stg)
@@ -43,10 +44,13 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
         [fn] = eval_objective(xn, xn_string, usr_par);
     end
     if (verbose)
-            fprintf( 'step length %f satisfies Armijo-Goldstein condition.\n', sig );
-            fprintf( 'requesting gradient to test Wolfe condition...\n' );
+        fprintf( 'step length %f satisfies Armijo-Goldstein condition.\n', sig );
+        fprintf( 'requesting gradient to test Wolfe condition...\n' );
     end
-    [gn,cn] = eval_grad_objective(xn, xn_string, usr_par);
+    
+    if( sig~=sig0 )
+        [gn,cn] = eval_grad_objective(xn, xn_string, usr_par);
+    end
 
     % check wolfe condition
     if ( gn'*s<=theta*stg )
@@ -101,7 +105,7 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
             if it_bisec > bisec_max
                 if sig > 0.01
                     
-                    fprintf( 'Hurrah! get out of here! fucking bisection!\n' );
+                    fprintf( 'Hurrah! get out of here!\n' );
                     
                     % assign the step that satisfies Armijo
                     sig = sig_armijo;           % step
