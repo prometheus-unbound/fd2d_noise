@@ -11,10 +11,12 @@ usr_par.cluster = 'monch';
 % 'euler';
 % 'brutus';
 
+
 usr_par.use_mex = 'yes';
 
 
-usr_par.type = 'structure';
+usr_par.type = 'source';
+% 'source';
 % 'source_constrained';
 % 'structure';
 
@@ -47,16 +49,19 @@ usr_par.filter.f_max = 1/7 + 0.01;
 
 % load array with reference stations and data
 usr_par.network = load('../output/interferometry/array_16_ref.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_point2.mat');
+usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_iugg.mat');
+
+
+% load source distribution that should be used for structure inversion
+% usr_par.source_dist = load('initial_models/model_68.mat');
 
 
 % specify percentile for clipping of kernel      ( = 0 to turn it off )
 usr_par.kernel.percentile = 0;
 
 
-% desing gaussian filter for smoothing of kernel ( = 0 to turn it off )
-usr_par.kernel.smoothing = 0;
-% usr_par.kernel.smoothing = fspecial('gaussian',[75 75], 30);
+% desing gaussian filter for smoothing of kernel
+usr_par.kernel.imfilter = fspecial('gaussian',[50 50], 20);
 
 
 % debug mode
@@ -73,9 +78,14 @@ options.tolerance = 1e-3;
 options.successive_change = 1e-16;
 options.successive_iterations = 100;
 options.max_iterations = 100;
-options.init_step_length = 1.0; 
-options.wolfe_try_to_increase_step_length = true;
+options.wolfe_try_to_increase_step_length = false;
 options.verbose = true;
+if( strcmp( usr_par.type, 'structure') )
+    options.init_step_length = 0.5;
+else
+    options.init_step_length = 16.0;
+end
+
 
 %%% FOR STEEPEST DESCENT
 % options.init_step_length = 1.0;

@@ -61,12 +61,12 @@ clear all
 
 
 %% check gradient
+[usr_par] = usr_par_init_default_parameters_lbfgs([]);
+
 % m = reshape( make_noise_source(), [], 1);
 % dm = 0.1 * m;
 
 [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
-[usr_par] = usr_par_init_default_parameters_lbfgs([]);
-usr_par.use_mex = 'no';
 [mu,rho] = define_material_parameters(nx,nz,model_type);
 m = map_parameters_to_m(mu,usr_par);
 % m = map_parameters_to_m(rho,usr_par);

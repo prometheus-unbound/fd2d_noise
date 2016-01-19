@@ -5,7 +5,7 @@ function [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct,fw_nth] = i
 % set basic simulation parameters
 %==========================================================================
 
-% % small test setup
+% % tiny setup for gradient validation
 % Lx = 6.0e4;             % model extension in x-direction [m]
 % Lz = 6.0e4;             % model extension in y-direction [m]
 % 
@@ -16,7 +16,18 @@ function [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct,fw_nth] = i
 % nt = 150;               % number of iterations
 
 
-% setup Andreas
+% % small setup
+% Lx = 4.0e5;         % model extension in x-direction [m]
+% Lz = 4.0e5;         % model extension in y-direction [m]
+% 
+% nx = 300;           % grid points in x-direction
+% nz = 300;           % grid points in z-direction
+% 
+% dt = 0.09;          % time step [s]
+% nt = 900;           % number of iterations
+
+
+% % setup Andreas
 Lx = 2.0e6;             % model extension in x-direction [m]
 Lz = 2.0e6;             % model extension in y-direction [m]
 
@@ -53,7 +64,7 @@ fw_nth = 2;             % only use 1 or 2 for now
 %==========================================================================
 
 model_type = 1;
-% model_type = 888;
+% model_type = 999;
 
 % 1=homogeneous 
 % 2=homogeneous with localised density perturbation
@@ -71,8 +82,8 @@ model_type = 1;
 % source type
 %==========================================================================
 
-% source_type = 'homogeneous';
-source_type = 'gaussian';
+source_type = 'homogeneous';
+% source_type = 'gaussian';
 
 % number of frequency bands
 n_basis_fct = 0;

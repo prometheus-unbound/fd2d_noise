@@ -17,18 +17,25 @@ if( strcmp( usr_par.type, 'source') )
     % load structure that is assumed for the source inversion
     [mu, rho] = define_material_parameters(nx,nz,model_type);
     
+    
 elseif( strcmp( usr_par.type, 'structure') )
     
-    % get source that is assumed for the structure inversion
-    [source_dist, spectrum] = make_noise_source();
+    % load source that is assumed for the structure inversion
+    if( ~isfield( usr_par, 'source_dist') )
+        [source_dist, spectrum] = make_noise_source();
+    else
+        [~, spectrum] = make_noise_source();
+        source_dist = reshape(usr_par.source_dist.model.m, 600, 600);
+        
+        % mine = fspecial('gaussian',[75 75], 30);
+        % source_dist = imfilter( reshape(usr_par.source_dist.model.m, 600, 600), mine, 'replicate' );
+    end
     
     % get mu from v, which is our optimization variable (relative parameterization)
     mu = map_m_to_parameters(m, usr_par);
     [~,rho] = define_material_parameters(nx,nz,model_type);
     
-    % rho = map_m_to_parameters(m, usr_par);
-    % [mu,~] = define_material_parameters(nx,nz,model_type);
-    
+        
 end
 
 

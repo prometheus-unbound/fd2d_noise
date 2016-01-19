@@ -1,18 +1,21 @@
 
 function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
     
+
     if( ~isfield( usr_par, 'cluster') )
         usr_par.cluster = 'local';
     end
 
-    
+
     if( ~isfield( usr_par, 'type') )
         usr_par.type = 'structure';
     end
+
     
     if( ~isfield( usr_par, 'use_mex') )
-        usr_par.use_mex = 'yes';
+        usr_par.use_mex = 'no';
     end
+    
     
     if( strcmp( usr_par.type, 'structure' ) )
         if( isfield( usr_par, 'structure_inversion') )
@@ -55,12 +58,12 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
 
     
     if( ~isfield( usr_par, 'network') )
-        usr_par.network = load('../output/interferometry/array_2_ref.mat');
+        usr_par.network = load('../output/interferometry/array_1_ref.mat');
     end
 
     
     if( ~isfield( usr_par, 'data') )
-        usr_par.data = load('../output/interferometry/data_2_ref_0.mat');
+        usr_par.data = load('../output/interferometry/data_1_ref_0.mat');
     end
     
     
@@ -69,12 +72,12 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
             usr_par.kernel.percentile = 0;
         end
         
-        if( ~isfield( usr_par.kernel, 'smoothing') )
-            usr_par.kernel.smoothing = 0;
+        if( ~isfield( usr_par.kernel, 'imfilter') )
+            usr_par.kernel.imfilter = fspecial('gaussian',[60 60], 30);
         end
     else
-        usr_par.kernel.percentile = 0;
-        usr_par.kernel.smoothing = 0;
+        usr_par.kernel.percentile = 0;                
+        usr_par.kernel.imfilter = fspecial('gaussian',[60 60], 30);
     end
 
     

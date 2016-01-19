@@ -1,11 +1,12 @@
 
-function [width,absorb_left,absorb_right,absorb_top,absorb_bottom] = absorb_specs()
+function [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_specs()
 
 %==========================================================================
 % absorbing boundaries
 %==========================================================================
 
 % width = 50;             % width of the boundary layer in km
+% width = 30000;          % width of the boundary layer in km
 width = 250000;         % width of the boundary layer in km
 
 absorb_left = 1;        % absorb waves on the left boundary

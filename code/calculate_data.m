@@ -5,12 +5,12 @@ clear all
 % close all
 
 
-mode = 'local';
-% mode = 'monch';
+% mode = 'local';
+mode = 'monch';
 % mode = 'euler';
 % mode = 'brutus';
 
-use_mex = 'no';
+use_mex = 'yes';
 
 addpath(genpath('../'))
 
@@ -73,6 +73,11 @@ end
 % array(2,1) = 3.5e4;
 % array(:,2) = 3.0e4;
 
+% array = zeros(2,2);
+% array(1,1) = 1.2e5;
+% array(2,1) = 2.8e5;
+% array(:,2) = 2.0e5;
+
 
 %% California setup
 % array(:,1) = cali.rec_x(1:40);
@@ -80,7 +85,7 @@ end
 
 
 %% select receivers that will be reference stations
-ref_stat = array;%(1,:);
+ref_stat = array; %(1,:);
 n_ref = size(ref_stat,1);
 n_rec = size(array,1)-1;
 
