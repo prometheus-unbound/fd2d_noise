@@ -92,25 +92,27 @@ n_rec = size(array,1)-1;
 
 %% plot configuration
 if( strcmp(make_plots,'yes') )
-    figure
-    hold on
-    plot(array(:,1),array(:,2),'o')
-    plot(ref_stat(:,1),ref_stat(:,2),'x')
-    xlim([0 Lx])
-    ylim([0 Lz])
-    drawnow
-    axis square
-    
-    return
+%     figure
+%     hold on
+%     plot(array(:,1),array(:,2),'o')
+%     plot(ref_stat(:,1),ref_stat(:,2),'x')
+%     xlim([0 Lx])
+%     ylim([0 Lz])
+%     drawnow
+%     axis square
+%     
+%     return
 
     plot_model    
+    
+    return
 end
 
 
 %% start matlabpool and set up path
 if( ~strcmp(mode,'local') )
     addpath(genpath('../'))
-    parobj = start_cluster(mode,'', n_ref);
+    parobj = start_cluster(mode, '', n_ref);
 end
 
 

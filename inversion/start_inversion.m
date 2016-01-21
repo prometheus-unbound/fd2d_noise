@@ -15,7 +15,7 @@ usr_par.cluster = 'monch';
 usr_par.use_mex = 'yes';
 
 
-usr_par.type = 'source';
+usr_par.type = 'structure';
 % 'source';
 % 'source_constrained';
 % 'structure';
@@ -30,7 +30,7 @@ if( strcmp( usr_par.type, 'structure') )
 end
 
 
-usr_par.measurement = 'log_amplitude_ratio';
+usr_par.measurement = 'waveform_difference';
 % 'log_amplitude_ratio';
 % 'amplitude_difference';
 % 'waveform_difference';
@@ -50,13 +50,16 @@ usr_par.filter.f_max = 1/7 + 0.01;
 % load array with reference stations and data
 usr_par.network = load('../output/interferometry/array_16_ref.mat');
 usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_iugg.mat');
+% usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_refl1.mat');
 
 
 % load source distribution that should be used for structure inversion
-% usr_par.source_dist = load('initial_models/model_68.mat');
+% (uncomment line if source specified in input_parameters.m should be used)
+usr_par.source_dist = load('initial_models/model_25.mat');
 
 
-% specify percentile for clipping of kernel      ( = 0 to turn it off )
+% specify percentile for clipping of kernel ( = 0 to turn it off )
+% be careful: so far not taken into account into gradient
 usr_par.kernel.percentile = 0;
 
 
@@ -81,7 +84,7 @@ options.max_iterations = 100;
 options.wolfe_try_to_increase_step_length = false;
 options.verbose = true;
 if( strcmp( usr_par.type, 'structure') )
-    options.init_step_length = 0.5;
+    options.init_step_length = 1.0;
 else
     options.init_step_length = 16.0;
 end
