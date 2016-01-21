@@ -9,10 +9,8 @@ if(n_basis_fct == 0)
     n_basis_fct = 1;
 end
 
-usr_par.type = 'source';
-usr_par.kernel.imfilter = fspecial('gaussian',[50 50], 20);
 
-path = '~/Desktop/model_1.mat';
+path = '~/Desktop/model_0.mat';
 
 
 % path = sprintf('~/Desktop/models/model_%i.mat',i);
@@ -44,6 +42,10 @@ path = '~/Desktop/model_1.mat';
 
 % model_final = load([path 'model_' num2str(n_models-1) '.mat']);
 load(path);
+
+
+usr_par.type = model.type;
+usr_par.kernel.imfilter = model.imfilter;
 m_parameters = reshape( map_m_to_parameters(model.m, usr_par), nx, nz, n_basis_fct );
 
 
@@ -53,9 +55,7 @@ m_parameters = reshape( map_m_to_parameters(model.m, usr_par), nx, nz, n_basis_f
 % load ~/Desktop/runs/inversion_newest/data/coverage/array_49_ref_coverage.mat
 
 
-
 load ~/Desktop/runs/inversion_new_world/data/array_16_ref.mat
-
 
 
 % cm = cbrewer('div','RdBu',100,'PCHIP');

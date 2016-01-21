@@ -26,9 +26,6 @@ elseif( strcmp( usr_par.type, 'structure') )
     else
         [~, spectrum] = make_noise_source();
         source_dist = reshape(usr_par.source_dist.model.m, 600, 600);
-        
-        % mine = fspecial('gaussian',[75 75], 30);
-        % source_dist = imfilter( reshape(usr_par.source_dist.model.m, 600, 600), mine, 'replicate' );
     end
     
     % get mu from v, which is our optimization variable (relative parameterization)
@@ -197,7 +194,7 @@ if( only_objective == true )
 end
 
 
-%- kernel treatment, i.e. clipping/smoothing
+%- kernel treatment, i.e. clipping
 grad_parameters = treat_kernel( grad_parameters, usr_par );
 
 
