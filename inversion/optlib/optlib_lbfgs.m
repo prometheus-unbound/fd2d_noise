@@ -32,8 +32,8 @@ if (size(previous_models,2) > 0)
     if (options.verbose)
         disp 'restoring previous models...'
     end
-   l_history = size(previous_models,2);
-   lmax = max(options.max_memory,l_history);
+    l_history = size(previous_models,2);
+    lmax = max(options.max_memory,l_history);
     
     P=zeros(size(m0,1),lmax);
     D=zeros(size(m0,1),lmax);

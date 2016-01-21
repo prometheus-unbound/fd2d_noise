@@ -27,7 +27,7 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
     end
     
     % [fn] = eval_objective(xn, xn_string, usr_par);
-    [fn,gn,cn] = eval_objective_and_gradient(xb, xb_string, usr_par);
+    [fn,gn,cn] = eval_objective_and_gradient(xn, xn_string, usr_par);
      
     % Determine maximal sig=sig0/2^k satisfying Armijo
     while (f-fn<del*sig*stg)
