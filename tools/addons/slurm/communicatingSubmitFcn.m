@@ -45,12 +45,16 @@ variables = {'MDCE_DECODE_FUNCTION', decodeFunction; ...
     'MDCE_STORAGE_LOCATION', props.StorageLocation; ...
     'MDCE_CMR', cluster.ClusterMatlabRoot; ...
     'MDCE_TOTAL_TASKS', num2str(props.NumberOfTasks)};
-% Trim the environment variables of empty values.
-nonEmptyValues = cellfun(@(x) ~isempty(strtrim(x)), variables(:,2));
-variables = variables(nonEmptyValues, :);
-% Set the remaining non-empty environment variables
+% Set each environment variable to newValue if currentValue differs.
+% We must do this particularly when newValue is an empty value,
+% to be sure that we clear out old values from the environment.
 for ii = 1:size(variables, 1)
-    setenv(variables{ii,1}, variables{ii,2});
+    variableName = variables{ii,1};
+    currentValue = getenv(variableName);
+    newValue = variables{ii,2};
+    if ~strcmp(currentValue, newValue)
+        setenv(variableName, newValue);
+    end
 end
 
 % Deduce the correct quote to use based on the OS of the current machine
@@ -80,7 +84,7 @@ jobName = sprintf('Job%d', job.ID);
 % for example to limit the number of nodes for a single job.
 % You may also wish to supply additional submission arguments to
 % the sbatch command here.
-additionalSubmitArgs = sprintf('--partition=fichtner_compute --time=01:30:00 --nodes=2 --ntasks-per-node=8 --mem-per-cpu=3072 --ntasks=%d', props.NumberOfTasks);
+additionalSubmitArgs = sprintf('--partition=fichtner_compute_wk --time=07-00:00:00 --nodes=8 --ntasks-per-node=2 --mem-per-cpu=16384 --ntasks=%d', props.NumberOfTasks);
 dctSchedulerMessage(5, '%s: Generating command for task %i', currFilename, ii);
 commandToRun = getSubmitString(jobName, quotedLogFile, quotedScriptName, ...
     additionalSubmitArgs);

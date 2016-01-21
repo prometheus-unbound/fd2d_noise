@@ -7,7 +7,7 @@ function plot_noise_source_kernels(X,Z,K_s,src,rec)
 %- initialisations --------------------------------------------------------
 cm = cbrewer('div','RdBu',100,'PCHIP');
 
-[Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
+[Lx,Lz] = input_parameters();
 f_sample = input_interferometry();
 
 

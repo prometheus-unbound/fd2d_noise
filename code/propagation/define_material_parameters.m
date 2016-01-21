@@ -40,10 +40,10 @@ elseif (model_type==2)
 elseif (model_type==3)
     
     rho = 3000.0*ones(nx,nz);
-    mu = 2.8e10*ones(nx,nz);
+    mu = 4.8e10*ones(nx,nz);
     
-    rho(1:round(nx/2),:) = rho(1:round(nx/2),:) + 200.0;
-    mu(1:round(nx/2),:) = mu(1:round(nx/2),:) + 3.5e10;
+    % rho(round(nx/2*1.25):end,:) = rho(round(nx/2*1.25):end,:) + 200.0;
+    mu(round(nx/2*1.25):end,:) = mu(round(nx/2*1.25):end,:) + 0.8e10;
     
     
 elseif (model_type==4)
@@ -93,6 +93,18 @@ elseif (model_type==7)
     mu(331:end,:) = 2.7e10;
 
     
+elseif ( model_type==666 )
+    
+    rho = 3000.0 * ones(nx,nz);
+    mu = 4.8e10 * ones(nx,nz);
+    
+%     mu(300:310,300:310) = 5.0e10;
+    
+%     A = imread('../models/rand_10_one_sided.png');
+%     mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
+%     mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
+    
+    
 elseif (model_type==999)
     
     rho = 3000.0*ones(nx,nz);
@@ -103,58 +115,89 @@ elseif (model_type==999)
     x_width = [1.1e5 1.1e5];
     z_width = [2.5e5 2.5e5];
     
-    [Lx,Lz,nx,nz] = input_parameters();
+    [Lx,Lz] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
-    % first structure: 4.0e9
+    % structure_1: 4.0e9
     % structure_2: 2.0e9
     % structure_3: 1.0e9
     for i=1:size(x_sourcem,2)
         mu = mu + (-1)^i * 4.0e9 * exp( -( (X-x_sourcem(i)).^2 ) / x_width(i)^2 )' .* exp( -( (Z-z_sourcem(i)).^2 ) / z_width(i)^2 )' ;
     end
+
     
-    if( strcmp(make_plots,'yes') )
-        figure(1)
-        clf
-        mesh(X,Z,sqrt(mu./rho)')
-        disp([ num2str( (max(max(sqrt(mu./rho)))-4000)/4000 * 100) ' % perturbation'])
-        shading interp
-        axis square
-        colorbar
-        cm = cbrewer('div','RdBu',100,'PCHIP');
-        colormap(cm)
-    end
+elseif (model_type==100)
+    
+    rho = 3000.0*ones(nx,nz);
+    mu = 4.8e10*ones(nx,nz);
+    
+    mu(377:388,287:298) = mu(377:388,287:298) + 4.0e9;    
     
     
-elseif (strcmp(model_type,'picture') )
+elseif (model_type==200)
     
-    rho = 3000.0 * ones(nx,nz); 
-    A = imread('../models/rand_3.png');
-    mu = 4.8e10 + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
-    mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
+    rho = 3000.0*ones(nx,nz);
+    mu = 4.8e10*ones(nx,nz);
     
-    [Lx,Lz,nx,nz] = input_parameters();
+    % mu(307:318,227:238) = mu(307:318,227:238) + 4.0e9;
+    
+    x_sourcem = [1.275e6];
+    z_sourcem = [0.975e6];
+    x_width = [0.2e5];
+    z_width = [0.2e5];
+    
+    [Lx,Lz] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
-    if( strcmp(make_plots,'yes') )
-        figure(1)
-        clf
-        pcolor(X,Z,sqrt(mu./rho)')
-        disp([ num2str( (max(max(sqrt(mu./rho)))-4000)/4000 * 100) ' % perturbation'])
-        shading interp
-        axis square
-        colorbar
-        cm = cbrewer('div','RdBu',100,'PCHIP');
-        colormap(cm)
+    for i=1:size(x_sourcem,2)
+        mu = mu + (-1)^i * 4.0e9 * exp( -( (X-x_sourcem(i)).^2 ) / x_width(i)^2 )' .* exp( -( (Z-z_sourcem(i)).^2 ) / z_width(i)^2 )' ;
     end
-   
+    
+    
+elseif (model_type==888)
+    
+    rho = 3000.0*ones(nx,nz);
+    mu = 4.8e10*ones(nx,nz);
+    
     
 else
 
     load(['models/mu_' str(model_type)]);
     load(['models/rho_' str(model_type)]);
     
+    
 end
+
+
+
+if( strcmp(make_plots,'yes') )
+    
+    [Lx,Lz] = input_parameters();
+    [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
+    
+    figure
+    mesh(X,Z,sqrt(mu./rho)')
+    view([0 90])
+    set(gca,'FontSize',12);
+    hold on
+    
+    % load ../output/interferometry/array_16_ref.mat
+    % plot3(array(:,1),array(:,2),4050 + 0*array(:,2),'wo')
+    
+    disp([ num2str( max(max( abs( sqrt(mu./rho)-4000) ))/4000 * 100) ' % perturbation'])
+    
+    shading interp
+    axis square
+    colorbar
+    cm = cbrewer('div','RdBu',100,'PCHIP');
+    colormap(cm)
+    % load clim.mat
+    % caxis(clim)
+    xlabel('x [m]')
+    ylabel('z [m]')
+    
+end
+    
 
 
 end

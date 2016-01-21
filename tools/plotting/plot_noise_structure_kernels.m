@@ -6,10 +6,7 @@ function plot_noise_structure_kernels(X,Z,K_rho)
 
 %- initialisations --------------------------------------------------------
 cm = cbrewer('div','RdBu',100,'PCHIP');
-
-[Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
-f_sample = input_interferometry();
-make_noise_source
+[Lx,Lz] = input_parameters();
 
 
 %- plot source and receiver positions -------------------------------------
@@ -23,15 +20,6 @@ make_noise_source
 % for k=1:length(rec_x)
 %     plot(rec_x(k),rec_z(k),'ko')
 % end
-
-
-%- plot noise distribution- -----------------------------------------------
-figure
-noise_strength = max(max(abs(noise_source_distribution(:,:,1)-1)));
-for i=length(n_noise_sources)
-    dist = pcolor(X,Z,(noise_source_distribution(:,:,i)-1)'/noise_strength);
-end
-shading interp
 
 
 %- plot noise source kernel -----------------------------------------------

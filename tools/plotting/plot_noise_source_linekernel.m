@@ -4,9 +4,6 @@ function K_line=plot_noise_source_linekernel(X,K_s)
 
 %- initialisations --------------------------------------------------------
 
-load cm_velocity;
-
-[Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
 f_sample = input_interferometry();
 
 %- decide on a frequency --------------------------------------------------
