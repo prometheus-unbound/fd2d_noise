@@ -23,7 +23,6 @@ if( strcmp( usr_par.type, 'source') )
 elseif( strcmp( usr_par.type, 'structure') )
     
     % grad_m = 2 * usr_par.structure_inversion.v0^2 * reshape( usr_par.structure_inversion.rho .* grad_parameters, [], 1 ) .* (1+m);
-    % grad_m = 4.8e10 * reshape( gaussblur2d( grad_parameters, x, z, [usr_par.kernel.sigma(1)*dx  usr_par.kernel.sigma(2)*dz] ), [], 1 );
     grad_m = 4.8e10 * reshape( imfilter( grad_parameters, usr_par.kernel.imfilter, 'circular' ), [], 1 );    
     
 end
