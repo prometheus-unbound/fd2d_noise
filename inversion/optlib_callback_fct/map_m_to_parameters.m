@@ -24,7 +24,6 @@ if( strcmp( usr_par.type, 'source') )
         
     else
         
-        % m_parameters = gaussblur2d( reshape( m, nx, nz ), x, z, [usr_par.kernel.sigma(1)*dx  usr_par.kernel.sigma(2)*dz] );
         m_parameters = imfilter( reshape( m, nx, nz ), usr_par.kernel.imfilter, 'circular' );        
         
     end
@@ -34,7 +33,6 @@ elseif( strcmp( usr_par.type, 'structure') )
     
     % in this case, m_parameters is mu, we don't consider rho at the moment
     % m_parameters = reshape( usr_par.structure_inversion.v0^2 * reshape( usr_par.structure_inversion.rho, [], 1) .* (1+m).^2, nx, nz );
-    % m_parameters = 4.8e10 * ( 1 + gaussblur2d( reshape( m, nx, nz ), x, z, [usr_par.kernel.sigma(1)*dx  usr_par.kernel.sigma(2)*dz] ) );
     m_parameters = 4.8e10 * ( 1 + imfilter( reshape( m, nx, nz ), usr_par.kernel.imfilter, 'circular' ) );
     
 end

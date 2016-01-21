@@ -16,13 +16,8 @@ function [grad_m] = map_gradparameters_to_gradm(m, grad_parameters, usr_par)
 % See also MAP_M_TO_PARAMETERS.
 
 
-[Lx,Lz,nx,nz,~,~,~,~,~,n_basis_fct] = input_parameters();
-[~,~,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
-
-
 if( strcmp( usr_par.type, 'source') )
     
-        % grad_m = reshape( gaussblur2d( grad_parameters, x, z, [usr_par.kernel.sigma(1)*dx  usr_par.kernel.sigma(2)*dz] ), [], 1 );
         grad_m = reshape( imfilter( grad_parameters, usr_par.kernel.imfilter, 'circular' ), [], 1 );
     
 elseif( strcmp( usr_par.type, 'structure') )
