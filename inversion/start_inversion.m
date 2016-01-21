@@ -1,4 +1,3 @@
-
 clear all
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -169,4 +168,3 @@ if( ~strcmp( usr_par.cluster, 'local' ) )
     delete(parobj)
     rmpath(genpath('../'))
 end
-
