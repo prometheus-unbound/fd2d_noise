@@ -5,12 +5,12 @@ clear all
 % close all
 
 
-% mode = 'local';
-mode = 'monch';
+mode = 'local';
+% mode = 'monch';
 % mode = 'euler';
 % mode = 'brutus';
 
-use_mex = 'yes';
+use_mex = 'no';
 
 addpath(genpath('../'))
 
@@ -26,7 +26,7 @@ addpath(genpath('../'))
 [mu, rho] = define_material_parameters(nx,nz,model_type);
 
 % mu = mu + 1e9;
-% source_dist = source_dist + 1;
+source_dist = source_dist + 1;
 
 if(model_type==666)
     
@@ -50,33 +50,25 @@ end
 
 
 %% define receiver array
-nr_x = 4;
-nr_z = 4;
-array = zeros(nr_x*nr_z,2);
-for i = 1:nr_x
-    for j = 1:nr_z        
-        array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
-        array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
-        
-%         array( (i-1)*nr_x + j, 1 ) = 0.7e6 + ( i-1 )*0.2e6;
-%         array( (i-1)*nr_z + j, 2 ) = 0.7e6 + ( j-1 )*0.2e6;
-        
-%         array( (i-1)*nr_x + j, 1 ) = 0.3e6 + ( i-1 )*1.4e6/(nr_x-1);
-%         array( (i-1)*nr_z + j, 2 ) = 0.3e6 + ( j-1 )*1.4e6/(nr_z-1);
-    end
-end
+% nr_x = 4;
+% nr_z = 4;
+% array = zeros(nr_x*nr_z,2);
+% for i = 1:nr_x
+%     for j = 1:nr_z        
+% %         array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
+% %         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
+%         
+%         array( (i-1)*nr_x + j, 1 ) = 1.8e5 + ( i-1 )*0.5e5;
+%         array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 )*0.5e5;
+%     end
+% end
 
 
 %% small test array, only two receivers close to each other
-% array = zeros(2,2);
-% array(1,1) = 2.5e4;
-% array(2,1) = 3.5e4;
-% array(:,2) = 3.0e4;
-
-% array = zeros(2,2);
-% array(1,1) = 1.2e5;
-% array(2,1) = 2.8e5;
-% array(:,2) = 2.0e5;
+array = zeros(2,2);
+array(1,1) = 2.5e4;
+array(2,1) = 3.5e4;
+array(:,2) = 3.0e4;
 
 
 %% California setup
@@ -85,23 +77,23 @@ end
 
 
 %% select receivers that will be reference stations
-ref_stat = array; %(1,:);
+ref_stat = array(1,:);
 n_ref = size(ref_stat,1);
 n_rec = size(array,1)-1;
 
 
 %% plot configuration
 if( strcmp(make_plots,'yes') )
-%     figure
-%     hold on
-%     plot(array(:,1),array(:,2),'o')
-%     plot(ref_stat(:,1),ref_stat(:,2),'x')
-%     xlim([0 Lx])
-%     ylim([0 Lz])
-%     drawnow
-%     axis square
-%     
-%     return
+    figure
+    hold on
+    plot(array(:,1),array(:,2),'o')
+    plot(ref_stat(:,1),ref_stat(:,2),'x')
+    xlim([0 Lx])
+    ylim([0 Lz])
+    drawnow
+    axis square
+    
+    return
 
     plot_model    
     

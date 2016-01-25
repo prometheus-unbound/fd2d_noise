@@ -71,10 +71,12 @@ folder_1 = '~/Desktop/runs/inversion_newest/data/';
 % u_0_h_p_fs1 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h_point1_freqsamp1.mat');
 % u_0_h_p_fs5 = load('~/Desktop/runs/inversion_newest/data/point/data_16_ref_0_1h_point1_freqsamp5.mat');
 
-u_0_h = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h_iugg.mat');
-u_0_h1g = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h1g_iugg.mat');
+u_0_h = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h_homog_small.mat');
+u_0_h1g = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h1g_iugg_small.mat');
 
-load([folder_1 'array_16_ref.mat'])
+load('~/Desktop/runs/2016_start/data/array_16_ref_small.mat');
+
+% load([folder_1 'array_16_ref.mat'])
 t = u_0_h.t;
 
 
@@ -128,10 +130,9 @@ end
 left = distances/4000.0 - 27.0;
 right = distances/4000.0 + 27.0;
 
-if( left < 0 )
-    index = find( t==0 );
-    left = t(index+1);
-end
+i_zero = find( t==0 );
+i_left_neg = find( left<0 );
+left(i_left_neg) = t(i_zero+1);
 
 if( right > t(end) )
     right = t(end);
@@ -144,7 +145,7 @@ fprintf('%f\n',sum(abs(misfit)))
 
 % % index = 165:180;
 index = 1:n_ref*n_rec;
-% plot_recordings_windows(first(index,:),t,veldis,'k',false,left(index),right(index));
-% plot_recordings_windows(second(index,:),t,veldis,'g',false,left(index),right(index));
-plot_recordings(first(index,:),t,veldis,'b',true);
-plot_recordings(second(index,:),t,veldis,'r',true);
+plot_recordings_windows(first(index,:),t,veldis,'k',true,left(index),right(index));
+plot_recordings_windows(second(index,:),t,veldis,'g',true,left(index),right(index));
+% plot_recordings(first(index,:),t,veldis,'b',true);
+% plot_recordings(second(index,:),t,veldis,'r',true);

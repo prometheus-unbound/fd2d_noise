@@ -4,13 +4,16 @@ clear all
 clc
 
 % get configuration
-[~,~,nx,nz,dt,nt,~,~,~,n_basis_fct] = input_parameters();
+[~,~,nx,nz,dt,nt,~,model_type,~,n_basis_fct] = input_parameters();
 if(n_basis_fct == 0)
     n_basis_fct = 1;
 end
 
 
-path = '~/Desktop/model_0.mat';
+path = '~/Desktop/model_8.mat';
+% path = '~/Desktop/source_homog.mat';
+% path2 = '~/Desktop/source_iugg.mat';
+% path = '~/Desktop/solution.mat';
 
 
 % path = sprintf('~/Desktop/models/model_%i.mat',i);
@@ -43,10 +46,23 @@ path = '~/Desktop/model_0.mat';
 % model_final = load([path 'model_' num2str(n_models-1) '.mat']);
 load(path);
 
+if( exist('path2', 'var') )
+    model2 = load(path2);
+    model.m = model.m - model2.model.m;
+end
 
-usr_par.type = model.type;
-usr_par.kernel.imfilter = model.imfilter;
+if( strcmp(path(end-11:end),'solution.mat') )
+    model.m = mfinal;
+else
+    usr_par.type = model.type;
+    usr_par.kernel.imfilter = model.imfilter;
+end
+
 m_parameters = reshape( map_m_to_parameters(model.m, usr_par), nx, nz, n_basis_fct );
+
+
+% [mu,rho] = define_material_parameters(nx,nz,model_type,'no');
+% m_parameters = m_parameters - mu;
 
 
 % [dist_true,~,clim] = make_noise_source('yes');
@@ -55,12 +71,15 @@ m_parameters = reshape( map_m_to_parameters(model.m, usr_par), nx, nz, n_basis_f
 % load ~/Desktop/runs/inversion_newest/data/coverage/array_49_ref_coverage.mat
 
 
-load ~/Desktop/runs/inversion_new_world/data/array_16_ref.mat
-
+% load ~/Desktop/runs/inversion_new_world/data/array_16_ref.mat
+if( ~exist('array', 'var') )
+    array = [];
+end
 
 % cm = cbrewer('div','RdBu',100,'PCHIP');
-% m = max(max(max(dist_inverted)));
-% clim = [-1*m 1*m];
+% m = max(max(max(abs(m_parameters))));
+% m = mean(mean(mean(abs(m_parameters))));
+% clim = [0.999*m 1.001*m];
 if( ~exist('cm','var') )
     cm = [];
 end

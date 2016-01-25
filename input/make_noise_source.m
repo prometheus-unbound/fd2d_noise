@@ -56,10 +56,10 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
         % small setup, 2 sources 
         if( strcmp(size,'small') )
             
-            x_sourcem = [1.0e5, 1.0e5];
-            z_sourcem = [1.0e5, 1.0e5];
-            sourcearea_width = [0.4e5, 0.4e5];
-            magnitude = [10.0, 2.0];
+            x_sourcem = [1.0e5];
+            z_sourcem = [1.6e5];
+            sourcearea_width = [4e4];
+            magnitude = [6.0];
             
         % large setup, 2 sources left of the array
         elseif( strcmp(size,'big') )
@@ -211,9 +211,9 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
             
         end
         
-%         load ../output/interferometry/array_1_ref.mat
+        load ../output/interferometry/array_16_ref_small.mat
 %         load ~/Desktop/array_1_ref.mat
-        array = [];
+%         array = [];
 %         load clim.mat
 %         clim = plot_noise_sources(noise_source_distribution,array,[],[clim(1) 0.3*clim(2)]);
         clim = plot_models(noise_source_distribution,array,[],[]);

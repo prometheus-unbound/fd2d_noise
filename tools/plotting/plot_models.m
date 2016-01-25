@@ -1,6 +1,6 @@
 % plot_noise_sources(noise_source_distribution,array,cm_psd,clim,overlay)
 %
-% noise_source_distribution
+% m_parameter
 % array (optional)
 % cm_psd: colormap (optional)
 % clim: colormap limits (optional)
@@ -8,7 +8,8 @@
 %
 % optional: leave empty if not wanted
 
-function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overlay)
+function [clim] = plot_models(m_parameter,array,cm_psd,clim,overlay)
+
 
     %% configuration
     [f_sample,n_sample] = input_interferometry();
@@ -25,7 +26,7 @@ function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overla
     %% colormap
     if( isempty(cm_psd) )
         
-        if( mean(mean(noise_source_distribution)) > 1e9 )
+        if( mean(mean(abs(m_parameter))) > 1e6 )
             cm = cbrewer('div','RdBu',120,'PCHIP');
             cm_psd = cm;
         else
@@ -38,8 +39,10 @@ function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overla
  
     
     %% open figure, set size, etc.
-    fig1 = figure;
-    set(fig1,'units','normalized','position',[.1 -.3 0.28 0.5])
+    fig1 = figure;%(1);
+%     subplot(1,2,1)
+    cla
+    % set(fig1,'units','normalized','position',[.1 -.3 0.28 0.5])
     set(gca,'FontSize',18);
     hold on
     
@@ -53,7 +56,7 @@ function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overla
     
     
     %% plot for n_basis_fct == 0, i.e. only one map, or structure model
-    if( n_basis_fct == 0 || mean(mean(noise_source_distribution)) > 1e9)
+    if( n_basis_fct == 0 || mean(mean(abs(m_parameter))) > 1e6 )
         
         if( nargin < 5 || isempty(overlay) )
             overlay = 'no';
@@ -64,7 +67,7 @@ function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overla
             [mu,~] = define_material_parameters(nx,nz,model_type);
             pcolor(X,Z,(mu-4.8e10)'/max(max(abs(mu-4.8e10))))
 
-            dist = pcolor(X, Z, sum(noise_source_distribution,3)' / max(max( sum(noise_source_distribution,3) )) );
+            dist = pcolor(X, Z, sum(m_parameter,3)' / max(max( sum(m_parameter,3) )) );
             alpha(dist,0.5)
             cb = colorbar;
             ylabel(cb,'normalized for overlay')
@@ -72,18 +75,18 @@ function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overla
 
         else
             
-            if( size(noise_source_distribution,3) > 1 )
-                pcolor(X, Z, sum(noise_source_distribution,3)'-1 )
+            if( size(m_parameter,3) > 1 )
+                pcolor(X, Z, sum(m_parameter,3)'-1 )
             else
-                mesh(X, Z, noise_source_distribution' )
+                mesh(X, Z, m_parameter' )
             end
             
             % cb = colorbar('SouthOutside');
             cb = colorbar;
             
-            if( mean(mean(noise_source_distribution)) > 1e9 )
+            if( mean(mean(abs(m_parameter))) > 1e6 )
                 ylabel(cb,'[N/m^2]')
-                set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
+%                 set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
 %                 set(cb,'YTick',[4.75 4.8 4.85]*1e10)
             else
                 ylabel(cb,'[kg^2/m^2/s^2]')
@@ -96,8 +99,8 @@ function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overla
         
         if( ~isempty(clim) )
             caxis(clim)
-        else
-            if( mean(mean(noise_source_distribution)) > 1e9 )
+        elseif( ~strcmp(overlay,'yes') )
+            if( mean(mean(abs(m_parameter))) > 1e6 )
                 caxis([4.4 5.2]*1e10)
             else
                 caxis([0 7])
@@ -106,10 +109,10 @@ function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overla
             clim = get(gca,'CLim');
         end
         
-%         plot([width,Lx-width],[width,width],'k--')
-%         plot([width,Lx-width],[Lz-width,Lz-width],'k--')
-%         plot([width,width],[width,Lz-width],'k--')
-%         plot([Lx-width,Lx-width],[width,Lz-width],'k--')
+%         plot3([width,Lx-width],[width,width],[2,2],'k--')
+%         plot3([width,Lx-width],[Lz-width,Lz-width],[2,2],'k--')
+%         plot3([width,width],[width,Lz-width],[2,2],'k--')
+%         plot3([Lx-width,Lx-width],[width,Lz-width],[2,2],'k--')
 
         
     %% plot maps for different frequency maps
@@ -120,11 +123,11 @@ function [clim] = plot_models(noise_source_distribution,array,cm_psd,clim,overla
         int_limits = integration_limits(n_sample,n_basis_fct);
         for ib = 1:n_basis_fct
 
-            h(ib) = mesh(X, Z, ib*fudge_factor + noise_source_distribution(:,:,ib)' );
-            set(h(ib),'CData',noise_source_distribution(:,:,ib)');
+            h(ib) = mesh(X, Z, ib*fudge_factor + m_parameter(:,:,ib)' );
+            set(h(ib),'CData',m_parameter(:,:,ib)');
 
-            text(1e3,1e3, ib*fudge_factor + 1 + noise_source_distribution(1,1,ib) , sprintf('%5.3f - %5.3f Hz',f_sample(int_limits(ib,1)),f_sample(int_limits(ib,2))) )
-            level = [ib*fudge_factor + 0.1 + noise_source_distribution(1,1,ib), ib*fudge_factor + 0.1 + noise_source_distribution(1,1,ib)];
+            text(1e3,1e3, ib*fudge_factor + 1 + m_parameter(1,1,ib) , sprintf('%5.3f - %5.3f Hz',f_sample(int_limits(ib,1)),f_sample(int_limits(ib,2))) )
+            level = [ib*fudge_factor + 0.1 + m_parameter(1,1,ib), ib*fudge_factor + 0.1 + m_parameter(1,1,ib)];
             plot3([width,Lx-width],[width,width],level,'k--')
             plot3([width,Lx-width],[Lz-width,Lz-width],level,'k--')
             plot3([width,width],[width,Lz-width],level,'k--')

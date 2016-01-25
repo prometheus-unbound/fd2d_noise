@@ -124,6 +124,24 @@ elseif (model_type==999)
     for i=1:size(x_sourcem,2)
         mu = mu + (-1)^i * 4.0e9 * exp( -( (X-x_sourcem(i)).^2 ) / x_width(i)^2 )' .* exp( -( (Z-z_sourcem(i)).^2 ) / z_width(i)^2 )' ;
     end
+    
+    
+elseif (model_type==9999)
+    
+    rho = 3000.0*ones(nx,nz);
+    mu = 4.8e10*ones(nx,nz);
+    
+    x_sourcem = [2.3e5 2.9e5];
+    z_sourcem = [2.0e5 2.0e5];
+    x_width = [2.2e4 2.2e4];
+    z_width = [5e4 5e4];
+    
+    [Lx,Lz] = input_parameters();
+    [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
+
+    for i=1:size(x_sourcem,2)
+        mu = mu + (-1)^i * 4.0e9 * exp( -( (X-x_sourcem(i)).^2 ) / x_width(i)^2 )' .* exp( -( (Z-z_sourcem(i)).^2 ) / z_width(i)^2 )' ;
+    end
 
     
 elseif (model_type==100)
@@ -176,9 +194,10 @@ if( strcmp(make_plots,'yes') )
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
     figure
-    mesh(X,Z,sqrt(mu./rho)')
+    % mesh(X,Z,sqrt(mu./rho)')
+    mesh(X/1000,Z/1000,mu')
     view([0 90])
-    set(gca,'FontSize',12);
+    set(gca,'FontSize',18);
     hold on
     
     % load ../output/interferometry/array_16_ref.mat
@@ -191,10 +210,18 @@ if( strcmp(make_plots,'yes') )
     colorbar
     cm = cbrewer('div','RdBu',100,'PCHIP');
     colormap(cm)
-    % load clim.mat
-    % caxis(clim)
-    xlabel('x [m]')
-    ylabel('z [m]')
+    cb = colorbar;
+    set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
+    caxis([4.4 5.2]*1e10)    
+    
+    xlabel('x [km]')
+    ylabel('z [km]')
+    xlabels = [0 1000 2000];
+    ylabels = [0 1000 2000];
+    set(gca, 'XTick', xlabels);
+    set(gca, 'YTick', ylabels);
+    
+    
     
 end
     

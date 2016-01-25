@@ -67,9 +67,19 @@ clear all
 % dm = 0.1 * m;
 
 [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
-[mu,rho] = define_material_parameters(nx,nz,model_type);
+[mu] = define_material_parameters(nx,nz,model_type);
 m = map_parameters_to_m(mu,usr_par);
-% m = map_parameters_to_m(rho,usr_par);
+
+% [mu2] = define_material_parameters(nx,nz,9999);
+% m2 = map_parameters_to_m(mu2,usr_par);
+% 
+% w = weighting(nx,nz);
+% 
+% alpha = 0.01 * 1.174788e-02 * 2 / sum( w .* (m-m2).^2 );
+% 
+% return
+
+usr_par.m0 = m;
 dm = m + 0.1;
 
 [dcheck, dcheck_struct] = optlib_derivative_check( m, dm, -10, -1, 1, usr_par);
