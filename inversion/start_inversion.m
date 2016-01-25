@@ -1,4 +1,7 @@
-clear all
+
+addpath(genpath('../'))
+[~,~,nx,nz,~,~,~,model_type] = input_parameters();
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % user input
@@ -14,22 +17,19 @@ usr_par.cluster = 'monch';
 usr_par.use_mex = 'yes';
 
 
-usr_par.type = 'structure';
+usr_par.type = 'source';
 % 'source';
 % 'source_constrained';
 % 'structure';
 
 if( strcmp( usr_par.type, 'structure') )
-    addpath(genpath('../'))
-    [~,~,nx,nz,~,~,~,model_type] = input_parameters();
     [~,rho] = define_material_parameters( nx, nz, model_type);
-
     usr_par.structure_inversion.rho = rho;
     usr_par.structure_inversion.v0 = 4000;    
 end
 
 
-usr_par.measurement = 'waveform_difference';
+usr_par.measurement = 'log_amplitude_ratio';
 % 'log_amplitude_ratio';
 % 'amplitude_difference';
 % 'waveform_difference';
@@ -47,14 +47,14 @@ usr_par.filter.f_max = 1/7 + 0.01;
 
 
 % load array with reference stations and data
-usr_par.network = load('../output/interferometry/array_16_ref.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_iugg.mat');
+usr_par.network = load('../output/interferometry/array_16_ref_small.mat');
+usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_iugg_small.mat');
 % usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_refl1.mat');
 
 
 % load source distribution that should be used for structure inversion
 % (uncomment line if source specified in input_parameters.m should be used)
-usr_par.source_dist = load('initial_models/model_25.mat');
+% usr_par.source_dist = load('initial_models/loga_homog_98.mat');
 
 
 % specify percentile for clipping of kernel ( = 0 to turn it off )
@@ -62,8 +62,13 @@ usr_par.source_dist = load('initial_models/model_25.mat');
 usr_par.kernel.percentile = 0;
 
 
-% desing gaussian filter for smoothing of kernel
-usr_par.kernel.imfilter = fspecial('gaussian',[50 50], 20);
+% design gaussian filter for smoothing of kernel (set second input variable to [1,1] to turn it off)
+usr_par.kernel.imfilter = fspecial('gaussian',[25 25], 10);
+
+
+% regularization j_total = dj/dm + alpha * ||m-m0||^2  (i.e. set alpha=0 to turn it off)
+usr_par.regularization.alpha = 0.02;
+usr_par.regularization.weighting = weighting( nx, nz );
 
 
 % debug mode
@@ -120,6 +125,7 @@ if( strcmp( usr_par.type, 'source' ) )
     % set up initial model
     m0 = make_noise_source();
     m0 = reshape(m0,[],1);
+    usr_par.m0 = m0;
     
     % do inversion
     [flag, mfinal, usr_par] = optlib_lbfgs(m0, options, usr_par);
@@ -135,7 +141,8 @@ elseif( strcmp( usr_par.type, 'source_constrained' ) )
     
     % set up initial model and lower/upper bounds
     m0 = make_noise_source();
-    m0 = reshape(m0,[],1);    
+    m0 = reshape(m0,[],1);
+    usr_par.m0 = m0;
     xl = 0 * m0;
     xu = inf * m0;
     
@@ -150,8 +157,8 @@ elseif( strcmp( usr_par.type, 'source_constrained' ) )
 elseif( strcmp( usr_par.type, 'structure' ) )
     
     % set up initial model
-    [~,~,nx,nz] = input_parameters();
     m0 = zeros(nx*nz, 1);
+    usr_par.m0 = m0;
     
     % do inversion
     % [flag, mfinal, usr_par] = optlib_steepest_descent(m0, options, usr_par);
@@ -166,5 +173,4 @@ end
 % close matlabpool and clean up path
 if( ~strcmp( usr_par.cluster, 'local' ) )
     delete(parobj)
-    rmpath(genpath('../'))
 end

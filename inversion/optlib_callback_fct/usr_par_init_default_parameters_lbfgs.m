@@ -79,7 +79,21 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
         usr_par.kernel.percentile = 0;                
         usr_par.kernel.imfilter = fspecial('gaussian',[60 60], 30);
     end
-
+    
+    
+    if( isfield(usr_par,'regularization') )
+        if( ~isfield( usr_par.regularization, 'alpha') )
+            usr_par.regularization.alpha = 0.0;
+        end
+        
+        if( ~isfield( usr_par.regularization, 'weighting') )
+            usr_par.regularization.weighting = 1.0;
+        end
+    else
+        usr_par.regularization.alpha = 0.0;
+        usr_par.regularization.weighting = 1.0;
+    end
+    
     
     if( isfield(usr_par,'debug') )
         if( ~isfield( usr_par.debug, 'df') )
