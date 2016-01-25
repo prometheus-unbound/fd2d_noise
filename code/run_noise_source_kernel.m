@@ -35,6 +35,10 @@ t = -(nt-1)*dt:dt:(nt-1)*dt;
 nt = length(t);
     
 
+%- initialise interferometry ----------------------------------------------       
+[~,n_sample,w_sample,dw,freq_samp] = input_interferometry();
+
+
 %- compute indices for adjoint source locations ---------------------------
 ns = size(adsrc,1);
 adsrc_id = zeros(ns,2);
@@ -45,15 +49,6 @@ for i=1:ns
 end
 
 
-%- initialise interferometry ----------------------------------------------       
-[~,n_sample,w_sample,dw,freq_samp] = input_interferometry();
-
-if( n_basis_fct == 0 )
-    n_basis_fct = 1;
-end
-K_s = zeros(nx,nz,n_basis_fct);
-
-
 %- prepare coefficients for Fourier transform and its inverse -------------
 ifft_coeff = zeros(nt,n_sample) + 1i*zeros(nt,n_sample);
 for k = 1:n_sample
@@ -62,9 +57,13 @@ end
 
 
 %- get integration boundaries for frequency bands -------------------------
-% if( n_basis_fct ~= 0 )
+if( n_basis_fct ~= 0 )
     [int_limits] = integration_limits(n_sample,n_basis_fct);
-% end
+end
+
+
+%- initialise absorbing boundary taper a la Cerjan ------------------------
+[absbound] = init_absbound();
 
 
 %- allocate dynamic fields ------------------------------------------------
@@ -73,9 +72,10 @@ sxy = zeros(nx-1,nz);
 szy = zeros(nx,nz-1);
 u = zeros(nx,nz);
 
-
-%- initialise absorbing boundary taper a la Cerjan ------------------------
-[absbound] = init_absbound();
+if( n_basis_fct == 0 )
+    n_basis_fct = 1;
+end
+K_s = zeros(nx,nz,n_basis_fct);
 
 
 %==========================================================================
