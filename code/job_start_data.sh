@@ -34,13 +34,13 @@ fi
 cat <<EOF > data.sh
 #!/bin/bash -l								
 
-#SBATCH --partition=other_largemem
+#SBATCH --partition=fichtner_compute
 #SBATCH --job-name=data
 #SBATCH --output=logs/matlab_%j.out
 #SBATCH --error=logs/matlab_%j.err
 #SBATCH --time=00-01:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem=8192
+#SBATCH --mem=2048
 
 
 ######################

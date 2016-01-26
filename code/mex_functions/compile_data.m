@@ -5,17 +5,18 @@ addpath(genpath('../../'))
 % G_2, df
 i1 = coder.typeof(complex(zeros(2,2,2)), [inf,inf,inf], 1);
 
-% mu, ad-stf, spectrum
+% mu, rho, spectrum
 i2 = coder.typeof(zeros(2,2), [inf,inf], 1);
 
 % src, rec
 i3 = coder.typeof(zeros(2,2), [inf,2], 1);
 
-% integer switch
+% integer switch, i.e. mode
 i4 = coder.typeof(1, 1, 0);
 
 % source_dist
 i5 = coder.typeof(zeros(2,2,2), [inf,inf,inf], 1);
+
 
 
 % run_forward1_green(mu, rho, src, mode)

@@ -1,4 +1,4 @@
-function [K_mu, stf_fft] = run_noise_structure_kernel( mu, rho, forward_dxu_time, forward_dzu_time, adstf, adsrc, spectrum, source_dist )
+function [K, stf_fft] = run_noise_adjoint( mu, rho, forward_dxu_time, forward_dzu_time, adstf, adsrc, spectrum, source_dist, G_2 )
 
 %==========================================================================
 % compute sensitivity kernel for mu (and rho)
@@ -32,24 +32,14 @@ rho = reshape(rho, nx, nz);
 mu = reshape(mu, nx, nz);
 
 
+%- time axis --------------------------------------------------------------
+t = -(nt-1)*dt:dt:(nt-1)*dt;
+n_zero = nt;
+nt = length(t);
+
+
 %- initialise interferometry ----------------------------------------------
 [~,n_sample,w_sample,dw,freq_samp] = input_interferometry();
-
-
-%- reshape source distribution --------------------------------------------
-n_noise_sources = size(spectrum,2);
-
-if( n_basis_fct == 0 )
-    noise_source_distribution = reshape(source_dist, nx, nz, n_noise_sources);
-else
-    noise_source_distribution = reshape(source_dist, nx, nz, n_basis_fct);
-end
-
-
-%- get integration boundaries for frequency bands -------------------------
-if( n_basis_fct ~= 0 )
-    [int_limits] = integration_limits(n_sample,n_basis_fct);
-end
 
 
 %- compute indices for adjoint source locations ---------------------------    
@@ -60,12 +50,6 @@ for i=1:ns_adj
     adsrc_id(i,1) = min( find( min(abs(x-adsrc(i,1))) == abs(x-adsrc(i,1))) );
     adsrc_id(i,2) = min( find( min(abs(z-adsrc(i,2))) == abs(z-adsrc(i,2))) );
 end
-
-
-%- time axis --------------------------------------------------------------
-t = -(nt-1)*dt:dt:(nt-1)*dt;
-n_zero = nt;
-nt = length(t);
 
 
 %- prepare coefficients for Fourier transform and its inverse -------------
@@ -85,6 +69,32 @@ for n=1:nt
     end
 end
 
+%- prepare coefficients for Fourier transform and its inverse -------------
+ifft_coeff2 = zeros(nt,n_sample) + 1i*zeros(nt,n_sample);
+for k = 1:n_sample
+    ifft_coeff2(:,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t' ) * dw;
+end
+
+
+%- get integration boundaries for frequency bands -------------------------
+if( n_basis_fct ~= 0 )
+    [int_limits] = integration_limits(n_sample,n_basis_fct);
+end
+
+
+%- initialise absorbing boundary taper a la Cerjan ------------------------
+[absbound] = init_absbound();
+
+
+%- reshape source distribution --------------------------------------------
+n_noise_sources = size(spectrum,2);
+
+if( n_basis_fct == 0 )
+    noise_source_distribution = reshape(source_dist, nx, nz, n_noise_sources);
+else
+    noise_source_distribution = reshape(source_dist, nx, nz, n_basis_fct);
+end
+
 
 %- allocate dynamic fields ------------------------------------------------
 v = zeros(nx,nz);
@@ -92,11 +102,16 @@ sxy = zeros(nx-1,nz);
 szy = zeros(nx,nz-1);
 u = zeros(nx,nz);
 stf_fft = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
+
+
+%- allocate source kernel structure ---------------------------------------
 K_mu = zeros(nx,nz);
 
-
-%- initialise absorbing boundary taper a la Cerjan ------------------------
-[absbound] = init_absbound();
+if( n_basis_fct == 0 )
+    K_s = zeros(nx,nz,1);
+else
+    K_s = zeros(nx,nz,n_basis_fct);
+end
 
 
 %==========================================================================
@@ -110,6 +125,7 @@ end
 
 i_ftc = 1;
 i_fw = 1;
+
 for n = 1:nt
     
     
@@ -172,8 +188,42 @@ for n = 1:nt
     strain_dxu = dx_v(u,dx,dz,nx,nz,order);
     strain_dzu = dz_v(u,dx,dz,nx,nz,order);
     
+    
+    if( size(adstf,3) == 1 && mod(n,freq_samp) == 0 && t(end-n+1) <= 0.0 )
+        
+        
+        if( n_basis_fct == 0 )
+            M_tn = zeros(nx,nz,1) + 1i*zeros(nx,nz,1);
+        else
+            M_tn = zeros(nx,nz,n_basis_fct) + 1i*zeros(nx,nz,n_basis_fct);
+        end
+        
+        
+        for k = 1:n_sample
+            
+            % funny construction with tmp variable needed for mex generation
+            if( n_basis_fct == 0 )
+                ib = 1;
+                tmp = repmat( spectrum(k) * G_2(:,:,k) * ifft_coeff2(end-n+1, k), 1, 1, 1);
+            else
+                ib = find( k >= int_limits(:,1) & k <= int_limits(:,2) );
+                tmp = repmat( spectrum(k) * G_2(:,:,k) * ifft_coeff2(end-n+1, k), 1, 1, n_basis_fct);
+            end           
+            
+            M_tn(:,:,ib) = M_tn(:,:,ib) + tmp(:,:,ib);
+            
+        end
+        
+        
+        for ib = 1:size(M_tn,3)
+            K_s(:,:,ib) = K_s(:,:,ib) + real( M_tn(:,:,ib) .* u );
+        end
+        
+        
+    end
+    
        
-    %- build up kernel
+    %- build up structure kernel
     if( mod(n, fw_nth) == 0 )
         K_mu(1:nx-1,:) = K_mu(1:nx-1,:) - strain_dxu .* forward_dxu_time(:,:,end-i_fw+1) * fw_nth;
         K_mu(:,1:nz-1) = K_mu(:,1:nz-1) - strain_dzu .* forward_dzu_time(:,:,end-i_fw+1) * fw_nth;
@@ -201,4 +251,16 @@ for n = 1:nt
     
     
 end
+
+
+% concatenate kernels
+if( n_basis_fct == 0 )
+    K = zeros(nx, nz, 2);
+    K(:,:,1) = K_s;
+else
+    K = zeros(nx, nz, n_basis_fct + 1);
+    K(:,:,1:n_basis_fct) = K_s;
+end
+
+K(:,:,end) = K_mu;
 

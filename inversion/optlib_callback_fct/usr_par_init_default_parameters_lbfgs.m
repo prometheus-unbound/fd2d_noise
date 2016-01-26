@@ -6,40 +6,41 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
         usr_par.cluster = 'local';
     end
 
-
-    if( ~isfield( usr_par, 'type') )
-        usr_par.type = 'structure';
-    end
-
     
     if( ~isfield( usr_par, 'use_mex') )
         usr_par.use_mex = 'no';
     end
     
     
-    if( strcmp( usr_par.type, 'structure' ) )
-        if( isfield( usr_par, 'structure_inversion') )
-            if( ~isfield( usr_par.structure_inversion, 'rho') )
-                [~,~,nx,nz,~,~,~,model_type] = input_parameters();
-                [~,rho] = define_material_parameters( nx, nz, model_type);                
-                usr_par.structure_inversion.rho = rho;
-            end
-            
-            if( ~isfield( usr_par.structure_inversion, 'v0') )
-                usr_par.structure_inversion.v0 = 4000;
-            end
-        else
+    if( isfield( usr_par, 'structure_inversion') )
+        if( ~isfield( usr_par.structure_inversion, 'rho') )
             [~,~,nx,nz,~,~,~,model_type] = input_parameters();
             [~,rho] = define_material_parameters( nx, nz, model_type);
             usr_par.structure_inversion.rho = rho;
-            
+        end
+        
+        if( ~isfield( usr_par.structure_inversion, 'v0') )
             usr_par.structure_inversion.v0 = 4000;
         end
+    else
+        [~,~,nx,nz,~,~,~,model_type] = input_parameters();
+        [~,rho] = define_material_parameters( nx, nz, model_type);
+        usr_par.structure_inversion.rho = rho;
+        
+        usr_par.structure_inversion.v0 = 4000;
     end
-
     
-    if( ~isfield( usr_par, 'measurement') )
-        usr_par.measurement = 'waveform_difference';
+ 
+    if( isfield( usr_par, 'measurement') )
+        if( ~isfield( usr_par.measurement, 'source') )
+            usr_par.measurement.source = 'waveform_difference';
+        end
+        if( ~isfield( usr_par.measurement, 'structure') )
+            usr_par.measurement.structure = 'waveform_difference';
+        end
+    else
+        usr_par.measurement.source = 'waveform_difference';
+        usr_par.measurement.structure = 'waveform_difference';
     end
 
     
@@ -73,11 +74,16 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
         end
         
         if( ~isfield( usr_par.kernel, 'imfilter') )
-            usr_par.kernel.imfilter = fspecial('gaussian',[60 60], 30);
+            usr_par.kernel.imfilter = fspecial('gaussian',[1 1], 30);
+        end
+        
+        if( ~isfield( usr_par.kernel, 'weighting') )
+            usr_par.kernel.weighting = 0.5;
         end
     else
         usr_par.kernel.percentile = 0;                
-        usr_par.kernel.imfilter = fspecial('gaussian',[60 60], 30);
+        usr_par.kernel.imfilter = fspecial('gaussian',[1 1], 30);
+        usr_par.kernel.weighting = 0.5;
     end
     
     

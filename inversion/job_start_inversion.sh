@@ -34,13 +34,13 @@ fi
 cat <<EOF > inversion.sh
 #!/bin/bash -l								
 
-#SBATCH --partition=fichtner_compute_wk
+#SBATCH --partition=fichtner_compute
 #SBATCH --job-name=inversion
 #SBATCH --output=logs/matlab_%j.out
 #SBATCH --error=logs/matlab_%j.err
-#SBATCH --time=07-0:00:00
+#SBATCH --time=01-0:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem=8192
+#SBATCH --mem=4096
 
 
 ######################

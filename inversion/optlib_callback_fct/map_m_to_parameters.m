@@ -15,27 +15,12 @@ function [m_parameters] = map_m_to_parameters(m, usr_par)
 
 [~,~,nx,nz,~,~,~,~,~,n_basis_fct] = input_parameters();
 
-
-if( strcmp( usr_par.type, 'source') )
-    
-    if( n_basis_fct ~= 0 )
-        
-        m_parameters = imfilter( reshape( m, nx, nz, n_basis_fct ), usr_par.kernel.imfilter, 'circular' );
-        
-    else
-        
-        m_parameters = imfilter( reshape( m, nx, nz ), usr_par.kernel.imfilter, 'circular' );        
-        
-    end
-    
-    
-elseif( strcmp( usr_par.type, 'structure') )
-    
-    % in this case, m_parameters is mu, we don't consider rho at the moment
-    % m_parameters = reshape( usr_par.structure_inversion.v0^2 * reshape( usr_par.structure_inversion.rho, [], 1) .* (1+m).^2, nx, nz );
-    m_parameters = 4.8e10 * ( 1 + imfilter( reshape( m, nx, nz ), usr_par.kernel.imfilter, 'circular' ) );
-    
+if( n_basis_fct == 0 )
+    n_basis_fct = 1;
 end
+
+m_parameters = imfilter( reshape( m, nx, nz, n_basis_fct + 1 ), usr_par.kernel.imfilter, 'circular' );
+m_parameters(:,:,end) = 4.8e10 * ( 1 + m_parameters(:,:,end) );
 
 
 end

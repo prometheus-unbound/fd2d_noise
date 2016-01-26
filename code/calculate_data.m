@@ -25,7 +25,7 @@ addpath(genpath('../'))
 [source_dist, spectrum] = make_noise_source();
 [mu, rho] = define_material_parameters(nx,nz,model_type);
 
-% mu = mu + 1e9;
+mu = mu + 1e9;
 source_dist = source_dist + 1;
 
 if(model_type==666)

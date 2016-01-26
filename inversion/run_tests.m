@@ -61,26 +61,30 @@ clear all
 
 
 %% check gradient
+[Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
 [usr_par] = usr_par_init_default_parameters_lbfgs([]);
 
-% m = reshape( make_noise_source(), [], 1);
-% dm = 0.1 * m;
+source = make_noise_source();
+mu = define_material_parameters(nx,nz,model_type);
 
-[Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
-[mu] = define_material_parameters(nx,nz,model_type);
-m = map_parameters_to_m(mu,usr_par);
+% set up initial model
+if( n_basis_fct == 0)
+    m_parameters = zeros(nx, nz, 2);
+    m_parameters(:,:,1) = make_noise_source();
+else
+    m_parameters = zeros(nx, nz, n_basis_fct+1);
+    m_parameters(:,:,1:n_basis_fct) = make_noise_source();
+end
+m_parameters(:,:,end) = define_material_parameters(nx,nz,model_type);
 
-% [mu2] = define_material_parameters(nx,nz,9999);
-% m2 = map_parameters_to_m(mu2,usr_par);
-% 
-% w = weighting(nx,nz);
-% 
-% alpha = 0.01 * 1.174788e-02 * 2 / sum( w .* (m-m2).^2 );
-% 
-% return
+% convert to optimization variable
+m = map_parameters_to_m(m_parameters,usr_par);
+
 
 usr_par.m0 = m;
-dm = m + 0.1;
+
+dm = 0.0 * m;
+dm(:,:,1:end) = m(:,:,1:end) + 0.1;
 
 [dcheck, dcheck_struct] = optlib_derivative_check( m, dm, -10, -1, 1, usr_par);
 

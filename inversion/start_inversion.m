@@ -1,6 +1,6 @@
 
 addpath(genpath('../'))
-[~,~,nx,nz,~,~,~,model_type] = input_parameters();
+[~,~,nx,nz,~,~,~,model_type,~,n_basis_fct] = input_parameters();
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17,19 +17,18 @@ usr_par.cluster = 'monch';
 usr_par.use_mex = 'yes';
 
 
-usr_par.type = 'source';
-% 'source';
-% 'source_constrained';
-% 'structure';
-
-if( strcmp( usr_par.type, 'structure') )
-    [~,rho] = define_material_parameters( nx, nz, model_type);
-    usr_par.structure_inversion.rho = rho;
-    usr_par.structure_inversion.v0 = 4000;    
-end
+% define v0
+[~,rho] = define_material_parameters( nx, nz, model_type);
+usr_par.structure_inversion.rho = rho;
+usr_par.structure_inversion.v0 = 4000;
 
 
-usr_par.measurement = 'log_amplitude_ratio';
+% define weighting for kernels
+usr_par.kernel.weighting = 0.5;
+
+
+usr_par.measurement.source = 'log_amplitude_ratio';
+usr_par.measurement.structure = 'waveform_difference';
 % 'log_amplitude_ratio';
 % 'amplitude_difference';
 % 'waveform_difference';
@@ -63,17 +62,18 @@ usr_par.kernel.percentile = 0;
 
 
 % design gaussian filter for smoothing of kernel (set second input variable to [1,1] to turn it off)
-usr_par.kernel.imfilter = fspecial('gaussian',[25 25], 10);
+usr_par.kernel.imfilter = fspecial('gaussian',[30 30], 12);
 
 
 % regularization j_total = dj/dm + alpha * ||m-m0||^2  (i.e. set alpha=0 to turn it off)
-usr_par.regularization.alpha = 0.02;
-usr_par.regularization.weighting = weighting( nx, nz );
+usr_par.regularization.alpha = 0.007;
+usr_par.regularization.weighting = weighting( nx, nz, n_basis_fct );
 
 
 % debug mode
 usr_par.debug.switch = 'no';
 usr_par.debug.df = 0;
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,11 +87,7 @@ options.successive_iterations = 100;
 options.max_iterations = 100;
 options.wolfe_try_to_increase_step_length = false;
 options.verbose = true;
-if( strcmp( usr_par.type, 'structure') )
-    options.init_step_length = 1.0;
-else
-    options.init_step_length = 16.0;
-end
+options.init_step_length = 32.0;
 
 
 %%% FOR STEEPEST DESCENT
@@ -101,6 +97,7 @@ end
 % options.output_file = 'iterations_lbfgs.tab';
 % options.max_iterations = 100;
 % options.tolerance = 1e-3;
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -119,58 +116,32 @@ end
 [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
 
 
-% run source inversion
-if( strcmp( usr_par.type, 'source' ) )
-    
-    % set up initial model
-    m0 = make_noise_source();
-    m0 = reshape(m0,[],1);
-    usr_par.m0 = m0;
-    
-    % do inversion
-    [flag, mfinal, usr_par] = optlib_lbfgs(m0, options, usr_par);
-    
-    % save solution
-    save('../output/solution.mat', 'flag', 'mfinal', 'usr_par')
-    
-    
-% run source inversion with lower and upper bounds
-elseif( strcmp( usr_par.type, 'source_constrained' ) )
-    
-    usr_par.type = 'source';
-    
-    % set up initial model and lower/upper bounds
-    m0 = make_noise_source();
-    m0 = reshape(m0,[],1);
-    usr_par.m0 = m0;
-    xl = 0 * m0;
-    xu = inf * m0;
-    
-    % do inversion
-    [m, c_final] = projected_steepest_descent( m0, xl, xu, 'get_obj_grad', 0.05, 0);
-
-    % save solution
-    save('../output/solution.mat', 'm', 'c_final')
-        
-    
-% run structure inversion
-elseif( strcmp( usr_par.type, 'structure' ) )
-    
-    % set up initial model
-    m0 = zeros(nx*nz, 1);
-    usr_par.m0 = m0;
-    
-    % do inversion
-    % [flag, mfinal, usr_par] = optlib_steepest_descent(m0, options, usr_par);
-    [flag, mfinal, usr_par] = optlib_lbfgs(m0, options, usr_par);
-    
-    % save solution
-    save('../output/solution.mat', 'flag', 'mfinal', 'usr_par')    
-    
+% set up initial model
+if( n_basis_fct == 0)
+    m_parameters = zeros(nx, nz, 2);
+    m_parameters(:,:,1) = make_noise_source();
+else
+    m_parameters = zeros(nx, nz, n_basis_fct+1);
+    m_parameters(:,:,1:n_basis_fct) = make_noise_source();
 end
+m_parameters(:,:,end) = define_material_parameters(nx,nz,model_type);
+
+
+% convert to optimization variable
+m0 = map_parameters_to_m(m_parameters,usr_par);
+usr_par.m0 = m0;
+
+
+% run inversion
+[flag, mfinal, usr_par] = optlib_lbfgs(m0, options, usr_par);
+
+
+% save solution
+save('../output/solution.mat', 'flag', 'mfinal', 'usr_par')
 
 
 % close matlabpool and clean up path
 if( ~strcmp( usr_par.cluster, 'local' ) )
     delete(parobj)
 end
+

@@ -10,39 +10,11 @@ if(n_basis_fct == 0)
 end
 
 
-path = '~/Desktop/model_8.mat';
-% path = '~/Desktop/source_homog.mat';
+path = '~/Desktop/model_3.mat';
 % path2 = '~/Desktop/source_iugg.mat';
-% path = '~/Desktop/solution.mat';
-
-
-% path = sprintf('~/Desktop/models/model_%i.mat',i);
-
-% path = '~/Desktop/runs/inversion/models/true_mu_structure_1.mat';
-% path = '~/Desktop/runs/inversion/models/true_source_uniform_blob3.mat';
-
-% path = '~/Desktop/runs/inversion/structure_1/uniform_blob3/structure/true_source/wd/';
-% path = '~/Desktop/runs/inversion/structure_1/uniform_blob3/structure/homog_source/wd/';
-% path = '~/Desktop/runs/inversion/structure_1/uniform_blob3/structure/source_from_log_a/wd/';
-
-% path = '~/Desktop/runs/inversion/structure_1/uniform_blob3/source/homog_structure/unconstrained/log_a/';
-% path = '~/Desktop/runs/inversion/structure_1/uniform_blob3/source/true_structure/log_a/';
-
-% path = '~/Desktop/runs/inversion_newest/source/2h2g_lr_nover_f1_bam/log_a/';
-% path = '~/Desktop/runs/inversion_newest/source/2h2g_f1_bam_richtig/log_a/';
-
-% path = '~/Desktop/runs/inversion_newest/coverage/16_orig/';
-% path = '~/Desktop/runs/inversion_newest/coverage/16_full/';
-% path = '~/Desktop/runs/inversion_newest/coverage/49_full/';
-
-% path = '~/Desktop/runs/inversion_newest/tradeoff/rand20/';
-% path = '~/Desktop/runs/inversion_newest/point1/1h/wd_freqsamp5_nosmoo/';
-% path = '~/Desktop/';
 
 
 % n_models = length( dir([path 'model_*']) );
-
-
 % model_final = load([path 'model_' num2str(n_models-1) '.mat']);
 load(path);
 
@@ -54,21 +26,14 @@ end
 if( strcmp(path(end-11:end),'solution.mat') )
     model.m = mfinal;
 else
-    usr_par.type = model.type;
     usr_par.kernel.imfilter = model.imfilter;
 end
 
-m_parameters = reshape( map_m_to_parameters(model.m, usr_par), nx, nz, n_basis_fct );
+m_parameters = reshape( map_m_to_parameters(model.m, usr_par), nx, nz, n_basis_fct + 1);
 
 
-% [mu,rho] = define_material_parameters(nx,nz,model_type,'no');
-% m_parameters = m_parameters - mu;
-
-
-% [dist_true,~,clim] = make_noise_source('yes');
-% load ~/Desktop/runs/inversion_newest/data/coverage/array_16_ref_coverage_orig.mat
-% load ~/Desktop/runs/inversion_newest/data/coverage/array_16_ref_coverage.mat
-% load ~/Desktop/runs/inversion_newest/data/coverage/array_49_ref_coverage.mat
+% mu = define_material_parameters(nx,nz,model_type,'no');
+% m_parameters(:,:,2) = m_parameters(:,:,2) - mu;
 
 
 % load ~/Desktop/runs/inversion_new_world/data/array_16_ref.mat

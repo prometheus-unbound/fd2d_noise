@@ -118,10 +118,10 @@ for i = 1:n_ref
 %     first(indices,:) = filter_correlations( first(indices,:), t, f_min, f_max );
 %     second(indices,:) = filter_correlations( second(indices,:), t, f_min, f_max );
     
-    [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
+%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
 %     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);
 %     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
-%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'waveform_difference', src, rec);
+    [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'waveform_difference', src, rec);
     
     
 end
@@ -144,8 +144,8 @@ fprintf('%f\n',sum(abs(misfit)))
 
 
 % % index = 165:180;
-index = 1:n_ref*n_rec;
-plot_recordings_windows(first(index,:),t,veldis,'k',true,left(index),right(index));
-plot_recordings_windows(second(index,:),t,veldis,'g',true,left(index),right(index));
+% index = 1:n_ref*n_rec;
+% plot_recordings_windows(first(index,:),t,veldis,'k',true,left(index),right(index));
+% plot_recordings_windows(second(index,:),t,veldis,'g',true,left(index),right(index));
 % plot_recordings(first(index,:),t,veldis,'b',true);
 % plot_recordings(second(index,:),t,veldis,'r',true);

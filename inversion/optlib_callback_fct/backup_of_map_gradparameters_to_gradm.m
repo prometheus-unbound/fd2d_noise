@@ -16,8 +16,16 @@ function [grad_m] = map_gradparameters_to_gradm(m, grad_parameters, usr_par)
 % See also MAP_M_TO_PARAMETERS.
 
 
-grad_parameters(:,:,end) = 4.8e10 * grad_parameters(:,:,end);
-grad_m = reshape( imfilter( grad_parameters, usr_par.kernel.imfilter, 'circular' ), [], 1 );
+if( strcmp( usr_par.type, 'source') )
+    
+        grad_m = reshape( imfilter( grad_parameters, usr_par.kernel.imfilter, 'circular' ), [], 1 );
+    
+elseif( strcmp( usr_par.type, 'structure') )
+    
+    % grad_m = 2 * usr_par.structure_inversion.v0^2 * reshape( usr_par.structure_inversion.rho .* grad_parameters, [], 1 ) .* (1+m);
+    grad_m = 4.8e10 * reshape( imfilter( grad_parameters, usr_par.kernel.imfilter, 'circular' ), [], 1 );    
+    
+end
 
 
 end

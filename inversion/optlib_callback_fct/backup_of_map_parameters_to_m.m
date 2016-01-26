@@ -13,8 +13,16 @@ function [m] = map_parameters_to_m(m_parameters, usr_par)
 % See also MAP_M_TO_PARAMETERS and MAP_GRADPARAMETERS_TO_GRADM.
 
 
-m_parameters(:,:,end) = m_parameters(:,:,end) / 4.8e10 - 1;
-m = reshape( m_parameters, [], 1 );
+if( strcmp( usr_par.type, 'source') )
     
+    m = reshape( m_parameters, [], 1);
+    
+elseif( strcmp( usr_par.type, 'structure') )
+    
+    % m = reshape( sqrt( m_parameters ./ (usr_par.structure_inversion.v0^2 * usr_par.structure_inversion.rho ) ) - 1, [], 1 );
+    m = reshape( m_parameters, [], 1) / 4.8e10 - 1;
+    
+end
+
 
 end

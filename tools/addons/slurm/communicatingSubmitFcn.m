@@ -84,7 +84,7 @@ jobName = sprintf('Job%d', job.ID);
 % for example to limit the number of nodes for a single job.
 % You may also wish to supply additional submission arguments to
 % the sbatch command here.
-additionalSubmitArgs = sprintf('--partition=fichtner_compute_wk --time=03-00:00:00 --nodes=2 --ntasks-per-node=8 --mem-per-cpu=4096 --ntasks=%d', props.NumberOfTasks);
+additionalSubmitArgs = sprintf('--partition=fichtner_compute --time=01-00:00:00 --nodes=2 --ntasks-per-node=8 --mem-per-cpu=4096 --ntasks=%d', props.NumberOfTasks);
 dctSchedulerMessage(5, '%s: Generating command for task %i', currFilename, ii);
 commandToRun = getSubmitString(jobName, quotedLogFile, quotedScriptName, ...
     additionalSubmitArgs);
