@@ -134,7 +134,29 @@ while (model.normg > options.tolerance *normg0 && ...
                                    options.wolfe_try_to_increase_step_length, ...
                                    options.verbose, ...
                                    usr_par);
+    
+                               
+%     if(sigma==0)
+%         fprintf(fid, '\tWarning: Test steepest descent instead.\n');
+%         s=g;
+%         stg=s'*g;
+%         step='Grad';
+%         sigma = 1.0;
+%         
+%         [sigma,model_new]=optlib_wolfe(model.m,s,stg, model.objective, ...
+%                                    options.wolfe_delta, ...
+%                                    options.wolfe_theta, ...
+%                                    sigma, ...
+%                                    options.wolfe_try_to_increase_step_length, ...
+%                                    options.verbose, ...
+%                                    usr_par);
+%     end
+%     
+%     if(sigma==0)
+%         error('mhm... daran lags nicht!')
+%     end
 
+    
     if (options.verbose)
         disp 'new model found.';
     end
@@ -142,7 +164,7 @@ while (model.normg > options.tolerance *normg0 && ...
     gn=model_new.gradient;
     model_new.normg = norm(model_new.gradient);
     
-%     mn=model.m-sigma*s;
+    % mn=model.m-sigma*s;
 
     fprintf(fid,'it=%d   j=%e   ||g||=%e   sigma=%6.5f ||s||=%e  step=%s\n', ...
             it, model_new.objective, model_new.normg,sigma,norm(s),step);

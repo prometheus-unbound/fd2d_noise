@@ -30,7 +30,7 @@
 %==========================================================================
 
 
-function [misfit_n,adstf] = make_adjoint_sources_inversion(u,u_0,t,veldis,measurement,src,rec)
+function [misfit_n, adstf] = make_adjoint_sources_inversion( u, u_0, t, veldis, measurement, src, rec )
 
 %==========================================================================
 %- initialisations --------------------------------------------------------

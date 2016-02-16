@@ -35,7 +35,7 @@ function [parobj] = start_cluster(mode,folder_name,n_workers)
         
         mkdir(folder_name);
         cluster.JobStorageLocation = folder_name;
-        cluster.SubmitArguments = '-W 12:00 -R "rusage[mem=3072]"';
+        cluster.SubmitArguments = '-W 120:00 -R "rusage[mem=16384]"';
         parobj = parpool(cluster,16);
         
     end

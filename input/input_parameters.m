@@ -1,5 +1,5 @@
 
-function [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct,fw_nth] = input_parameters()
+function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, fw_nth] = input_parameters()
 
 %==========================================================================
 % set basic simulation parameters
@@ -17,26 +17,26 @@ function [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct,fw_nth] = i
 
 
 % % small setup
-Lx = 4.0e5;         % model extension in x-direction [m]
-Lz = 4.0e5;         % model extension in y-direction [m]
-
-nx = 300;           % grid points in x-direction
-nz = 300;           % grid points in z-direction
-
-dt = 0.09;          % time step [s]
-nt = 900;           % number of iterations
+% Lx = 4.0e5;         % model extension in x-direction [m]
+% Lz = 4.0e5;         % model extension in y-direction [m]
+% 
+% nx = 300;           % grid points in x-direction
+% nz = 300;           % grid points in z-direction
+% 
+% dt = 0.09;          % time step [s]
+% nt = 900;           % number of iterations
 
 
 % % setup Andreas
-% Lx = 2.0e6;             % model extension in x-direction [m]
-% Lz = 2.0e6;             % model extension in y-direction [m]
-% 
-% nx = 600;               % grid points in x-direction
-% nz = 600;               % grid points in z-direction
-% 
-% dt = 0.23;              % time step [s]
-% nt = 1600;              % number of iterations
-% % nt = 2600;            % number of iterations
+Lx = 2.0e6;             % model extension in x-direction [m]
+Lz = 2.0e6;             % model extension in y-direction [m]
+
+nx = 600;               % grid points in x-direction
+nz = 600;               % grid points in z-direction
+
+dt = 0.23;              % time step [s]
+nt = 1600;              % number of iterations
+% nt = 2600;            % number of iterations
 
 
 % % California setup
@@ -56,7 +56,7 @@ order = 4;              % finite-difference order (2 or 4)
 %==========================================================================
 
 % store every nth time step of forward field
-fw_nth = 1;             % only use 1 or 2 for now
+fw_nth = 2;             % only use 1 or 2 for now
 
 
 %==========================================================================
@@ -64,7 +64,7 @@ fw_nth = 1;             % only use 1 or 2 for now
 %==========================================================================
 
 model_type = 1;
-% model_type = 9999;
+% model_type = 999;
 
 % 1=homogeneous 
 % 2=homogeneous with localised density perturbation

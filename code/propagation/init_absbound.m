@@ -9,7 +9,8 @@ absbound = ones(nx,nz);
 [width,absorb_left,absorb_right,absorb_top,absorb_bottom] = absorb_specs();
 
 
-%- Initialisation of Cerjan-type absorbing boundary tapers ----------------
+%--------------------------------------------------------------------------
+%- Initialisation of Cerjan-type absorbing boundary tapers 
 %--------------------------------------------------------------------------
 
 %- left boundary

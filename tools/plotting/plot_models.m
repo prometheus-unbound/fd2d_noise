@@ -8,7 +8,7 @@
 %
 % optional: leave empty if not wanted
 
-function [clim] = plot_models(m_parameter,array,cm_psd,clim,overlay)
+function [clim] = plot_models( m_parameter, array, cm_psd, clim, overlay )
 
 
     %% configuration
@@ -34,7 +34,8 @@ function [clim] = plot_models(m_parameter,array,cm_psd,clim,overlay)
  
     
     %% open figure, set size, etc.
-    fig1 = figure; 
+    fig1 = figure(1);
+    clf
     set(fig1,'units','normalized','position',[.1 .3 0.5 0.4])
     ax1 = subplot(1,2,1);
     set(ax1,'FontSize',18);
@@ -114,8 +115,8 @@ function [clim] = plot_models(m_parameter,array,cm_psd,clim,overlay)
             
     if( ~isempty(clim) )
         caxis(clim)
-    % elseif( ~strcmp(overlay,'yes') )
-        % caxis([0 7])
+    elseif( ~strcmp(overlay,'yes') )
+%         caxis([0 7])
     end
     
     xlabels = [0 1000 2000];
@@ -148,8 +149,8 @@ function [clim] = plot_models(m_parameter,array,cm_psd,clim,overlay)
     
     if( ~isempty(clim) )
         caxis(clim)
-    % else
-        % caxis([4.4 5.2]*1e10)
+    else
+        caxis([4.4 5.2]*1e10)
     end
     
     xlabels = [0 1000 2000];

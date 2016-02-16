@@ -3,15 +3,10 @@ clear all
 % close all
 clc
 
-% get configuration
-[~,~,nx,nz,dt,nt,~,model_type,~,n_basis_fct] = input_parameters();
-if(n_basis_fct == 0)
-    n_basis_fct = 1;
-end
+[Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, fw_nth] = input_parameters();
 
-
-path = '~/Desktop/model_3.mat';
-% path2 = '~/Desktop/source_iugg.mat';
+path = '~/Desktop/model_56.mat';
+% path2 = '~/Desktop/model_69.mat';
 
 
 % n_models = length( dir([path 'model_*']) );
@@ -27,14 +22,23 @@ if( strcmp(path(end-11:end),'solution.mat') )
     model.m = mfinal;
 else
     usr_par.kernel.imfilter = model.imfilter;
+    [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
 end
 
-m_parameters = reshape( map_m_to_parameters(model.m, usr_par), nx, nz, n_basis_fct + 1);
 
+% get true source and material
+if( usr_par.config.n_basis_fct == 0 )
+    m_true = zeros( usr_par.config.nx, usr_par.config.nz, 2 );
+else
+    m_true = zeros( usr_par.config.nx, usr_par.config.nz, usr_par.config.n_basis_fct+1 );
+end
 
-% mu = define_material_parameters(nx,nz,model_type,'no');
-% m_parameters(:,:,2) = m_parameters(:,:,2) - mu;
+% m_true(:,:,1:end-1) = make_noise_source( source_type, usr_par.config.n_basis_fct );
+% m_true(:,:,end) = define_material_parameters( usr_par.config.nx, usr_par.config.nz, model_type );
+% m_true = map_m_to_parameters( map_parameters_to_m( m_true, usr_par ) , usr_par );
+% m_parameters = map_m_to_parameters(model.m, usr_par) - m_true;
 
+m_parameters = map_m_to_parameters(model.m, usr_par);
 
 % load ~/Desktop/runs/inversion_new_world/data/array_16_ref.mat
 if( ~exist('array', 'var') )
@@ -65,7 +69,7 @@ end
 
 % data = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform_1gaussian_homogeneous.mat');
 % initial = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform1_homogeneous.mat');
-% t = -(nt-1)*dt:dt:(nt-1)*dt;
+% t = data.t;
 % 
 % figure
 % plot_recordings(data.c_data,t,'vel','k',true);

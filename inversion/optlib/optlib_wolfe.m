@@ -32,9 +32,12 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
     % Determine maximal sig=sig0/2^k satisfying Armijo
     while (f-fn<del*sig*stg)
         sig=0.5*sig;
-        if sig < 0.01 * sig0
-            error(['seems that we''re not in a descent direction at all... sig = ', num2str(sig)]);
-        end
+        % if sig < 0.01 * sig0
+        %     fprintf( 'seems that we''re not in a descent direction at all... sig = %f.\n', sig );
+        %     sig = 0.0;
+        %     model = 0.0;
+        %     return
+        % end
         xn=xj-sig*s;
         xn_string = optlib_generate_random_string(8);
         if (verbose)
@@ -103,7 +106,7 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
             
             % stop bisection after 5 iterations
             if it_bisec > bisec_max
-                if sig > 0.01
+                if sig > 0.001
                     
                     fprintf( 'Hurrah! get out of here!\n' );
                     

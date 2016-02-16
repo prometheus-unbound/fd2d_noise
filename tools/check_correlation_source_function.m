@@ -1,4 +1,4 @@
-function check_correlation_source_function(x_plot,z_plot)
+function check_correlation_source_function(x_plot, z_plot)
 
 
 %- load the velocity spectrum field ---------------------------------------
@@ -6,7 +6,7 @@ load('../output/interferometry/G_2.mat');
 
 
 %- read input and make space-time coordinates -----------------------------
-[Lx,Lz,nx,nz,dt,nt,order,model_type] = input_parameters();
+[Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
 f_sample = input_interferometry();
 
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
@@ -24,7 +24,7 @@ s = conj(s);
 
 
 %- initialise noise spectrum ----------------------------------------------
-make_noise_source;
+[~, spectrum] = make_noise_source(source_type, n_basis_fct);
 
 
 %- approximate inverse Fourier transform ----------------------------------
@@ -33,7 +33,7 @@ w_sample = 2*pi*f_sample;
 dw = w_sample(2) - w_sample(1);
 
 for k=1:length(f_sample)
-    stf = stf + noise_spectrum(k) * s(k) * exp(1i*w_sample(k)*t);
+    stf = stf + spectrum(k) * s(k) * exp(1i*w_sample(k)*t);
 end
 
 %stf=stf+s(1)/2.0;
@@ -46,13 +46,13 @@ figure
 set(gca,'FontSize',20)
 
 subplot(2,1,1)
-plot(f_sample,abs(noise_spectrum.*s),'k');
+plot(f_sample,abs(spectrum.*s),'k');
 xlabel('\nu [Hz]')
 ylabel('amplitude spectrum')
 title(['displacement spectrum at position x=' num2str(x(x_id)) ' m, z=' num2str(z(z_id)) ' m'])
 
 subplot(2,1,2)
-plot(f_sample,angle(noise_spectrum.*s),'k');
+plot(f_sample,angle(spectrum.*s),'k');
 xlabel('\nu [Hz]','FontSize',20)
 ylabel('phase spectrum','FontSize',20)
 

@@ -1,4 +1,4 @@
-function [mu,rho] = define_material_parameters(nx,nz,model_type,make_plots)
+function [mu, rho] = define_material_parameters( nx, nz, model_type, make_plots )
 
 %==========================================================================
 % generate material parameters mu [N/m^2] and rho [kg/m^3]
