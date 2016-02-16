@@ -1,5 +1,5 @@
 
-function [m_parameters] = map_m_to_parameters(m, usr_par)
+function [m_parameters] = map_m_to_parameters( m, usr_par )
 % MAP_M_TO_PARAMETERS function to map the model variable m to physical
 % parameters.
 %
@@ -13,14 +13,15 @@ function [m_parameters] = map_m_to_parameters(m, usr_par)
 % See also MAP_PARAMETERS_TO_M and MAP_GRADPARAMETERS_TO_GRADM.
 
 
-[~,~,nx,nz,~,~,~,~,~,n_basis_fct] = input_parameters();
+m_parameters = reshape( m, usr_par.config.nx, usr_par.config.nz, [] );
 
-if( n_basis_fct == 0 )
-    n_basis_fct = 1;
-end
+[absbound] = init_absbound();
+[ix,iz] = find( absbound == 1, 1, 'first' );
+m_parameters(ix:end-ix+1, iz:end-iz+1, :) = imfilter( m_parameters(ix:end-ix+1, iz:end-iz+1, :) , usr_par.kernel.imfilter, 'circular' );
+% m_parameters = imfilter( m_parameters , usr_par.kernel.imfilter, 'circular' );
 
-m_parameters = imfilter( reshape( m, nx, nz, n_basis_fct + 1 ), usr_par.kernel.imfilter, 'circular' );
-m_parameters(:,:,end) = 4.8e10 * ( 1 + m_parameters(:,:,end) );
+m_parameters(:,:,1:end-1) = usr_par.initial.ref_source + m_parameters(:,:,1:end-1);
+m_parameters(:,:,end) = usr_par.initial.mu_0 * ( usr_par.initial.ref_structure + m_parameters(:,:,end) );
 
 
 end

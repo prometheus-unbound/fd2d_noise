@@ -5,11 +5,6 @@ function [dcheck, dcheck_struct] = optlib_derivative_check(m,dm,hpmin,hpmax,step
 
 [j, g] = eval_objective_and_gradient(m, optlib_generate_random_string(8), usr_par);
 
-% test_gradient
-% stuff = load('jh_vec.mat');
-% jh_vec = stuff.jh_vec;
-% j = stuff.j;
-
 j
 normg = norm(g)
 norm_dm = norm(dm)
@@ -18,7 +13,7 @@ djdm = g' * dm
 
 dcheck = zeros(hpmax-hpmin+1,6);
 it=0;
-% jh_vec = zeros((hpmax-hpmin)/step+1, 1);
+
 for hp=hpmin:step:hpmax
     it=it+1;
     fprintf('current power of 10: %5d \niteration:           %2d/%2d\n', hp, it, (hpmax-hpmin)/step+1 );
@@ -26,7 +21,6 @@ for hp=hpmin:step:hpmax
     
     [jh] = eval_objective(mh, optlib_generate_random_string(8), usr_par);
     jh_vec(it) = jh;
-%     jh = jh_vec(it);
     
     djdmh = (jh-j) / (10^hp);
     dcheck(it,:) = [10^hp, djdm, djdmh, abs(djdm - djdmh), abs(djdm - djdmh) / abs(djdm), djdm / djdmh];
@@ -39,9 +33,6 @@ for hp=hpmin:step:hpmax
     
     
 end
-
-
-% save('jh_vec.mat','jh_vec','j')
 
 
 h1 = figure;

@@ -1,39 +1,68 @@
 
 addpath(genpath('../'))
-[~,~,nx,nz,~,~,~,model_type,~,n_basis_fct] = input_parameters();
+[~,~,nx,nz,~,~,~,model_type,source_type,n_basis_fct] = input_parameters();
+usr_par.config.nx = nx; 
+usr_par.config.nz = nz;
+usr_par.config.n_basis_fct = n_basis_fct; 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usr_par.cluster = 'monch';
+usr_par.cluster = 'euler';
 % 'local';
 % 'monch';
 % 'euler';
 % 'brutus';
 
 
+usr_par.type = 'joint';
+% 'source'
+% 'structure'
+% 'joint'
+
+
 usr_par.use_mex = 'yes';
+% 'yes'
+% 'no'
 
 
-% define v0
-[~,rho] = define_material_parameters( nx, nz, model_type);
-usr_par.structure_inversion.rho = rho;
-usr_par.structure_inversion.v0 = 4000;
+% define reference models for perturbations and mu_0 for structure
+usr_par.initial.ref_source = 0;
+usr_par.initial.ref_structure = 1;
+usr_par.initial.mu_0 = 4.8e10;
+
+
+% if wanted, load initial perturbations for source and/or structure
+% initial_model = load('initial_models/loga_homog_98.mat');
+usr_par.initial.source_dist = initial_model.model.m( 1 : end - nx*nz, 1 );
+% usr_par.initial.structure = initial_model.model.m( end - nx*nz + 1 : end, 1 );
+
+
+usr_par.measurement.source = 'log_amplitude_ratio';
+usr_par.measurement.structure = 'cc_time_shift';
+% 'log_amplitude_ratio';
+% 'amplitude_difference';
+% 'waveform_difference';
+% 'cc_time_shift';
 
 
 % define weighting for kernels
 usr_par.kernel.weighting = 0.5;
 
 
-usr_par.measurement.source = 'log_amplitude_ratio';
-usr_par.measurement.structure = 'waveform_difference';
-% 'log_amplitude_ratio';
-% 'amplitude_difference';
-% 'waveform_difference';
-% 'cc_time_shift';
+% design gaussian filter for smoothing of kernel (set second input variable to [1,1] to turn it off)
+usr_par.kernel.imfilter = fspecial('gaussian',[75 75], 30);
+% usr_par.kernel.imfilter = fspecial('gaussian',[1 1], 30);
 
+% load array with reference stations and data
+% usr_par.network = load('../output/interferometry/array_2_ref.mat');
+% usr_par.data = load('../output/interferometry/data_2_ref_0.mat');
+% usr_par.network = load('../output/interferometry/array_16_ref_small.mat');
+% usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_iugg_small.mat');
+usr_par.network = load('../output/interferometry/array_16_ref.mat');
+usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_iugg_newpara.mat');
 
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')
 usr_par.veldis = 'dis';
@@ -45,34 +74,10 @@ usr_par.filter.f_min = 1/7 - 0.01;
 usr_par.filter.f_max = 1/7 + 0.01;
 
 
-% load array with reference stations and data
-usr_par.network = load('../output/interferometry/array_16_ref_small.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_iugg_small.mat');
-% usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_refl1.mat');
-
-
-% load source distribution that should be used for structure inversion
-% (uncomment line if source specified in input_parameters.m should be used)
-% usr_par.source_dist = load('initial_models/loga_homog_98.mat');
-
-
-% specify percentile for clipping of kernel ( = 0 to turn it off )
-% be careful: so far not taken into account into gradient
-usr_par.kernel.percentile = 0;
-
-
-% design gaussian filter for smoothing of kernel (set second input variable to [1,1] to turn it off)
-usr_par.kernel.imfilter = fspecial('gaussian',[30 30], 12);
-
-
 % regularization j_total = dj/dm + alpha * ||m-m0||^2  (i.e. set alpha=0 to turn it off)
-usr_par.regularization.alpha = 0.007;
-usr_par.regularization.weighting = weighting( nx, nz, n_basis_fct );
-
-
-% debug mode
-usr_par.debug.switch = 'no';
-usr_par.debug.df = 0;
+usr_par.regularization.alpha = 1e-6;
+usr_par.regularization.beta = 1e-3;
+usr_par.regularization.weighting = weighting( nx, nz );
 
 
 
@@ -83,11 +88,16 @@ usr_par.debug.df = 0;
 %%% FOR LBFGS
 options.tolerance = 1e-3;
 options.successive_change = 1e-16;
-options.successive_iterations = 100;
-options.max_iterations = 100;
+options.successive_iterations = 400;
+options.max_iterations = 500;
 options.wolfe_try_to_increase_step_length = false;
 options.verbose = true;
-options.init_step_length = 32.0;
+
+if( strcmp( usr_par.measurement.source, 'cc_time_shift') || strcmp( usr_par.measurement.structure, 'cc_time_shift') )
+    options.init_step_length = 0.025;
+else
+    options.init_step_length = 1.0;
+end
 
 
 %%% FOR STEEPEST DESCENT
@@ -104,10 +114,21 @@ options.init_step_length = 32.0;
 % running the inversion
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+if( strcmp( usr_par.type, 'source') )
+    if( usr_par.kernel.weighting ~= 0.0 )
+        usr_par.kernel.weighting = 0.0;
+        fprintf('\nset usr_par.kernel.weighting to 0.0\n')
+    end
+elseif( strcmp( usr_par.type, 'structure') )
+    if( usr_par.kernel.weighting ~= 1.0 )
+        usr_par.kernel.weighting = 1.0;
+        fprintf('\nset usr_par.kernel.weighting to 1.0\n')
+    end
+end
 
-% start matlabpool and set up path
+
+% start matlabpool
 if( ~strcmp( usr_par.cluster, 'local') )
-    addpath(genpath('../'))
     parobj = start_cluster( usr_par.cluster, '', size(usr_par.network.ref_stat,1));
 end
 
@@ -117,30 +138,41 @@ end
 
 
 % set up initial model
-if( n_basis_fct == 0)
+if( usr_par.config.n_basis_fct == 0 )
     m_parameters = zeros(nx, nz, 2);
-    m_parameters(:,:,1) = make_noise_source();
 else
-    m_parameters = zeros(nx, nz, n_basis_fct+1);
-    m_parameters(:,:,1:n_basis_fct) = make_noise_source();
+    m_parameters = zeros(nx, nz, usr_par.n_basis_fct+1);
 end
-m_parameters(:,:,end) = define_material_parameters(nx,nz,model_type);
+
+m_parameters(:,:,1:end-1) = make_noise_source( source_type, usr_par.config.n_basis_fct );
+m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
 
 
 % convert to optimization variable
-m0 = map_parameters_to_m(m_parameters,usr_par);
+m0 = map_parameters_to_m( m_parameters, usr_par );
+
+if( isfield( usr_par, 'initial') )
+    if( isfield( usr_par.initial, 'source_dist') )
+        m0( 1 : end - nx*nz, 1 ) = usr_par.initial.source_dist;
+    end
+    
+    if( isfield( usr_par.initial, 'structure') )
+        m0( end - nx*nz + 1 : end, 1 ) = usr_par.initial.structure;
+    end
+end
+
 usr_par.m0 = m0;
 
 
 % run inversion
-[flag, mfinal, usr_par] = optlib_lbfgs(m0, options, usr_par);
+[flag, mfinal, usr_par] = optlib_lbfgs( m0, options, usr_par );
 
 
 % save solution
-save('../output/solution.mat', 'flag', 'mfinal', 'usr_par')
+save('../output/solution.mat', 'flag', 'mfinal', 'usr_par', '-v7.3')
 
 
-% close matlabpool and clean up path
+% close matlabpool
 if( ~strcmp( usr_par.cluster, 'local' ) )
     delete(parobj)
 end

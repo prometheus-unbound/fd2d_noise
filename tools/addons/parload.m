@@ -1,4 +1,4 @@
-function [y] = load_G_2(filename)
+function [y] = parload(filename)
 
     foo = load(filename);
     whichVariables = fieldnames(foo);

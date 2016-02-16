@@ -1,14 +1,11 @@
 
 function [K] = treat_kernel( K_raw, usr_par )
-    
-
-    [~,~,~,~,~,~,~,~,~,n_basis_fct] = input_parameters();
-    
+       
     
     % clip kernel if desired
     if( usr_par.kernel.percentile ~= 0 )
         
-        if( n_basis_fct == 0 || strcmp( usr_par.type, 'structure') )
+        if( usr_par.config.n_basis_fct == 0 || strcmp( usr_par.type, 'structure') )
             n_basis_fct = 1;
         end
         

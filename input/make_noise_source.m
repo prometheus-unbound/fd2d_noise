@@ -1,15 +1,15 @@
 
-function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(make_plots)
+function [noise_source_distribution, noise_spectrum, clim] = make_noise_source( source_type, n_basis_fct, make_plots )
 
     % define make_plots if not specified
-    if( nargin < 1 )
+    if( nargin < 3 )
         make_plots = 'no';
     end
 
     
     % get configuration
     [f_sample,n_sample] = input_interferometry();
-    [Lx,Lz,nx,nz,~,~,~,~,source_type,n_basis_fct] = input_parameters();
+    [Lx,Lz,nx,nz] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);  
     
     if( Lx == 2.0e6 && Lz == 2.0e6 )
@@ -211,12 +211,21 @@ function [noise_source_distribution,noise_spectrum,clim] = make_noise_source(mak
             
         end
         
-        load ../output/interferometry/array_16_ref_small.mat
-%         load ~/Desktop/array_1_ref.mat
-%         array = [];
-%         load clim.mat
-%         clim = plot_noise_sources(noise_source_distribution,array,[],[clim(1) 0.3*clim(2)]);
-        clim = plot_models(noise_source_distribution,array,[],[]);
+        
+        % load ../output/interferometry/array_16_ref_small.mat
+        array = [];
+        
+        if( n_basis_fct == 0 )
+            plotten = zeros( nx, nz, 2);
+        else
+            plotten = zeros( nx, nz, n_basis_fct+1 );
+        end
+        
+        
+        plotten(:,:,1:end-1) = noise_source_distribution;
+        plotten(:,:,end) = 0*noise_source_distribution;
+        
+        clim = plot_models( plotten,array, [], [] );
         
     else
         

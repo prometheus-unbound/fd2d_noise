@@ -35,45 +35,18 @@ clear all
 
 
 
-%% check adjoint state
-% [~,~,~,~,~,nt] = input_parameters();
-% m = make_noise_source();
-% df = m;
-% 
-% df_time_dependent = 0.0 * repmat( df, 1, 1, 2*nt-1 );
-% for n = 1:size(df_time_dependent,3)
-% 
-%     if( mod(n,5) == 2 )
-%         df_time_dependent(:,:,n) = 1.0;
-%     else
-%         df_time_dependent(:,:,n) = 0.0;
-%     end
-%     
-% end
-% 
-% usr_par = usr_par_init_default_parameters_lbfgs([]);
-% usr_par.debug.switch = 'yes';
-% 
-% [dcheck, dcheck_struct] = optlib_adjoint_state_check( reshape(m,[],1), df_time_dependent, -10, -2, 1, usr_par);
-% keyboard
-% clear all
-
-
-
 %% check gradient
 [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
 [usr_par] = usr_par_init_default_parameters_lbfgs([]);
 
-source = make_noise_source();
-mu = define_material_parameters(nx,nz,model_type);
 
 % set up initial model
 if( n_basis_fct == 0)
     m_parameters = zeros(nx, nz, 2);
-    m_parameters(:,:,1) = make_noise_source();
+    m_parameters(:,:,1) = make_noise_source(source_type, n_basis_fct);
 else
     m_parameters = zeros(nx, nz, n_basis_fct+1);
-    m_parameters(:,:,1:n_basis_fct) = make_noise_source();
+    m_parameters(:,:,1:n_basis_fct) = make_noise_source(source_type, n_basis_fct);
 end
 m_parameters(:,:,end) = define_material_parameters(nx,nz,model_type);
 
@@ -83,8 +56,13 @@ m = map_parameters_to_m(m_parameters,usr_par);
 
 usr_par.m0 = m;
 
-dm = 0.0 * m;
-dm(:,:,1:end) = m(:,:,1:end) + 0.1;
+dm = 0.0 * m_parameters;
+dm(:,:,1:end) = dm(:,:,1:end) + 0.1;
 
-[dcheck, dcheck_struct] = optlib_derivative_check( m, dm, -10, -1, 1, usr_par);
+[absbound] = init_absbound();
+for i = 1:size(dm,3)
+   dm(:,:,i) =  double( absbound == 1 ) .* dm(:,:,i);
+end
+
+[dcheck, dcheck_struct] = optlib_derivative_check( m, reshape(dm,[],1), -10, -1, 1, usr_par);
 

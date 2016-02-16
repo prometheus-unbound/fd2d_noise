@@ -31,7 +31,7 @@ usr_par.model(it+1) = orderfields( model );
 
 %- save model -------------------------------------------------------------
 model.imfilter = usr_par.kernel.imfilter;
-save( sprintf('models/model_%i.mat',it), 'model' )
+save( sprintf('../inversion/models/model_%i.mat',it), 'model' )
 
 
 end

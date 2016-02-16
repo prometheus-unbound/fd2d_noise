@@ -1,5 +1,5 @@
 
-function [j, g, c_all] = eval_objective_and_gradient(m, ModRandString, usr_par, only_objective)
+function [j, g, c_all] = eval_objective_and_gradient( m, ModRandString, usr_par, only_objective )
  
 
 if( nargin < 4 )
@@ -7,32 +7,29 @@ if( nargin < 4 )
 end
 
 
-[~,~,nx,nz,~,~,~,model_type,~,n_basis_fct] = input_parameters();
-if(n_basis_fct == 0)
-    n_basis_fct = 1;
-end
-
+%- get configuration
+[~,~,~,~,~,~,~,model_type, source_type, n_basis_fct] = input_parameters();
 
 %- redirect optimization variable x and initialize kernel structures
-parameters = map_m_to_parameters(m, usr_par);
+m_parameters = map_m_to_parameters(m, usr_par);
 
 % loading of spectra important for n_basis_fct=0, i.e. one map for each noise source
-source_dist = parameters(:,:,1:n_basis_fct);
-[~, spectrum] = make_noise_source();
+source_dist = m_parameters(:,:,1:end-1);
+[~, spectrum] = make_noise_source(source_type, n_basis_fct);
 
 % material parameters
-mu = parameters(:,:,end);
-[~,rho] = define_material_parameters(nx,nz,model_type);
+mu = m_parameters(:,:,end);
+[~,rho] = define_material_parameters( usr_par.config.nx, usr_par.config.nz, model_type);
 
 
 %- loop over reference stations
-j = 0;
+j = 0; j_source = 0; j_structure = 0;
 t = usr_par.data.t;
 nt = length(t);
 n_ref = size( usr_par.network.ref_stat, 1 );
 n_rec = size( usr_par.network.array, 1 ) - 1;
 c_it = zeros( n_ref, n_rec, nt );
-grad_parameters = zeros( nx, nz, n_basis_fct + 1 );
+grad_parameters = 0.0 * m_parameters;
 
 
 parfor i = 1:n_ref
@@ -44,29 +41,36 @@ parfor i = 1:n_ref
     
     
     % calculate Green function 
-    if( strcmp( usr_par.use_mex, 'yes') )
-        [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green_mex(mu, rho, src, 1);
+    if( strcmp( usr_par.type, 'source') && exist(['../output/interferometry/G_2_' num2str(i) '.mat'], 'file') )
+        G_2 = parload( ['../output/interferometry/G_2_' num2str(i) '.mat'] );
     else
-        [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green(mu, rho, src, 1);
+        
+        if( strcmp( usr_par.type, 'source' ) )
+            [G_2] = run_forward1_green_mex(mu, rho, src, 0);
+            parsave( ['../output/interferometry/G_2_' num2str(i) '.mat'], G_2 )
+        else
+            [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green_mex(mu, rho, src, 1);
+        end
+        
     end
             
     
-    % calculate correlation        
-    if( strcmp( usr_par.use_mex, 'yes') )
-        [c_it(i,:,:), ~, C_2_dxu_time, C_2_dzu_time] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 1, usr_par.debug.df );
+    % calculate correlation
+    if( strcmp( usr_par.type, 'source' ) )
+        [c_it(i,:,:)] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 0 );
     else
-        [c_it(i,:,:), ~, C_2_dxu_time, C_2_dzu_time] = run_forward2_correlation( mu, rho, G_2, spectrum, source_dist, rec, 1, usr_par.debug.df );
+        [c_it(i,:,:), ~, C_2_dxu_time, C_2_dzu_time] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 1 );
     end
     
     
     % filter correlations if wanted
-    if( strcmp( usr_par.filter.apply_filter, 'yes') )
+    if( strcmp( usr_par.filter.apply_filter, 'yes' ) )
+        
         c_data_iref = filter_correlations( usr_par.data.c_data( (i-1)*n_rec + 1 : i*n_rec, : ), t, usr_par.filter.f_min, usr_par.filter.f_max, 4 );
-        c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, usr_par.filter.f_min, usr_par.filter.f_max, 4 );
-               
+        c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, usr_par.filter.f_min, usr_par.filter.f_max, 4 );       
+        
     else
         c_data_iref = usr_par.data.c_data( (i-1)*n_rec + 1 : i*n_rec, : );
-        
     end
     
     
@@ -83,23 +87,26 @@ parfor i = 1:n_ref
     if( only_objective == false )
         
         % calculate kernel kernel
-        if( strcmp( usr_par.use_mex, 'yes') )
+        if( strcmp( usr_par.type, 'source' ) )
             
-            % first run
-            [grad_i_1, adjoint_state_1] = run_noise_adjoint_mex( mu, rho, C_2_dxu_time, C_2_dzu_time, complex(adstf), rec, spectrum, source_dist, G_2 );
+            % mode == 0, do not need structure kernel
+            [grad_i_1, ~] = run_noise_adjoint_mex( mu, rho, single(0.0), single(0.0), complex(adstf), rec, spectrum, source_dist, G_2, 0 );
+            [grad_i_2] = 0.0 * grad_i_1;
             
-            % second run
-            [grad_i_2] = run_noise_adjoint_mex( mu, rho, G_2_dxu_time, G_2_dzu_time, adjoint_state_1, rec, spectrum, source_dist, G_2 );
+        elseif( strcmp( usr_par.type, 'structure' ) )
+            
+            % mode == 1, do not need source kernel
+            [grad_i_1, adjoint_state_1] = run_noise_adjoint_mex( mu, rho, C_2_dxu_time, C_2_dzu_time, complex(adstf), rec, spectrum, source_dist, G_2, 1 );
+            [grad_i_2] = run_noise_adjoint_mex( mu, rho, G_2_dxu_time, G_2_dzu_time, adjoint_state_1, rec, spectrum, source_dist, G_2, 1 );
             
         else
             
-            % first run
-            [grad_i_1, adjoint_state_1] = run_noise_adjoint( mu, rho, C_2_dxu_time, C_2_dzu_time, complex(adstf), rec, spectrum, source_dist, G_2 );
-            
-            % second run
-            [grad_i_2] = run_noise_adjoint( mu, rho, G_2_dxu_time, G_2_dzu_time, adjoint_state_1, rec, spectrum, source_dist, G_2 );
+            % mode == 2, need both kernels
+            [grad_i_1, adjoint_state_1] = run_noise_adjoint_mex( mu, rho, C_2_dxu_time, C_2_dzu_time, complex(adstf), rec, spectrum, source_dist, G_2, 2 );
+            [grad_i_2] = run_noise_adjoint_mex( mu, rho, G_2_dxu_time, G_2_dzu_time, adjoint_state_1, rec, spectrum, source_dist, G_2, 2 );
             
         end
+            
         
         % sum up both contributions
         grad_parameters_i = grad_i_1 + grad_i_2;
@@ -107,22 +114,31 @@ parfor i = 1:n_ref
         
         % sum up kernels
         grad_parameters = grad_parameters + grad_parameters_i;
+        % parsave( ['../output/interferometry/grad_parameters_' num2str(i) '.mat'], grad_parameters_i )
         
     end
     
     
     % sum up misfits
     j = j + sum(j_n);
+    j_source = j_source + sum(j_n_source);
+    j_structure = j_structure + sum(j_n_structure);
     
     
 end
 
 
-fprintf('misfit: %f\n',j)
 
-%%% TEST REGULARIZATON
-j = j + usr_par.regularization.alpha/2 * sum( usr_par.regularization.weighting .* (m - usr_par.m0).^2 ); 
-fprintf('misfit with regularization: %f\n',j)
+% for i = 1:n_ref
+%     grad_parameters_i = parload( ['../output/interferometry/grad_parameters_' num2str(i) '.mat'] );
+%     grad_parameters = grad_parameters + grad_parameters_i;
+% end
+
+
+
+fprintf('misfit total:      %15.10f\n',j)
+fprintf('misfit source:     %15.10f\n',j_source)
+fprintf('misfit structure:  %15.10f\n',j_structure)
 
 
 %- reorganize correlation vector
@@ -133,21 +149,22 @@ end
 
 
 if( only_objective == true )
-    g = 0;
+    
+    j = regularization( j, 0, m, usr_par );
+    fprintf('misfit with regu.: %15.10f\n',j)
+    g = 0;    
     return    
+    
 end
-
-
-%- kernel treatment, i.e. clipping
-grad_parameters = treat_kernel( grad_parameters, usr_par );
 
 
 %- map grad_parameters to grad_m
 g = map_gradparameters_to_gradm( m, grad_parameters, usr_par );
 
 
-%%% TEST REGULARIZATON
-g = g + usr_par.regularization.alpha * usr_par.regularization.weighting .* ( m - usr_par.m0 );
+%- add regularization
+[ j, g ] = regularization( j, g, m, usr_par );
+fprintf('misfit with regu.: %15.10f\n',j)
 
 
 end

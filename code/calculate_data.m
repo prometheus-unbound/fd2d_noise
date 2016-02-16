@@ -1,88 +1,117 @@
 
 tic
 
-clear all
-% close all
-
-
-mode = 'local';
-% mode = 'monch';
-% mode = 'euler';
-% mode = 'brutus';
-
-use_mex = 'no';
-
 addpath(genpath('../'))
-
-
-%% set up model
-[Lx,Lz,nx,nz,dt,nt,order,model_type,~,n_basis_fct] = input_parameters();
+[Lx,Lz,nx,nz,dt,nt,~,model_type,source_type,n_basis_fct] = input_parameters();
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
-[width] = absorb_specs();
 
 
-%% get source and material
-[source_dist, spectrum] = make_noise_source();
-[mu, rho] = define_material_parameters(nx,nz,model_type);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user input
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-mu = mu + 1e9;
-source_dist = source_dist + 1;
-
-if(model_type==666)
-    
-    A = imread('../models/rand_20_one_sided1.png');
-    mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
-    mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
-    
-elseif(model_type==888)
-    
-    cali = load('california.mat');
-    mu = (cali.v).^2 .* rho;
-    
-end
+usr_par.cluster = 'monch';
+% 'local';
+% 'monch';
+% 'euler';
+% 'brutus';
 
 
-%% specify output behaviour
-output_specs
-if(strcmp(mode,'cluster'))
-    make_plots = 'no';
-end
+usr_par.use_mex = 'yes';
+% 'yes'
+% 'no'
 
 
-%% define receiver array
+% define reference models for perturbations and mu_0 for structure
+usr_par.initial.ref_source = 0;
+usr_par.initial.ref_structure = 1;
+usr_par.initial.mu_0 = 4.8e10;
+usr_par.kernel.imfilter = fspecial('gaussian',[75 75], 30);
+% usr_par.kernel.imfilter = fspecial('gaussian',[1 1], 30);
+
+
+% define receiver array
 % nr_x = 4;
 % nr_z = 4;
 % array = zeros(nr_x*nr_z,2);
 % for i = 1:nr_x
 %     for j = 1:nr_z        
-% %         array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
-% %         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
+%         array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
+%         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
 %         
-%         array( (i-1)*nr_x + j, 1 ) = 1.8e5 + ( i-1 )*0.5e5;
-%         array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 )*0.5e5;
+%         % array( (i-1)*nr_x + j, 1 ) = 1.8e5 + ( i-1 )*0.5e5;
+%         % array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 )*0.5e5;
 %     end
 % end
 
-
-%% small test array, only two receivers close to each other
+% small test array, only two receivers close to each other
 array = zeros(2,2);
 array(1,1) = 2.5e4;
 array(2,1) = 3.5e4;
 array(:,2) = 3.0e4;
 
 
-%% California setup
-% array(:,1) = cali.rec_x(1:40);
-% array(:,2) = cali.rec_z(1:40);
+% select receivers that will be reference stations
+ref_stat = array;% (1,:);
 
 
-%% select receivers that will be reference stations
-ref_stat = array(1,:);
-n_ref = size(ref_stat,1);
-n_rec = size(array,1)-1;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% calculate data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% start matlabpool
+if( ~strcmp(usr_par.cluster,'local') )
+    parobj = start_cluster( mode, '', n_ref );
+end
 
 
-%% plot configuration
+% set necessary fields that might not have been set
+[usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
+
+
+% get source and material
+if( n_basis_fct == 0 )
+    m_parameters = zeros( nx, nz, 2 );
+else
+    m_parameters = zeros( nx, nz, n_basis_fct+1 );
+end
+
+m_parameters(:,:,1:end-1) = make_noise_source( source_type, n_basis_fct );
+m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
+
+m_parameters(:,:,end) = m_parameters(:,:,end) + 1e9;
+m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + 1;
+
+% if(model_type==666)     
+%     A = imread('../models/rand_20_one_sided1.png');
+%     mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
+%     mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';     
+% elseif(model_type==888)     
+%     cali = load('california.mat');
+%     mu = (cali.v).^2 .* rho;     
+% end
+
+
+% convert to m and then back to parameters again, necessary since the smoothing operator is part of the parameterization
+m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
+
+
+% redirect parameters 
+source_dist = m_parameters(:,:,1:end-1);
+[~, spectrum] = make_noise_source( source_type, n_basis_fct );             % important for n_basis_fct=0
+mu = m_parameters(:,:,end);
+[~,rho] = define_material_parameters( nx, nz, model_type );
+
+
+% specify output behaviour
+output_specs
+if(strcmp(usr_par.cluster,'cluster'))
+    make_plots = 'no';
+end
+
+
+% plot configuration
 if( strcmp(make_plots,'yes') )
     figure
     hold on
@@ -93,22 +122,21 @@ if( strcmp(make_plots,'yes') )
     drawnow
     axis square
     
-    return
-
-    plot_model    
+    figure
+    hold on
+    mesh(X,Z,(mu./rho)')
+    xlim([0 Lx])
+    ylim([0 Lz])
+    drawnow
+    axis image
     
     return
 end
 
 
-%% start matlabpool and set up path
-if( ~strcmp(mode,'local') )
-    addpath(genpath('../'))
-    parobj = start_cluster(mode, '', n_ref);
-end
-
-
-%% calculate correlations
+% calculate correlations
+n_ref = size(ref_stat,1);
+n_rec = size(array,1)-1;
 t = -(nt-1)*dt:dt:(nt-1)*dt;
 c_it = zeros(n_ref,n_rec,length(t));
 
@@ -126,17 +154,17 @@ parfor i = 1:n_ref
     
     
     fprintf('%i: calculate Green function\n',i)
-    if( strcmp(use_mex,'yes') )
-        [G_2] = run_forward1_green_mex(mu, rho, src, 1);
+    if( strcmp(usr_par.use_mex,'yes') )
+        [G_2] = run_forward1_green_mex( mu, rho, src, 0 );
     else
-        [G_2] = run_forward1_green(mu, rho, src, 1);
+        [G_2] = run_forward1_green( mu, rho, src, 0 );
     end
     
     fprintf('%i: calculate correlation\n',i)
-    if( strcmp(use_mex,'yes') )
-        [c_it(i,:,:)] = run_forward2_correlation_mex(mu, rho, G_2, spectrum, source_dist, rec, 1, 0);
+    if( strcmp(usr_par.use_mex,'yes') )
+        [c_it(i,:,:)] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 0 );
     else
-        [c_it(i,:,:)] = run_forward2_correlation(mu, rho, G_2, spectrum, source_dist, rec, 1, 0);
+        [c_it(i,:,:)] = run_forward2_correlation( mu, rho, G_2, spectrum, source_dist, rec, 0 );
     end
     
     fprintf('%i: done\n',i)
@@ -151,7 +179,7 @@ for i = 1:n_ref
 end
 
 
-%% plot data
+% plot data
 if( strcmp(make_plots,'yes') )
     figure
     plot_recordings(c_data,t,'vel','k-',true);
@@ -159,15 +187,14 @@ if( strcmp(make_plots,'yes') )
 end
 
 
-%% save array and data for inversion
+% save array and data for inversion
 save( sprintf('../output/interferometry/array_%i_ref.mat',n_ref), 'array', 'ref_stat')
 save( sprintf('../output/interferometry/data_%i_ref_%i.mat',n_ref,n_basis_fct), 'c_data', 't')
 
 
-%% close matlabpool and clean up path
-if( ~strcmp(mode,'local') )
+% close matlabpool
+if( ~strcmp(usr_par.cluster,'local') )
     delete(parobj)
-    rmpath(genpath('../'))
 end
 
 
