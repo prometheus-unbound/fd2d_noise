@@ -1,4 +1,4 @@
-function [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green(mu, rho, src, mode)
+function [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green( mu, rho, src, mode )
 
 %==========================================================================
 % compute Green function for reference station
@@ -8,6 +8,7 @@ function [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green(mu, rho, src, mo
 % mu [N/m^2]
 % rho [kg/m^3]
 % src: source position, i.e. the reference station
+% mode: integer switch, mode==0 when forward strain is not needed
 %
 % output:
 %--------
@@ -106,7 +107,7 @@ i_fw = 1;
 for n = 1:nt
     
     
-    if( mode == 1 && mod(n+nt-1, fw_nth) == 0 )
+    if( mode ~= 0 && mod(n+nt-1, fw_nth) == 0 )
         G_2_dxu_time(:,:,i_fw) = single(strain_dxv);
         G_2_dzu_time(:,:,i_fw) = single(strain_dzv);
         

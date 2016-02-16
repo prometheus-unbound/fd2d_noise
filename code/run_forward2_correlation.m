@@ -1,4 +1,4 @@
-function [displacement_seismograms, t, C_2_dxu_time, C_2_dzu_time] = run_forward2_correlation(mu, rho, G_2, spectrum, source_dist, rec, mode, df)
+function [displacement_seismograms, t, C_2_dxu_time, C_2_dzu_time] = run_forward2_correlation( mu, rho, G_2, spectrum, source_dist, rec, mode )
 
 %==========================================================================
 % compute correlation wavefield
@@ -11,7 +11,7 @@ function [displacement_seismograms, t, C_2_dxu_time, C_2_dzu_time] = run_forward
 % spectrum: spectrum of noise distribution
 % source_dist: source distribution
 % rec: receiverss
-% df: perturbation of rhs, implemented for check of adjoint state
+% mode: integer switch, mode==0 when forward strain is not needed
 %
 % output:
 %--------
@@ -117,7 +117,7 @@ for n = 1:nt
 
     
     %- save strain of correlation wavefield for mu-kernel
-    if( mode == 1 && mod(n, fw_nth) == 0 )
+    if( mode ~= 0 && mod(n, fw_nth) == 0 )
         C_2_dxu_time(:,:,i_fw) = single(strain_dxu);
         C_2_dzu_time(:,:,i_fw) = single(strain_dzu);
         
@@ -160,11 +160,11 @@ for n = 1:nt
    
     
     %- possible perturbation of rhs to test adjoint state -----------------
-    if( size(df,1)==1 && size(df,2)==1 )
-        DS = real( DS + repmat(df,nx,nz) );
-    else
-        DS = real( DS + df(:,:,n) );
-    end
+    % if( size(df,1)==1 && size(df,2)==1 )
+    %     DS = real( DS + repmat(df,nx,nz) );
+    % else
+    %     DS = real( DS + df(:,:,n) );
+    % end
     
     
     %- update velocity field ----------------------------------------------
@@ -196,11 +196,6 @@ for n = 1:nt
     
     
 end
-
-
-% time = datetime('now');
-% formatOut = 'yyyy-mm-dd-HH-MM-SS';
-% save(sprintf('stress_correlation_%s.mat',datestr(time,formatOut,'local')), 'C_2_dxu', 'C_2_dzu')
 
 
 end

@@ -2,7 +2,7 @@
 addpath(genpath('../../'))
 
 
-% G_2, df, adstf
+% G_2, adstf
 i1 = coder.typeof(complex(zeros(2,2,2)), [inf,inf,inf], 1);
 
 % mu, rho, spectrum
@@ -26,8 +26,8 @@ i6 = coder.typeof((zeros(2,2,2,'single')), [inf,inf,inf], 1);
 codegen run_forward1_green.m -args {i2, i2, i3, i4}
 
 
-% run_forward2_correlation(mu, rho, G_2, spectrum, source_dist, rec, mode, df)
-codegen run_forward2_correlation.m -args {i2, i2, i1, i2, i5, i3, i4, i1}
+% run_forward2_correlation(mu, rho, G_2, spectrum, source_dist, rec, mode)
+codegen run_forward2_correlation.m -args {i2, i2, i1, i2, i5, i3, i4}
 
 
 % run_noise_source_kernel( mu, rho, G_2, spectrum, adstf, adsrc )
@@ -38,8 +38,8 @@ codegen run_forward2_correlation.m -args {i2, i2, i1, i2, i5, i3, i4, i1}
 % codegen run_noise_structure_kernel.m -args {i2, i2, i6, i6, i1, i3, i2, i5}
 
 
-% run_noise_adjoint( mu, rho, forward_dxu_time, forward_dzu_time, adstf, adsrc, spectrum, source_dist, G_2 )
-codegen run_noise_adjoint.m -args {i2, i2, i6, i6, i1, i3, i2, i5, i1}
+% run_noise_adjoint( mu, rho, forward_dxu_time, forward_dzu_time, adstf, adsrc, spectrum, source_dist, G_2, mode )
+codegen run_noise_adjoint.m -args {i2, i2, i6, i6, i1, i3, i2, i5, i1, i4}
 
 
 

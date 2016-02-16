@@ -1,4 +1,4 @@
-function [K, stf_fft] = run_noise_adjoint( mu, rho, forward_dxu_time, forward_dzu_time, adstf, adsrc, spectrum, source_dist, G_2 )
+function [K, stf_fft] = run_noise_adjoint( mu, rho, forward_dxu_time, forward_dzu_time, adstf, adsrc, spectrum, source_dist, G_2, mode )
 
 %==========================================================================
 % compute sensitivity kernel for mu (and rho)
@@ -12,6 +12,11 @@ function [K, stf_fft] = run_noise_adjoint( mu, rho, forward_dxu_time, forward_dz
 % adsrc: adjoint source locations
 % spectrum: spectrum of noise distribution
 % source_dist: source distribution
+% G_2: Fourier transformed displacement Green function of reference station
+% mode: integer switch
+%       == 0 for source inversion
+%       == 1 for structure inversion
+%       == 2 for joint inversion
 %
 % output:
 %--------
@@ -118,7 +123,9 @@ end
 % iterate
 %==========================================================================
 
-%- only need first half of second adjoint run - strain of Green function is zero in second half
+%- only need first half of second adjoint run
+% strain of Green function is zero in second half, i.e. with time reversal
+% only first half of second adjoint run is necessary
 if( size(adstf,3) ~= 1 )
     nt = n_zero;
 end
@@ -134,12 +141,14 @@ for n = 1:nt
     
     
     %- add adjoint source time function -----------------------------------
+    % size(adstf,3) == 1 means: first run
     if( size(adstf,3) == 1 )
         
         for i=1:ns_adj
             DS(adsrc_id(i,1),adsrc_id(i,2)) = DS(adsrc_id(i,1),adsrc_id(i,2)) + real(adstf(i,n));
         end
-        
+
+    % second run, does not happen with mode == 0
     else
         
         if( mod(n,freq_samp) == 0 && t(n) < 0.0 )
@@ -189,7 +198,9 @@ for n = 1:nt
     strain_dzu = dz_v(u,dx,dz,nx,nz,order);
     
     
-    if( size(adstf,3) == 1 && mod(n,freq_samp) == 0 && t(end-n+1) <= 0.0 )
+    %- build up source kernel ---------------------------------------------
+    % mode == 1 means inversion for structure only, don't need source kernel
+    if( mode ~= 1 && size(adstf,3) == 1 && mod(n,freq_samp) == 0 && t(end-n+1) <= 0.0 )
         
         
         if( n_basis_fct == 0 )
@@ -223,8 +234,9 @@ for n = 1:nt
     end
     
        
-    %- build up structure kernel
-    if( mod(n, fw_nth) == 0 )
+    %- build up structure kernel ------------------------------------------
+    % mode == 0 means inversion for source only, don't need structure kernel
+    if( mode ~= 0 && mod(n, fw_nth) == 0 )
         K_mu(1:nx-1,:) = K_mu(1:nx-1,:) - strain_dxu .* forward_dxu_time(:,:,end-i_fw+1) * fw_nth;
         K_mu(:,1:nz-1) = K_mu(:,1:nz-1) - strain_dzu .* forward_dzu_time(:,:,end-i_fw+1) * fw_nth;
         
@@ -233,7 +245,8 @@ for n = 1:nt
 
 
     %- save fourier transformed adjoint state for second run --------------
-    if( size(adstf,3) == 1 )
+    % mode == 0 means inversion for source only, don't need second run
+    if( mode ~= 0 && size(adstf,3) == 1 )
         
         if( mod(n,freq_samp) ~= 0 )
             continue
@@ -253,7 +266,7 @@ for n = 1:nt
 end
 
 
-% concatenate kernels
+%- concatenate kernels ----------------------------------------------------
 if( n_basis_fct == 0 )
     K = zeros(nx, nz, 2);
     K(:,:,1) = K_s;
