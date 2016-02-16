@@ -1,6 +1,19 @@
 #!/bin/bash
 
-module load matlab/r2015a
+
+brutus=`grep brutus start_inversion.m  | awk 'END {print NR}'`
+euler=`grep euler start_inversion.m  | awk 'END {print NR}'`
+monch=`grep monch start_inversion.m  | awk 'END {print NR}'`
+
+if [ $brutus -gt 1 ] || [ $euler -gt 1 ]; then
+    module load matlab/8.5
+fi
+
+if [ $monch -gt 1 ]; then
+    module load matlab/r2015a
+fi
+
+
 
 while true; do
     read -p "Do conversion to mex-functions? " yn
@@ -10,6 +23,7 @@ while true; do
         * ) echo "Please answer yes or no.";;
     esac
 done
+
 
 
 nf=`ls -l ../output/interferometry/G_2_* 2>/dev/null | grep -v ^l | wc -l`
@@ -26,21 +40,27 @@ if [ $nf -gt 0 ]; then
 fi
 
 
+
 # START JOB ON EULER/BRUTUS
-# bsub -W "12:00" -R "rusage[mem=3072]" -o "logs/matlab_%J.out" -e "logs/matlab_%J.err" -n 1 matlab -nodisplay -singleCompThread -r start_inversion
+if [ $brutus -gt 1 ] || [ $euler -gt 1 ]; then
+	bsub -W "168:00" -R "rusage[mem=16384]" -o "logs/matlab_%J.out" -e "logs/matlab_%J.err" -n 1 matlab -nodisplay -singleCompThread -r start_inversion
+fi
+
 
 
 # START JOB ON MONCH
+if [ $monch -gt 1 ]; then
+
 cat <<EOF > inversion.sh
 #!/bin/bash -l								
 
-#SBATCH --partition=fichtner_compute
+#SBATCH --partition=fichtner_compute_wk
 #SBATCH --job-name=inversion
 #SBATCH --output=logs/matlab_%j.out
 #SBATCH --error=logs/matlab_%j.err
-#SBATCH --time=01-0:00:00
+#SBATCH --time=07-0:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem=4096
+#SBATCH --mem=16384
 
 
 ######################
@@ -54,4 +74,6 @@ EOF
 
 sbatch inversion.sh
 rm inversion.sh
+
+fi
 
