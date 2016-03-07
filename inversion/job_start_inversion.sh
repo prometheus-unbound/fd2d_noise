@@ -32,7 +32,7 @@ if [ $nf -gt 0 ]; then
 	while true; do
 	    read -p "Move Green functions in output/interferometry? " yn
 	    case $yn in
-	        [Yy]* ) var=$(date '+%Y_%m_%d_%H_%M_%S'); mkdir ../../backup/$var; mv ../output/interferometry/G_2_*.mat ../../backup/$var/; break;;
+	        [Yy]* ) var=$(date '+%Y_%m_%d_%H_%M_%S'); mkdir -p ../../tmp/$var; mv ../output/interferometry/G_2_*.mat ../../tmp/$var/; break;;
 	        [Nn]* ) break;;
 	        * ) echo "Please answer yes or no.";;
 	    esac
@@ -60,7 +60,7 @@ cat <<EOF > inversion.sh
 #SBATCH --error=logs/matlab_%j.err
 #SBATCH --time=07-0:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem=16384
+#SBATCH --mem-per-cpu=10240
 
 
 ######################

@@ -1,6 +1,8 @@
 
 tic
 
+clear all
+
 addpath(genpath('../'))
 [Lx,Lz,nx,nz,dt,nt,~,model_type,source_type,n_basis_fct] = input_parameters();
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
@@ -26,33 +28,36 @@ usr_par.use_mex = 'yes';
 usr_par.initial.ref_source = 0;
 usr_par.initial.ref_structure = 1;
 usr_par.initial.mu_0 = 4.8e10;
-usr_par.kernel.imfilter = fspecial('gaussian',[75 75], 30);
-% usr_par.kernel.imfilter = fspecial('gaussian',[1 1], 30);
+% usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
+% usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
+% usr_par.kernel.imfilter.source = fspecial('gaussian',[20 20], 10);
+usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
 
 % define receiver array
-% nr_x = 4;
-% nr_z = 4;
-% array = zeros(nr_x*nr_z,2);
-% for i = 1:nr_x
-%     for j = 1:nr_z        
-%         array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
-%         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
-%         
-%         % array( (i-1)*nr_x + j, 1 ) = 1.8e5 + ( i-1 )*0.5e5;
-%         % array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 )*0.5e5;
-%     end
-% end
+nr_x = 4;
+nr_z = 4;
+array = zeros(nr_x*nr_z,2);
+for i = 1:nr_x
+    for j = 1:nr_z        
+        array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
+        array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
+        
+%         array( (i-1)*nr_x + j, 1 ) = 0.775e6 + ( i-1 )*0.15e6;
+%         array( (i-1)*nr_z + j, 2 ) = 0.775e6 + ( j-1 )*0.15e6;
+    end
+end
 
 % small test array, only two receivers close to each other
-array = zeros(2,2);
-array(1,1) = 2.5e4;
-array(2,1) = 3.5e4;
-array(:,2) = 3.0e4;
+% array = zeros(2,2);
+% array(1,1) = 2.5e4;
+% array(2,1) = 3.5e4;
+% array(:,2) = 3.0e4;
 
 
 % select receivers that will be reference stations
-ref_stat = array;% (1,:);
+ref_stat = array; %(1,:);
 
 
 
@@ -60,13 +65,9 @@ ref_stat = array;% (1,:);
 % calculate data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% start matlabpool
-if( ~strcmp(usr_par.cluster,'local') )
-    parobj = start_cluster( mode, '', n_ref );
-end
-
-
 % set necessary fields that might not have been set
+usr_par.network = [];
+usr_par.data = [];
 [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
 
 
@@ -80,17 +81,27 @@ end
 m_parameters(:,:,1:end-1) = make_noise_source( source_type, n_basis_fct );
 m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
 
-m_parameters(:,:,end) = m_parameters(:,:,end) + 1e9;
-m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + 1;
 
-% if(model_type==666)     
-%     A = imread('../models/rand_20_one_sided1.png');
-%     mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
-%     mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';     
-% elseif(model_type==888)     
-%     cali = load('california.mat');
-%     mu = (cali.v).^2 .* rho;     
-% end
+
+% m_parameters(:,:,end) = m_parameters(:,:,end) + 1e9;
+% m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + 1;
+
+if(model_type==666)
+    
+    A = imread('../models/rand_20_one_sided1.png');
+    m_parameters(:,:,end) = m_parameters(:,:,end) + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
+    m_parameters(:,:,end) = m_parameters(:,:,end) - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';     
+    error('\nwill ich noch nicht\n')
+    
+elseif(model_type==888)   
+    
+    load('../models/random_0.25_norm.mat');
+    m_parameters(:,:,end) = m_parameters(:,:,end) + 5.0e9 * signal;
+    
+    % cali = load('california.mat');
+    % mu = (cali.v).^2 .* rho;     
+    
+end
 
 
 % convert to m and then back to parameters again, necessary since the smoothing operator is part of the parameterization
@@ -115,16 +126,18 @@ end
 if( strcmp(make_plots,'yes') )
     figure
     hold on
-    plot(array(:,1),array(:,2),'o')
-    plot(ref_stat(:,1),ref_stat(:,2),'x')
+    plot( array(:,1), array(:,2), 'o' )
+    plot( ref_stat(:,1), ref_stat(:,2), 'x' )
     xlim([0 Lx])
     ylim([0 Lz])
     drawnow
     axis square
     
+%     return
+    
     figure
     hold on
-    mesh(X,Z,(mu./rho)')
+    mesh( X, Z, (mu./rho)' )
     xlim([0 Lx])
     ylim([0 Lz])
     drawnow
@@ -142,6 +155,13 @@ c_it = zeros(n_ref,n_rec,length(t));
 
 fprintf('\n')
 
+
+% start matlabpool
+if( ~strcmp(usr_par.cluster,'local') )
+    parobj = start_cluster( usr_par.cluster, '', n_ref );
+end
+
+
 parfor i = 1:n_ref
     
     if( strcmp(verbose,'yes') )
@@ -154,18 +174,11 @@ parfor i = 1:n_ref
     
     
     fprintf('%i: calculate Green function\n',i)
-    if( strcmp(usr_par.use_mex,'yes') )
-        [G_2] = run_forward1_green_mex( mu, rho, src, 0 );
-    else
-        [G_2] = run_forward1_green( mu, rho, src, 0 );
-    end
+    [G_2] = run_forward1_green_mex( mu, rho, src, 0 );
+    
     
     fprintf('%i: calculate correlation\n',i)
-    if( strcmp(usr_par.use_mex,'yes') )
-        [c_it(i,:,:)] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 0 );
-    else
-        [c_it(i,:,:)] = run_forward2_correlation( mu, rho, G_2, spectrum, source_dist, rec, 0 );
-    end
+    [c_it(i,:,:)] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 0 );
     
     fprintf('%i: done\n',i)
     

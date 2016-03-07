@@ -1,9 +1,9 @@
 #!/bin/bash
 
 
-brutus=`grep brutus start_inversion.m  | awk 'END {print NR}'`
-euler=`grep euler start_inversion.m  | awk 'END {print NR}'`
-monch=`grep monch start_inversion.m  | awk 'END {print NR}'`
+brutus=`grep brutus calculate_data.m  | awk 'END {print NR}'`
+euler=`grep euler calculate_data.m  | awk 'END {print NR}'`
+monch=`grep monch calculate_data.m  | awk 'END {print NR}'`
 
 if [ $brutus -gt 1 ] || [ $euler -gt 1 ]; then
     module load matlab/8.5
@@ -51,13 +51,13 @@ if [ $monch -gt 1 ]; then
 cat <<EOF > data.sh
 #!/bin/bash -l								
 
-#SBATCH --partition=fichtner_compute
+#SBATCH --partition=other_hugemem
 #SBATCH --job-name=data
 #SBATCH --output=logs/matlab_%j.out
 #SBATCH --error=logs/matlab_%j.err
-#SBATCH --time=00-05:00:00
+#SBATCH --time=01-00:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem=3072
+#SBATCH --mem=10240
 
 
 ######################

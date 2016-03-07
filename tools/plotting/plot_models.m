@@ -2,18 +2,24 @@
 %
 % m_parameter
 % array (optional)
-% cm_psd: colormap (optional)
 % clim: colormap limits (optional)
 % overlay: 'yes' or 'no', only of use for n_basis_fct == 0 (optional)
 %
 % optional: leave empty if not wanted
 
-function [clim] = plot_models( m_parameter, array, cm_psd, clim, overlay )
+function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_source, cm_structure )
 
+    if( nargin < 5 || isempty(overlay) )
+        overlay = 'no';
+    end
+    
+    if( nargin < 6 || isempty(video) )
+        video = 'no';
+    end
 
     %% configuration
     [f_sample,n_sample] = input_interferometry();
-    [Lx,Lz,nx,nz,~,~,~,model_type,~,n_basis_fct] = input_parameters();
+    [Lx,Lz,nx,nz,~,~,~,model_type] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     [width] = absorb_specs();
     
@@ -23,18 +29,26 @@ function [clim] = plot_models( m_parameter, array, cm_psd, clim, overlay )
     width = width/1000;
     
     
-    %% colormap
-    if( isempty(cm_psd) )
-        cm_structure = cbrewer('div','RdBu',120,'PCHIP');
-        
+    %% colormaps
+    if( nargin < 7 || isempty(cm_source) )
         % cm_source = cbrewer('div','BrBG',120,'PCHIP');
         cm_source_orig = cbrewer('div','RdBu',120,'PCHIP');
         cm_source = cm_source_orig(50:120,:);
     end
- 
+    
+    if( nargin < 8 || isempty(cm_structure) )
+        cm_structure = cbrewer('div','RdBu',120,'PCHIP');
+    end
+    
+    
     
     %% open figure, set size, etc.
-    fig1 = figure(1);
+    if(strcmp(video,'no') )
+        fig1 = figure;
+    else
+        fig1 = figure(1);
+    end
+    
     clf
     set(fig1,'units','normalized','position',[.1 .3 0.5 0.4])
     ax1 = subplot(1,2,1);
@@ -44,18 +58,13 @@ function [clim] = plot_models( m_parameter, array, cm_psd, clim, overlay )
     
     %% plot array if given
     if( ~isempty(array) )
-        array = array / 1000;
-        plot3(array(:,1),array(:,2),2+0*array(:,2),'kd','MarkerFaceColor','k','MarkerSize',5)
+        plot3( array(:,1)/1000, array(:,2)/1000, 2+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
         legend('array')
     end
     
     
     %% plot for n_basis_fct == 0, i.e. only one map, or structure model
     if( n_basis_fct == 0 )
-        
-        if( nargin < 5 || isempty(overlay) )
-            overlay = 'no';
-        end
         
         if(strcmp(overlay,'yes'))
 
@@ -110,13 +119,17 @@ function [clim] = plot_models( m_parameter, array, cm_psd, clim, overlay )
     
     cb = colorbar;
     ylabel(cb,'[kg^2/m^2/s^2]')
-    set(cb,'YTick',[0 2 4 6])
     colormap(ax1,cm_source)
             
-    if( ~isempty(clim) )
-        caxis(clim)
-    elseif( ~strcmp(overlay,'yes') )
+    if( clim(1)~=0 || clim(2)~=0 )
+        caxis([clim(1) clim(2)]);
+        set(cb,'YTick',[clim(1) clim(2)])
+    elseif( strcmp(video, 'yes') )
+        caxis([0 7])
+        set(cb,'YTick',[0 2 4 6])
+    else
 %         caxis([0 7])
+%         set(cb,'YTick',[0 2 4 6])
     end
     
     xlabels = [0 1000 2000];
@@ -141,24 +154,35 @@ function [clim] = plot_models( m_parameter, array, cm_psd, clim, overlay )
     set(ax2,'FontSize',18);
     hold on
     
-    mesh(X, Z, m_parameter(:,:,2)' )
+    % plot array if given
+    if( ~isempty(array) )
+        plot3( array(:,1)/1000, array(:,2)/1000, 5.0e10+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
+        legend('array')
+    end
+    
+    mesh(X, Z, m_parameter(:,:,end)' )
     cb = colorbar;
     ylabel(cb,'[N/m^2]')
-    set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
     colormap(ax2,cm_structure);
     
-    if( ~isempty(clim) )
-        caxis(clim)
-    else
+    if( clim(3)~=0 || clim(4)~=0 )
+        caxis([clim(3) clim(4)]);
+        set(cb,'YTick',[clim(3) clim(4)])
+    elseif( strcmp(video,'yes') )
         caxis([4.4 5.2]*1e10)
+        set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
+    else
+%         caxis([4.4 5.2]*1e10)
+%         set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
     end
     
     xlabels = [0 1000 2000];
-    ylabels = [0 1000 2000];
+    % ylabels = [0 1000 2000];
     set(gca, 'XTick', xlabels);
-    set(gca, 'YTick', ylabels);
+    % set(gca, 'YTick', ylabels);
+    set(gca, 'YTick', []);
     xlabel('x [km]')
-    ylabel('z [km]')
+    % ylabel('z [km]')
     xlim([0 Lx])
     ylim([0 Lz])
     
@@ -169,6 +193,8 @@ function [clim] = plot_models( m_parameter, array, cm_psd, clim, overlay )
     ax.LineWidth = 2;
     axis square
 
+    
+    orient landscape
     
 end
 

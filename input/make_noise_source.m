@@ -1,5 +1,5 @@
 
-function [noise_source_distribution, noise_spectrum, clim] = make_noise_source( source_type, n_basis_fct, make_plots )
+function [ noise_source_distribution, noise_spectrum ] = make_noise_source( source_type, n_basis_fct, make_plots )
 
     % define make_plots if not specified
     if( nargin < 3 )
@@ -8,9 +8,9 @@ function [noise_source_distribution, noise_spectrum, clim] = make_noise_source( 
 
     
     % get configuration
-    [f_sample,n_sample] = input_interferometry();
-    [Lx,Lz,nx,nz] = input_parameters();
-    [X,Z] = define_computational_domain(Lx,Lz,nx,nz);  
+    [f_sample, n_sample] = input_interferometry();
+    [Lx, Lz, nx, nz, ~, ~, ~, model_type] = input_parameters();
+    [X, Z] = define_computational_domain(Lx,Lz,nx,nz);  
     
     if( Lx == 2.0e6 && Lz == 2.0e6 )
         size = 'big';
@@ -64,23 +64,17 @@ function [noise_source_distribution, noise_spectrum, clim] = make_noise_source( 
         % large setup, 2 sources left of the array
         elseif( strcmp(size,'big') )
             
-%             % original setup
-%             x_sourcem = [0.5e6, 0.6e6];
-%             z_sourcem = [0.8e6, 1.3e6];
-%             sourcearea_width = [2.0e5, 1.5e5];
-%             magnitude = [5.0, 5.0];
-            
-            % setup for coverage test
+            % standard
             x_sourcem = [0.6e6, 0.6e6];
             z_sourcem = [0.8e6, 1.3e6];
             sourcearea_width = [2.0e5, 1.5e5];
             magnitude = [6.0, 5.0];
            
-%             % lr_nover
-%             x_sourcem = [0.4e6, 1.6e6];
-%             z_sourcem = [1.0e6, 1.0e6];
-%             sourcearea_width = [1.2e5, 1.2e5];
-%             magnitude = [6.0, 6.0];
+%             % ring test
+%             x_sourcem = [0.5e6];
+%             z_sourcem = [0.8e6];
+%             sourcearea_width = [1.5e5];
+%             magnitude = [6.0];
 
         end
 
@@ -175,7 +169,7 @@ function [noise_source_distribution, noise_spectrum, clim] = make_noise_source( 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     if( n_basis_fct ~= 0 )
-        [noise_source_distribution] = general_source( noise_spectrum, noise_source_distribution );
+        [noise_source_distribution] = general_source( noise_spectrum, noise_source_distribution, n_basis_fct );
         noise_spectrum = ones(n_sample,1);
     end
     
@@ -213,23 +207,26 @@ function [noise_source_distribution, noise_spectrum, clim] = make_noise_source( 
         
         
         % load ../output/interferometry/array_16_ref_small.mat
+        % load ../output/interferometry/array_16_ref_center2.mat
         array = [];
         
         if( n_basis_fct == 0 )
-            plotten = zeros( nx, nz, 2);
+            m_parameters = zeros( nx, nz, 2);
         else
-            plotten = zeros( nx, nz, n_basis_fct+1 );
+            m_parameters = zeros( nx, nz, n_basis_fct+1 );
         end
         
+        m_parameters(:,:,1:end-1) = noise_source_distribution;
+        m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
         
-        plotten(:,:,1:end-1) = noise_source_distribution;
-        plotten(:,:,end) = 0*noise_source_distribution;
+        usr_par.network = [];
+        usr_par.data = [];
+        usr_par.config.n_basis_fct = n_basis_fct;
+        usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+        [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
+        m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
         
-        clim = plot_models( plotten,array, [], [] );
-        
-    else
-        
-        clim = [];
+        plot_models( m_parameters, n_basis_fct, array, [0 0 0 0] );       
         
     end
     

@@ -14,6 +14,7 @@ f_max = 1/7 + 0.005;
 
 % load inversion results
 path = '~/Desktop/models/';
+% path = '~/Desktop/models_first_run/';
 models_dir = dir([path 'model_*']);
 models_dir = sort_nat({models_dir.name});
 
@@ -43,12 +44,16 @@ writerObj = VideoWriter('~/Desktop/test','MPEG-4');
 writerObj.FrameRate = 6;
 open(writerObj);
 
+load clim.mat
+
+usr_par.network = []; usr_par.data = [];
+usr_par.ring.switch = 'no';
+[usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
+array = [];
+
 for i = 1:length(models_dir)
 
-    load([path char(models_dir(i))]);
-    
-    usr_par.kernel.imfilter = model.imfilter;
-    [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
+    load([path char(models_dir(i))]);    
     
     % get true source and material
     if( usr_par.config.n_basis_fct == 0 )
@@ -58,9 +63,9 @@ for i = 1:length(models_dir)
     end
     
     m_parameters = map_m_to_parameters(model.m, usr_par);
-    
-    array = [];
-    plot_models( m_parameters, array, [], [] );
+%     plot_models( m_parameters, array, [0 0 clim(1) clim(2)], 'no', 'yes');
+%     plot_models( m_parameters, array, [0 0 4.6e10 5.0e10], 'no', 'yes');
+    plot_models( m_parameters, array, [0 0 4.6e10 5.0e10], 'no', 'yes');
     
     drawnow
     % pause(0.1)
@@ -68,7 +73,6 @@ for i = 1:length(models_dir)
     M = getframe(fig1);
     writeVideo(writerObj,M);
     
-
 end
 
 

@@ -15,7 +15,7 @@ function [ alpha, beta ] = approx_alpha( misfit )
     
     
     m_parameters(:,:,1:end-1) = make_noise_source( 'gaussian', n_basis_fct );
-    m_parameters(:,:,end) = define_material_parameters( nx, nz, 999 );
+    m_parameters(:,:,end) = define_material_parameters( nx, nz, 200 );
     
     m_parameters_0(:,:,1:end-1) = make_noise_source( 'homogeneous', n_basis_fct );
     m_parameters_0(:,:,end) = define_material_parameters( nx, nz, 1 );

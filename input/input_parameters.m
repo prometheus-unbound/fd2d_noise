@@ -56,7 +56,7 @@ order = 4;              % finite-difference order (2 or 4)
 %==========================================================================
 
 % store every nth time step of forward field
-fw_nth = 2;             % only use 1 or 2 for now
+fw_nth = 4;
 
 
 %==========================================================================
@@ -64,7 +64,10 @@ fw_nth = 2;             % only use 1 or 2 for now
 %==========================================================================
 
 model_type = 1;
+% model_type = 200;
+% model_type = 888;
 % model_type = 999;
+
 
 % 1=homogeneous 
 % 2=homogeneous with localised density perturbation
@@ -75,7 +78,6 @@ model_type = 1;
 % 7=another layered medium
 % 666 = put source picture in ../models-folder
 % 999 = IUGG structure, two pills
-% 100 = test point spread function
 
 
 %==========================================================================
@@ -86,5 +88,5 @@ source_type = 'homogeneous';
 % source_type = 'gaussian';
 
 % number of frequency bands
-n_basis_fct = 0;  
+n_basis_fct = 5;  
 

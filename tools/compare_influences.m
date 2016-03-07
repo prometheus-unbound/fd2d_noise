@@ -1,38 +1,16 @@
 
-clear all
-
-
-
-
-
-u_0_h = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h1g_iugg.mat');
-u_0_h1g = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h1g_iugg_newpara.mat');
-load('~/Desktop/runs/2016_start/data/array_16_ref.mat');
-
-% u_0_h = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h_homog_small.mat');
-% u_0_h1g = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h1g_homog_small.mat');
-% u_0_h1g = load('~/Desktop/runs/2016_start/data/data_16_ref_0_1h1g_iugg_small.mat');
-% load('~/Desktop/runs/2016_start/data/array_16_ref_small.mat');
-
-
-t = u_0_h.t;
-
+function [misfit] = compare_influences( first, second, t, array, ref_stat, plotten )
 
 
 n_ref = size(ref_stat,1);
 n_rec = size(array,1)-1;
 distances = zeros(n_ref*n_rec,1);
-first = zeros(n_ref*n_rec,length(t));
-second = zeros(n_ref*n_rec,length(t));
 
 
 % veldis = 'vel';
 veldis = 'dis';
 
-f_min = 1/15 - 0.01;
-f_max = 1/15 + 0.01;
-
-misfit = 0;
+misfit = zeros(n_rec*n_ref, 4);
 for i = 1:n_ref
        
     % each reference station will act as a source once
@@ -43,23 +21,11 @@ for i = 1:n_ref
     distances( (i-1)*n_rec + 1 : i*n_rec , 1 ) = sqrt( (src(1,1) - rec(:,1)).^2 + (src(1,2) - rec(:,2)).^2 );
     
     % calculate misfit
-    indices = (i-1)*n_rec + 1 : i*n_rec;
-    
-    % first(indices,:) = u2_h_0.c_data( indices , : );
-    % second(indices,:) = u2b_h_0.c_data( indices , : );
-    
-    first(indices,:) = u_0_h.c_data( indices , : );
-    second(indices,:) = u_0_h1g.c_data( indices , : );
-    
-%     first_save = first;
-%     second_save = second;  
-%     first(indices,:) = filter_correlations( first(indices,:), t, f_min, f_max );
-%     second(indices,:) = filter_correlations( second(indices,:), t, f_min, f_max );
-    
-%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
-%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);
-%     [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
-    [misfit( (i-1)*n_rec + 1 : i*n_rec ),~] = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'waveform_difference', src, rec);
+    indices = (i-1)*n_rec + 1 : i*n_rec; 
+    misfit( (i-1)*n_rec + 1 : i*n_rec, 1 ) = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
+    misfit( (i-1)*n_rec + 1 : i*n_rec, 2 ) = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);
+    misfit( (i-1)*n_rec + 1 : i*n_rec, 3 ) = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
+    misfit( (i-1)*n_rec + 1 : i*n_rec, 4 ) = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'waveform_difference', src, rec);
     
     
 end
@@ -77,13 +43,20 @@ if( right > t(end) )
 end
 
 
-fprintf('%f\n',sum(abs(misfit)))
-% fprintf('%f',max(abs(misfit)))
+fprintf('loga:  %8.4f,   max: %8.4f,   mean: %8.4f\n', sum(abs(misfit(:,1))), max(abs(misfit(:,1))), mean(abs(misfit(:,1))) )
+fprintf('amp:   %8.4f,   max: %8.4f,   mean: %8.4f\n', sum(abs(misfit(:,2))), max(abs(misfit(:,2))), mean(abs(misfit(:,2))) )
+fprintf('cc:    %8.4f,   max: %8.4f,   mean: %8.4f\n', sum(abs(misfit(:,3))), max(abs(misfit(:,3))), mean(abs(misfit(:,3))) )
+fprintf('wd:    %8.4f,   max: %8.4f,   mean: %8.4f\n', sum(abs(misfit(:,4))), max(abs(misfit(:,4))), mean(abs(misfit(:,4))) )
+
+if( strcmp(plotten,'yes') )
+    figure
+    % % index = 165:180;
+    index = 1:n_ref*n_rec;
+    % plot_recordings_windows(first(index,:),t,veldis,'k',true,left(index),right(index));
+    % plot_recordings_windows(second(index,:),t,veldis,'g',true,left(index),right(index));
+    plot_recordings(first(index,:),t,veldis,'b',true);
+    plot_recordings(second(index,:),t,veldis,'r',true);
+end
 
 
-% % index = 165:180;
-index = 1:n_ref*n_rec;
-% plot_recordings_windows(first(index,:),t,veldis,'k',true,left(index),right(index));
-% plot_recordings_windows(second(index,:),t,veldis,'g',true,left(index),right(index));
-% plot_recordings(first(index,:),t,veldis,'b',true);
-% plot_recordings(second(index,:),t,veldis,'r',true);
+end
