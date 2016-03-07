@@ -88,8 +88,13 @@ for n = nt:(2*nt-1)
     end
 end
 
-G_2_dxu_time = zeros(nx-1,nz,n_fw,'single');
-G_2_dzu_time = zeros(nx,nz-1,n_fw,'single');
+if( mode ~= 0 )
+    G_2_dxu_time = zeros(nx-1,nz,n_fw,'single');
+    G_2_dzu_time = zeros(nx,nz-1,n_fw,'single');
+else
+    G_2_dxu_time = single(0.0);
+    G_2_dzu_time = single(0.0);
+end
 strain_dxv = zeros(nx-1,nz);
 strain_dzv = zeros(nx,nz-1);
 

@@ -93,8 +93,13 @@ szy = zeros(nx,nz-1);
 u = zeros(nx,nz);
 
 n_fw = floor(nt/fw_nth);
-C_2_dxu_time = zeros(nx-1,nz,n_fw,'single');
-C_2_dzu_time = zeros(nx,nz-1,n_fw,'single');
+if( mode ~= 0 )
+    C_2_dxu_time = zeros(nx-1,nz,n_fw,'single');
+    C_2_dzu_time = zeros(nx,nz-1,n_fw,'single');
+else
+    C_2_dxu_time = single(0.0);
+    C_2_dzu_time = single(0.0);
+end
 strain_dxu = zeros(nx-1,nz);
 strain_dzu = zeros(nx,nz-1);
 
