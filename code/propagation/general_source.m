@@ -1,8 +1,8 @@
 
-function [dist_general] = general_source( noise_spectrum, noise_source_distribution )
+function [dist_general] = general_source( noise_spectrum, noise_source_distribution, n_basis_fct )
 
     
-    [~,~,nx,nz,~,~,~,~,~,n_basis_fct] = input_parameters();
+    [~,~,nx,nz] = input_parameters();
     [~,n_sample] = input_interferometry();
     n_noise_sources = size( noise_spectrum, 2 );
    

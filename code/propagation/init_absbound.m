@@ -2,8 +2,8 @@
 function [absbound] = init_absbound()
 
 % get parameters
-[Lx,Lz,nx,nz,~,~,~,~] = input_parameters();
-[X,Z,~,~,~,~] = define_computational_domain(Lx,Lz,nx,nz);
+[Lx,Lz,nx,nz] = input_parameters();
+[X,Z] = define_computational_domain(Lx,Lz,nx,nz);
 
 absbound = ones(nx,nz);
 [width,absorb_left,absorb_right,absorb_top,absorb_bottom] = absorb_specs();
