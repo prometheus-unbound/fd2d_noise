@@ -37,7 +37,11 @@ clear all
 
 %% check gradient
 [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
-[usr_par] = usr_par_init_default_parameters_lbfgs([]);
+
+usr_par.network = load('../output/interferometry/array_2_ref.mat');
+usr_par.data = load('../output/interferometry/data_2_ref_0.mat');
+
+[usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
 
 
 % set up initial model
@@ -60,9 +64,28 @@ dm = 0.0 * m_parameters;
 dm(:,:,1:end) = dm(:,:,1:end) + 0.1;
 
 [absbound] = init_absbound();
+
+%%% TEST %%%
+x_source_r = 3.0e4;
+z_source_r = 3.0e4;
+radius = 2.0e4;
+thickness = 5e3;
+[Lx, Lz, nx, nz] = input_parameters();
+[X, Z] = define_computational_domain(Lx,Lz,nx,nz);
+
+R = ( (X-x_source_r).^2 + (Z-z_source_r).^2 ).^(1/2);
+
+% mesh( double(R > (radius-thickness/2) & R < (radius+thickness/2) ) )
+% return 
+
+% dm(:,:,1) = dm(:,:,1) .* double(R > (radius-thickness/2) & R < (radius+thickness/2) );
+%%% TEST END %%%
+
+
 for i = 1:size(dm,3)
-   dm(:,:,i) =  double( absbound == 1 ) .* dm(:,:,i);
+   dm(:,:,i) =  double( absbound == 1 ) .* dm(:,:,i); 
 end
+
 
 [dcheck, dcheck_struct] = optlib_derivative_check( m, reshape(dm,[],1), -10, -1, 1, usr_par);
 

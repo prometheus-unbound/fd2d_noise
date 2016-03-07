@@ -106,7 +106,7 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
             
             % stop bisection after 5 iterations
             if it_bisec > bisec_max
-                if sig > 0.001
+                if sig > eps % 0.0001
                     
                     fprintf( 'Hurrah! get out of here!\n' );
                     

@@ -73,26 +73,45 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
 
     
     if( isfield(usr_par,'kernel') )
-        if( ~isfield( usr_par.kernel, 'imfilter') )
-            usr_par.kernel.imfilter = fspecial('gaussian',[10 10], 30);
+        if( isfield( usr_par.kernel, 'imfilter') )
+            if( ~isfield( usr_par.kernel.imfilter, 'source' ) )
+                usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+            end
+            if( ~isfield( usr_par.kernel.imfilter, 'structure' ) )
+                usr_par.kernel.imfilter.structure = fspecial('gaussian',[1 1], 1);
+            end            
+        else 
+            usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+            usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
         end
         
         if( ~isfield( usr_par.kernel, 'weighting') )
             usr_par.kernel.weighting = 0.5;
         end
     else
-        usr_par.kernel.imfilter = fspecial('gaussian',[10 10], 30);
+        usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+        usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
+        
         usr_par.kernel.weighting = 0.5;
     end
     
     
+    if( isfield( usr_par, 'ring' ) )
+        if( ~isfield( usr_par.ring, 'switch' ) )
+            usr_par.ring.switch = 'no';
+        end
+    else
+        usr_par.ring.switch = 'no';
+    end
+    
+    
     if( ~isfield( usr_par, 'network') )
-        usr_par.network = load('../output/interferometry/array_16_ref.mat');
+        error('\nload array!\n')
     end
     
     
     if( ~isfield( usr_par, 'data') )
-        usr_par.data = load('../output/interferometry/data_16_ref_0_1h1g_iugg_newpara.mat');
+        error('\nload data!\n')
     end
     
     

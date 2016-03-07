@@ -105,7 +105,7 @@ parfor i = 1:n_ref
             [grad_i_1, adjoint_state_1] = run_noise_adjoint_mex( mu, rho, C_2_dxu_time, C_2_dzu_time, complex(adstf), rec, spectrum, source_dist, G_2, 2 );
             [grad_i_2] = run_noise_adjoint_mex( mu, rho, G_2_dxu_time, G_2_dzu_time, adjoint_state_1, rec, spectrum, source_dist, G_2, 2 );
             
-        end
+        end      
             
         
         % sum up both contributions

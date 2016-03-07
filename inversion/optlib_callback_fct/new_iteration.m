@@ -30,7 +30,14 @@ usr_par.model(it+1) = orderfields( model );
 
 
 %- save model -------------------------------------------------------------
-model.imfilter = usr_par.kernel.imfilter;
+model.imfilter.source = usr_par.kernel.imfilter.source;
+model.imfilter.structure = usr_par.kernel.imfilter.structure;
+model.config.n_basis_fct = usr_par.config.n_basis_fct;
+
+if( strcmp( usr_par.ring.switch, 'yes' ) )
+   model.ring = usr_par.ring; 
+end
+
 save( sprintf('../inversion/models/model_%i.mat',it), 'model' )
 
 
