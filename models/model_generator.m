@@ -10,7 +10,7 @@ clc
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 
 
-corr_length = 0.25;
+corr_length = 0.09;
 k_max = 2 * pi * dx / (corr_length * Lx);
 pert = 1e10 / (corr_length * Lx)^2;
 
