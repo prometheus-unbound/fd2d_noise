@@ -24,8 +24,18 @@ u_0_random_h1g_04 = load('~/Desktop/runs/2016_start/data_random/data_16_ref_0_1h
 u_0_random_h_05 = load('~/Desktop/runs/2016_start/data_random/data_16_ref_0_1h_random_0.5.mat');
 u_0_random_h1g_05 = load('~/Desktop/runs/2016_start/data_random/data_16_ref_0_1h1g_random_0.5.mat');
 
-t = u_0_random_h_005.t;
+u_5 = load('~/Desktop/data_16_ref_5_h2g_0.3_1_homog_nfft_5.mat');
+u_20 = load('~/Desktop/data_16_ref_20_h2g_0.3_1_homog_nfft_5.mat');
+u_91 = load('~/Desktop/data_16_ref_91_h2g_0.3_1_homog_nfft_5.mat');
+
+t = u_5.t;
 load('~/Desktop/runs/2016_start/data_iugg/array_16_ref.mat');
+
+
+misfit_91_20 = compare_influences( u_91.c_data, u_20.c_data, t, array, ref_stat, 'yes' );
+hold on
+misfit_91_5 = compare_influences( u_91.c_data, u_5.c_data, t, array, ref_stat, 'yes' );
+
 
 misfit_0001 = compare_influences( u_0_homog_h.c_data, u_0_random_h1g_0001.c_data, t, array, ref_stat, 'no' );
 misfit_001 = compare_influences( u_0_homog_h.c_data, u_0_random_h1g_001.c_data, t, array, ref_stat, 'no' );

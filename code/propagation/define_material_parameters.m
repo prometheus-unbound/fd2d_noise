@@ -93,16 +93,10 @@ elseif (model_type==7)
     mu(331:end,:) = 2.7e10;
 
     
-elseif ( model_type==666 )
+elseif ( model_type==666 || model_type==888 )
     
     rho = 3000.0 * ones(nx,nz);
     mu = 4.8e10 * ones(nx,nz);
-    
-%     mu(300:310,300:310) = 5.0e10;
-    
-%     A = imread('../models/rand_10_one_sided.png');
-%     mu = mu + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
-%     mu = mu - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
     
     
 elseif (model_type==999)
@@ -144,38 +138,26 @@ elseif (model_type==9999)
     end
 
     
-elseif (model_type==100)
-    
-    rho = 3000.0*ones(nx,nz);
-    mu = 4.8e10*ones(nx,nz);
-    
-    mu(377:388,287:298) = mu(377:388,287:298) + 4.0e9;    
-    
     
 elseif (model_type==200)
     
     rho = 3000.0*ones(nx,nz);
     mu = 4.8e10*ones(nx,nz);
-    
-    % mu(307:318,227:238) = mu(307:318,227:238) + 4.0e9;
-    
+        
     x_sourcem = [1.275e6];
     z_sourcem = [0.975e6];
-    x_width = [0.2e5];
-    z_width = [0.2e5];
+    x_width = [0.7e2];
+    z_width = [0.7e2];
+    
+    % point1: 0.1e5, 0.1e5, 2e10
+    % point2: 0.7e2, 0.7e2, 3.0e31
     
     [Lx,Lz] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
     for i=1:size(x_sourcem,2)
-        mu = mu + (-1)^i * 4.0e9 * exp( -( (X-x_sourcem(i)).^2 ) / x_width(i)^2 )' .* exp( -( (Z-z_sourcem(i)).^2 ) / z_width(i)^2 )' ;
+        mu = mu + (-1)^i * 3.0e31 * exp( -( (X-x_sourcem(i)).^2 ) / x_width(i)^2 )' .* exp( -( (Z-z_sourcem(i)).^2 ) / z_width(i)^2 )' ;
     end
-    
-    
-elseif (model_type==888)
-    
-    rho = 3000.0*ones(nx,nz);
-    mu = 4.8e10*ones(nx,nz);
     
     
 else
@@ -190,41 +172,48 @@ end
 
 if( strcmp(make_plots,'yes') )
     
-    [Lx,Lz] = input_parameters();
+    [Lx,Lz,nx,nz,~,~,~,~,source_type,n_basis_fct] = input_parameters();   
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
-    figure
-    % mesh(X,Z,sqrt(mu./rho)')
-    mesh(X/1000,Z/1000,mu')
-    view([0 90])
-    set(gca,'FontSize',18);
-    hold on
+%     load ../output/interferometry/array_16_ref.mat
+%     min_x = min(array(:,1));
+%     min_z = min(array(:,2));
+%     max_x = max(array(:,1));
+%     max_z = max(array(:,2));
+%     
+%     buffer = 1e5;
+%     pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
     
-    % load ../output/interferometry/array_16_ref.mat
-    % plot3(array(:,1),array(:,2),4050 + 0*array(:,2),'wo')
+    array = [];
     
-    disp([ num2str( max(max( abs( sqrt(mu./rho)-4000) ))/4000 * 100) ' % perturbation'])
+    if( n_basis_fct == 0 )
+        m_parameters = zeros( nx, nz, 2);
+    else
+        m_parameters = zeros( nx, nz, n_basis_fct+1 );
+    end
     
-    shading interp
-    axis square
-    colorbar
-    cm = cbrewer('div','RdBu',100,'PCHIP');
-    colormap(cm)
-    cb = colorbar;
-    set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
-    caxis([4.4 5.2]*1e10)    
-    
-    xlabel('x [km]')
-    ylabel('z [km]')
-    xlabels = [0 1000 2000];
-    ylabels = [0 1000 2000];
-    set(gca, 'XTick', xlabels);
-    set(gca, 'YTick', ylabels);
+    m_parameters(:,:,1:end-1) = make_noise_source( source_type, n_basis_fct );
+    m_parameters(:,:,end) = mu;
     
     
+    usr_par.network = []; usr_par.data = [];
+    
+    load('../models/random_0.06_norm.mat');
+    m_parameters(:,:,end) = m_parameters(:,:,end) + 5.0e9 * signal;% .* pattern';
+    usr_par.kernel.imfilter.source = fspecial('gaussian', [1 1], 1);
+%     usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
+    % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
+    % usr_par.kernel.imfilter.source = fspecial('gaussian',[20 20], 10);
+    usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
+    [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
+    
+    m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
+    
+    
+    plot_models( m_parameters, n_basis_fct, array, [0 7 4.7e10 4.9e10] );
     
 end
-    
+
 
 
 end

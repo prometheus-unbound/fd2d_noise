@@ -33,6 +33,8 @@ usr_par.model(it+1) = orderfields( model );
 model.imfilter.source = usr_par.kernel.imfilter.source;
 model.imfilter.structure = usr_par.kernel.imfilter.structure;
 model.config.n_basis_fct = usr_par.config.n_basis_fct;
+model.config.nx = usr_par.config.nx;
+model.config.nz = usr_par.config.nz;
 
 if( strcmp( usr_par.ring.switch, 'yes' ) )
    model.ring = usr_par.ring; 

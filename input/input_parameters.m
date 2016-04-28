@@ -13,7 +13,7 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, f
 % nz = 50;                % grid points in z-direction
 % 
 % dt = 0.09;              % time step [s]
-% nt = 150;               % number of iterations
+% nt = 250;                % number of iterations
 
 
 % % small setup
@@ -29,14 +29,16 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, f
 
 % % setup Andreas
 Lx = 2.0e6;             % model extension in x-direction [m]
+% Lx = 3.0e6;             % model extension in x-direction [m]
 Lz = 2.0e6;             % model extension in y-direction [m]
 
 nx = 600;               % grid points in x-direction
+% nx = 900;               % grid points in x-direction
 nz = 600;               % grid points in z-direction
 
 dt = 0.23;              % time step [s]
 nt = 1600;              % number of iterations
-% nt = 2600;            % number of iterations
+% nt = 3500;            % number of iterations
 
 
 % % California setup
@@ -56,7 +58,7 @@ order = 4;              % finite-difference order (2 or 4)
 %==========================================================================
 
 % store every nth time step of forward field
-fw_nth = 4;
+fw_nth = 1;
 
 
 %==========================================================================
@@ -65,6 +67,7 @@ fw_nth = 4;
 
 model_type = 1;
 % model_type = 200;
+% model_type = 666;
 % model_type = 888;
 % model_type = 999;
 
@@ -88,5 +91,5 @@ source_type = 'homogeneous';
 % source_type = 'gaussian';
 
 % number of frequency bands
-n_basis_fct = 5;  
+n_basis_fct = 0;  
 

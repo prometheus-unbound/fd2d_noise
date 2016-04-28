@@ -22,10 +22,10 @@ for i = 1:n_ref
     
     % calculate misfit
     indices = (i-1)*n_rec + 1 : i*n_rec; 
-    misfit( (i-1)*n_rec + 1 : i*n_rec, 1 ) = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'log_amplitude_ratio', src, rec);
-    misfit( (i-1)*n_rec + 1 : i*n_rec, 2 ) = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'amplitude_difference', src, rec);
-    misfit( (i-1)*n_rec + 1 : i*n_rec, 3 ) = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'cc_time_shift', src, rec);
-    misfit( (i-1)*n_rec + 1 : i*n_rec, 4 ) = make_adjoint_sources_inversion(first(indices,:), second(indices,:), t, veldis, 'waveform_difference', src, rec);
+    misfit( (i-1)*n_rec + 1 : i*n_rec, 1 ) = make_adjoint_sources( first(indices,:), second(indices,:), 0*first(indices,:), t, veldis, 'log_amplitude_ratio', src, rec, '1st' ); 
+    misfit( (i-1)*n_rec + 1 : i*n_rec, 2 ) = make_adjoint_sources( first(indices,:), second(indices,:), 0*first(indices,:), t, veldis, 'amplitude_difference', src, rec, '1st' );
+    misfit( (i-1)*n_rec + 1 : i*n_rec, 3 ) = make_adjoint_sources( first(indices,:), second(indices,:), 0*first(indices,:), t, veldis, 'cc_time_shift', src, rec, '1st' );
+    misfit( (i-1)*n_rec + 1 : i*n_rec, 4 ) = make_adjoint_sources( first(indices,:), second(indices,:), 0*first(indices,:), t, veldis, 'waveform_difference', src, rec, '1st' );
     
     
 end

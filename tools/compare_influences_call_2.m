@@ -3,26 +3,26 @@ clear all
 clc
 
 
-u_0_homog_h = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_0.3_1_homog.mat');
-u_0_homog_h2g = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_0.3_1_homog.mat'); 
-u_0_random_h_0001 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_random_0.001.mat');
-u_0_random_h2g_0001 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_random_0.001.mat');
-u_0_random_h_001 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_random_0.01.mat');
-u_0_random_h2g_001 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_random_0.01.mat');
-u_0_random_h_005 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_random_0.05.mat');
-u_0_random_h2g_005 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_random_0.05.mat');
-u_0_random_h_01 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_random_0.1.mat');
-u_0_random_h2g_01 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_random_0.1.mat');
-u_0_random_h_025 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_random_0.25.mat');
-u_0_random_h2g_025 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_random_0.25.mat');
-u_0_random_h_02 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_random_0.2.mat');
-u_0_random_h2g_02 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_random_0.2.mat');
-u_0_random_h_03 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_random_0.3.mat');
-u_0_random_h2g_03 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_random_0.3.mat');
-u_0_random_h_04 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_random_0.4.mat');
-u_0_random_h2g_04 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_random_0.4.mat');
-u_0_random_h_05 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h_random_0.5.mat');
-u_0_random_h2g_05 = load('~/Desktop/runs/2016_start/data_random_2/data_16_ref_91_h2g_random_0.5.mat');
+u_0_homog_h = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_0.3_1_homog.mat');
+u_0_homog_h2g = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_0.3_1_homog.mat'); 
+u_0_random_h_0001 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_random_0.001.mat');
+u_0_random_h2g_0001 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_random_0.001.mat');
+u_0_random_h_001 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_random_0.01.mat');
+u_0_random_h2g_001 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_random_0.01.mat');
+u_0_random_h_005 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_random_0.05.mat');
+u_0_random_h2g_005 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_random_0.05.mat');
+u_0_random_h_01 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_random_0.1.mat');
+u_0_random_h2g_01 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_random_0.1.mat');
+u_0_random_h_025 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_random_0.25.mat');
+u_0_random_h2g_025 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_random_0.25.mat');
+u_0_random_h_02 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_random_0.2.mat');
+u_0_random_h2g_02 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_random_0.2.mat');
+u_0_random_h_03 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_random_0.3.mat');
+u_0_random_h2g_03 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_random_0.3.mat');
+u_0_random_h_04 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_random_0.4.mat');
+u_0_random_h2g_04 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_random_0.4.mat');
+u_0_random_h_05 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h_random_0.5.mat');
+u_0_random_h2g_05 = load('~/Desktop/runs/2016_start/data_random_h2g/data_16_ref_91_h2g_random_0.5.mat');
 
 t = u_0_random_h_005.t;
 load('~/Desktop/runs/2016_start/data_iugg/array_16_ref.mat');

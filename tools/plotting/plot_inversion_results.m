@@ -1,19 +1,17 @@
 
 clear all
 % close all
-clc
+% clc
 
 [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, fw_nth] = input_parameters();
 
 
-% path = '~/Desktop/runs/2016_start/source_inversions/homog_0.mat';
-% path2 = '~/Desktop/runs/2016_start/source_inversions/true_structure_0.mat';
+path = '~/Desktop/model_65.mat';
+% path2 = '~/Desktop/model_0.mat';
 
-path = '~/Desktop/model_0.mat';
-% path2 = '~/Desktop/model_32.mat';
 
 difftrue = 'no';
-gradient = 'yes';
+gradient = 'no';
 
 
 
@@ -47,13 +45,18 @@ else
     if( isfield(model.imfilter, 'source') )
         usr_par.kernel.imfilter.source = model.imfilter.source;
         usr_par.kernel.imfilter.structure = model.imfilter.structure;
+        usr_par.config.n_basis_fct = model.config.n_basis_fct;
     else
         usr_par.kernel.imfilter.source = model.imfilter;
         usr_par.kernel.imfilter.structure = model.imfilter;
-        % usr_par.config.n_basis_fct = model.config.n_basis_fct;
-        usr_par.config.n_basis_fct = 5;
+        usr_par.config.n_basis_fct = model.config.n_basis_fct;
     end
     
+    if( isfield(model.config, 'n_basis_fct') )
+        usr_par.config.n_basis_fct = model.config.n_basis_fct;
+    else
+        usr_par.config.n_basis_fct = n_basis_fct;
+    end
     
     [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
 end
@@ -88,8 +91,71 @@ else
 end
 
 
+if( usr_par.config.n_basis_fct > 5 )
+    
+    [~,n_sample] = input_interferometry();
+    dist_general = zeros( nx, nz, n_sample );
+    grad_general = zeros( nx, nz, n_sample );
+    int_limits = integration_limits( n_sample, usr_par.config.n_basis_fct );
+    
+    model.gradient = reshape(model.gradient,nx,nz,usr_par.config.n_basis_fct+1);
+    
+    for is = 1:n_sample
+        
+        for ib = 1:usr_par.config.n_basis_fct
+            if( is>=int_limits(ib,1) && is<=int_limits(ib,1) )
+                break;
+            end
+        end
+        
+        dist_general(:,:,is) = m_parameters(:,:,ib);
+        grad_general(:,:,is) = model.gradient(:,:,ib);
+        
+    end
+    
+    dist_few = zeros( nx, nz, 5 );
+    grad_few = zeros( nx, nz, 5 );
+    int_limits = integration_limits( n_sample, 5 );
+    
+    for ib = 1:5
+        
+        indices = int_limits(ib,1) : int_limits(ib,2);
+        ni = length(indices);
+        
+        for k = indices
+            dist_few(:,:,ib) = dist_few(:,:,ib) + dist_general(:,:,k) / ni;
+            grad_few(:,:,ib) = grad_few(:,:,ib) + grad_general(:,:,k) / ni;
+        end
+        
+    end
+    
+    tmp = zeros( nx, nz, 6 );
+    tmp(:,:,1:5) = dist_few;
+    tmp(:,:,6) = m_parameters(:,:,end);
+    m_parameters = tmp;
+    
+    tmp(:,:,1:5) = grad_few;
+    tmp(:,:,6) = model.gradient(:,:,end);
+    model.gradient = tmp;
+    
+    usr_par.config.n_basis_fct = 5;
+end
+
+
 %% load array
-load ../output/interferometry/array_16_ref.mat
+% load ../output/interferometry/array_16_ref.mat
+
+% [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
+% min_x = min(array(:,1));
+% min_z = min(array(:,2));
+% max_x = max(array(:,1));
+% max_z = max(array(:,2));
+% buffer = 1e5;
+% pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
+% 
+% m_parameters(:,:,end) = pattern' .* m_parameters(:,:,end);
+% m_parameters(:,:,end) = m_parameters(:,:,end) + double( m_parameters(:,:,end) == 0 ) * 4.8e10;
+
 if( ~exist('array', 'var') )
     array = [];
 end
@@ -99,13 +165,24 @@ end
 if( exist('clim','var') )
     plot_models( m_parameters, array, [clim(1) clim(2) clim(3) clim(4)] );
 else
-%     cm = cbrewer('div','RdBu',120,'PCHIP');
-%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no', cm );
+    
+%     if( exist('path2', 'var') )
+        cm = cbrewer('div','RdBu',120,'PCHIP');
+        plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no', cm );
+%     else
 
-    load clim.mat
+%     load clim.mat
 %     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 clim(1) clim(2)], 'no', 'no' );
-    plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 4 4.6e10 5.0e10], 'no', 'no' );
+%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 4.6e10 5.0e10], 'no', 'no' );
+%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 4.73e10 4.87e10], 'no', 'no' );
+
+%     cm_source_orig = cbrewer('div','RdBu',120,'PCHIP');
+%     cm_source = cm_source_orig(33:120,:);
+%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 3 4.7e10 4.9e10], 'no', 'no', cm_source );
+%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 4.6e10 5.0e10], 'no', 'no' );
 %     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no' );
+
+%     end
 
 end
 
@@ -123,14 +200,28 @@ end
 
 
 
-return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
 % plot correlations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-data = load('~/Desktop/runs/2016_start/data_iugg/data_16_ref_0_1h1g_iugg_newpara.mat');
+return
+fprintf('\nResidual nach Inversion:\n')
+% data = load('~/Desktop/runs/2016_start/data_random_norm/data_16_ref_0_1h1g_random_0.07_norm.mat');
+data = load('~/Desktop/runs/2016_start/data_more_sources/data_16_ref_0_h2g_homog.mat');
+misfit_1 = compare_influences( model.correlation, data.c_data, data.t, array, ref_stat, 'no' );
+
+return
+fprintf('\nEffekt - Struktur:\n')
+data2 = load('~/Desktop/runs/2016_start/data_random_norm/data_16_ref_0_1h1g_homog.mat');
+misfit_2 = compare_influences( data2.c_data, data.c_data, data.t, array, ref_stat, 'no' );
+
+fprintf('\nEffekt - Struktur und Quelle:\n')
+data3 = load('~/Desktop/runs/2016_start/data_random_norm/data_16_ref_0_1h_homog.mat');
+misfit_3 = compare_influences( data3.c_data, data.c_data, data.t, array, ref_stat, 'no' );
+
+return
 % initial = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform1_homogeneous.mat');
-t = data.t;
+
 
 figure
 plot_recordings(data.c_data,t,'vel','k',true);

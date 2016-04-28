@@ -43,7 +43,7 @@ fi
 
 # START JOB ON EULER/BRUTUS
 if [ $brutus -gt 1 ] || [ $euler -gt 1 ]; then
-	bsub -W "168:00" -R "rusage[mem=16384]" -o "logs/matlab_%J.out" -e "logs/matlab_%J.err" -n 1 matlab -nodisplay -singleCompThread -r start_inversion
+	bsub -W "120:00" -R "rusage[mem=10240]" -o "logs/matlab_%J.out" -e "logs/matlab_%J.err" -n 1 matlab -nodisplay -singleCompThread -r start_inversion
 fi
 
 
@@ -58,10 +58,10 @@ cat <<EOF > inversion.sh
 #SBATCH --job-name=inversion
 #SBATCH --output=logs/matlab_%j.out
 #SBATCH --error=logs/matlab_%j.err
-#SBATCH --time=07-0:00:00
+#SBATCH --time=07-00:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=10240
-
+#SBATCH --share
 
 ######################
 # Begin work section #

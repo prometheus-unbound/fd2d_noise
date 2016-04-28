@@ -61,13 +61,13 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
     
     if( isfield( usr_par, 'measurement') )
         if( ~isfield( usr_par.measurement, 'source') )
-            usr_par.measurement.source = 'log_amplitude_ratio';
+            usr_par.measurement.source = 'waveform_difference';
         end
         if( ~isfield( usr_par.measurement, 'structure') )
             usr_par.measurement.structure = 'waveform_difference';
         end
     else
-        usr_par.measurement.source = 'log_amplitude_ratio';
+        usr_par.measurement.source = 'waveform_difference';
         usr_par.measurement.structure = 'waveform_difference';
     end
 

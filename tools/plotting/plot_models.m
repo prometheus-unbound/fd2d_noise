@@ -49,9 +49,14 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
         fig1 = figure(1);
     end
     
-    clf
+    % clf
     set(fig1,'units','normalized','position',[.1 .3 0.5 0.4])
-    ax1 = subplot(1,2,1);
+    if(strcmp(video,'yes'))
+        ax1 = subplot(2,2,1);
+    else
+        ax1 = subplot(1,2,1);
+    end
+    cla
     set(ax1,'FontSize',18);
     hold on
     
@@ -83,10 +88,10 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
 
         end
         
-        % plot3([width,Lx-width],[width,width],[2,2],'k--')
-        % plot3([width,Lx-width],[Lz-width,Lz-width],[2,2],'k--')
-        % plot3([width,width],[width,Lz-width],[2,2],'k--')
-        % plot3([Lx-width,Lx-width],[width,Lz-width],[2,2],'k--')
+        plot3([width,Lx-width],[width,width],[2,2],'k--')
+        plot3([width,Lx-width],[Lz-width,Lz-width],[2,2],'k--')
+        plot3([width,width],[width,Lz-width],[2,2],'k--')
+        plot3([Lx-width,Lx-width],[width,Lz-width],[2,2],'k--')
 
         
     %% plot maps for different frequency maps
@@ -128,8 +133,8 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
         caxis([0 7])
         set(cb,'YTick',[0 2 4 6])
     else
-%         caxis([0 7])
-%         set(cb,'YTick',[0 2 4 6])
+        % caxis([0 7])
+        % set(cb,'YTick',[0 2 4 6])
     end
     
     xlabels = [0 1000 2000];
@@ -137,7 +142,7 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     set(gca, 'XTick', xlabels);
     set(gca, 'YTick', ylabels);
     xlabel('x [km]')
-    ylabel('z [km]')
+    % ylabel('z [km]')
     xlim([0 Lx])
     ylim([0 Lz])
     
@@ -147,16 +152,25 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     ax = gca;
     ax.LineWidth = 2;
     axis square
+    % axis image
     
+    
+%     return
     
     %% structure plot
-    ax2 = subplot(1,2,2);
+    if(strcmp(video,'yes'))
+        ax2 = subplot(2,2,2);
+    else
+        ax2 = subplot(1,2,2);
+    end
+    cla
+%     set(ax2,'FontSize',28);
     set(ax2,'FontSize',18);
     hold on
     
     % plot array if given
     if( ~isempty(array) )
-        plot3( array(:,1)/1000, array(:,2)/1000, 5.0e10+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
+        plot3( array(:,1)/1000, array(:,2)/1000, 5.5e10+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
         legend('array')
     end
     
@@ -170,21 +184,47 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
         set(cb,'YTick',[clim(3) clim(4)])
     elseif( strcmp(video,'yes') )
         caxis([4.4 5.2]*1e10)
-        set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
+        set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10,'FontSize',28)
     else
-%         caxis([4.4 5.2]*1e10)
-%         set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
+        % caxis([4.4 5.2]*1e10)
+        % set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
     end
     
     xlabels = [0 1000 2000];
-    % ylabels = [0 1000 2000];
+    ylabels = [0 1000 2000];
     set(gca, 'XTick', xlabels);
-    % set(gca, 'YTick', ylabels);
+    set(gca, 'YTick', ylabels);
+    % set(gca, 'XTick', []);
     set(gca, 'YTick', []);
     xlabel('x [km]')
-    % ylabel('z [km]')
+%     ylabel('z [km]')
     xlim([0 Lx])
     ylim([0 Lz])
+        
+    plot3([width,Lx-width],[width,width],[5.5e10,5.5e10],'k--')
+    plot3([width,Lx-width],[Lz-width,Lz-width],[5.5e10,5.5e10],'k--')
+    plot3([width,width],[width,Lz-width],[5.5e10,5.5e10],'k--')
+    plot3([Lx-width,Lx-width],[width,Lz-width],[5.5e10,5.5e10],'k--')
+    
+%     title('inverted, with equal noise dist.','FontSize',34)
+%     title('inverted, with inverted source','FontSize',34)
+%     title('joint inversion','FontSize',34)
+%     title('true structure','FontSize',34)
+
+%     title('true structure','FontSize',34)
+%     title('traveltime inversion','FontSize',34)
+%     title('FWI, with inverted source','FontSize',34)
+
+%     min_x = min(array(:,1))/1e3;
+%     min_z = min(array(:,2))/1e3;
+%     max_x = max(array(:,1))/1e3;
+%     max_z = max(array(:,2))/1e3;
+%     buffer = 60;
+    
+%     plot3([min_x-buffer,max_x+buffer],[min_z-buffer,min_z-buffer],[5.5e10,5.5e10],'k--','LineWidth',3)
+%     plot3([min_x-buffer,max_x+buffer],[max_z+buffer,max_z+buffer],[5.5e10,5.5e10],'k--','LineWidth',4)
+%     plot3([min_x-buffer,min_x-buffer],[min_z-buffer,max_z+buffer],[5.5e10,5.5e10],'k--','LineWidth',4)
+%     plot3([max_x+buffer,max_x+buffer],[min_z-buffer,max_z+buffer],[5.5e10,5.5e10],'k--','LineWidth',4)    
     
     shading interp   
     grid on
@@ -192,7 +232,6 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     ax = gca;
     ax.LineWidth = 2;
     axis square
-
     
     orient landscape
     

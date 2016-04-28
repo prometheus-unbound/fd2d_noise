@@ -12,7 +12,7 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
     [Lx, Lz, nx, nz, ~, ~, ~, model_type] = input_parameters();
     [X, Z] = define_computational_domain(Lx,Lz,nx,nz);  
     
-    if( Lx == 2.0e6 && Lz == 2.0e6 )
+    if( Lx == 2.0e6 || Lz == 2.0e6 )
         size = 'big';
     else
         size = 'small';
@@ -65,16 +65,27 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         elseif( strcmp(size,'big') )
             
             % standard
-            x_sourcem = [0.6e6, 0.6e6];
-            z_sourcem = [0.8e6, 1.3e6];
-            sourcearea_width = [2.0e5, 1.5e5];
-            magnitude = [6.0, 5.0];
-           
-%             % ring test
-%             x_sourcem = [0.5e6];
-%             z_sourcem = [0.8e6];
-%             sourcearea_width = [1.5e5];
+            x_sourcem = [0.6e6, 0.5e6, 1.3e6];
+            z_sourcem = [0.8e6, 1.5e6, 1.6e6];
+            sourcearea_width = [2.0e5, 1.5e5, 1.8e5];
+            magnitude = [6.0, 5.0, 3.0];
+            
+%             x_sourcem = [0.4e6];
+%             z_sourcem = [1.0e6];
+%             sourcearea_width = [0.3e5];
 %             magnitude = [6.0];
+            
+%             % laura
+%             x_sourcem = 1.3e6;
+%             z_sourcem = 0.8e6;
+%             sourcearea_width = 1.5e5;
+%             magnitude = 6.0;
+                      
+%             % ring test
+%             x_sourcem = 0.5e6;
+%             z_sourcem = 0.8e6;
+%             sourcearea_width = 1.5e5;
+%             magnitude = 6.0;
 
         end
 
@@ -131,6 +142,16 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
                 + magnitude(ns) * ( exp( -( (X-x_sourcem(ns)).^2 + (Z-z_sourcem(ns)).^2 ) / (sourcearea_width(ns))^2 ) )';
         end
         
+%         for ns = 1:3
+%             noise_source_distribution(:,:,1) = noise_source_distribution(:,:,1) ...
+%                 + magnitude(ns) * ( exp( -( (X-x_sourcem(ns)).^2 + (Z-z_sourcem(ns)).^2 ) / (sourcearea_width(ns))^2 ) )';
+%         end
+
+%         for ns = 1
+%             noise_source_distribution(:,:,1) = noise_source_distribution(:,:,1) ...
+%                 + magnitude(ns) * ( exp( -(X-0.5e6).^2  / 1.8e5^2 ) .* exp( -(Z-1.0e6).^2 / 5.0e5^2 ) )';
+%         end
+
         
     % ring of sources with taper
     elseif( strcmp(source_type,'ring') )
@@ -206,9 +227,12 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         end
         
         
+%         load ../output/interferometry/array_28_ref.mat
+        load ../output/interferometry/array_1_ref.mat
+%         load ../output/interferometry/array_16_ref.mat
         % load ../output/interferometry/array_16_ref_small.mat
         % load ../output/interferometry/array_16_ref_center2.mat
-        array = [];
+        % array = [];
         
         if( n_basis_fct == 0 )
             m_parameters = zeros( nx, nz, 2);
@@ -222,11 +246,13 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         usr_par.network = [];
         usr_par.data = [];
         usr_par.config.n_basis_fct = n_basis_fct;
-        usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+%         usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
         [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
         m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
         
-        plot_models( m_parameters, n_basis_fct, array, [0 0 0 0] );       
+%         cm = cbrewer('div','RdBu',120,'PCHIP');
+%         plot_models( m_parameters, n_basis_fct, array, [-0.2 1.1 4.6e10 5.0e10], 'no', 'no', cm );       
+        plot_models( m_parameters, n_basis_fct, array, [0 0 4.6e10 5.0e10], 'no', 'no' );       
         
     end
     

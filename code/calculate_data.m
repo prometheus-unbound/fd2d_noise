@@ -12,14 +12,14 @@ addpath(genpath('../'))
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usr_par.cluster = 'monch';
+usr_par.cluster = 'local';
 % 'local';
 % 'monch';
 % 'euler';
 % 'brutus';
 
 
-usr_par.use_mex = 'yes';
+usr_par.use_mex = 'no';
 % 'yes'
 % 'no'
 
@@ -36,24 +36,33 @@ usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
 
 % define receiver array
-nr_x = 4;
-nr_z = 4;
-array = zeros(nr_x*nr_z,2);
-for i = 1:nr_x
-    for j = 1:nr_z        
-        array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 )*0.25e6;
-        array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 )*0.25e6;
-        
-%         array( (i-1)*nr_x + j, 1 ) = 0.775e6 + ( i-1 )*0.15e6;
-%         array( (i-1)*nr_z + j, 2 ) = 0.775e6 + ( j-1 )*0.15e6;
-    end
-end
+% nr_x = 4;
+% nr_z = 4;
+% array = zeros(nr_x*nr_z,2);
+% for i = 1:nr_x
+%     for j = 1:nr_z        
+%         array( (i-1)*nr_x + j, 1 ) = 0.9e6 + ( i-1 ) * 0.25e6;
+%         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 ) * 0.25e6;
+%         
+% %         array( (i-1)*nr_z + j, 1 ) = 0.5e6 + ( i-1 ) * 0.1e6;
+% %         array( (i-1)*nr_z + j, 2 ) = 1.0e6;
+%         
+% %         array( (i-1)*nr_z + j, 1 ) = 1.0e5 + ( i-1 ) * 0.1e5;
+% %         array( (i-1)*nr_z + j, 2 ) = 2.0e5;
+%     end
+% end
+
 
 % small test array, only two receivers close to each other
+array = zeros(2,2);
+array(1,1) = 2.5e4;
+array(2,1) = 3.5e4;
+array(:,2) = 3.0e4;
+
 % array = zeros(2,2);
-% array(1,1) = 2.5e4;
-% array(2,1) = 3.5e4;
-% array(:,2) = 3.0e4;
+% array(1,1) = 1.25e5;
+% array(2,1) = 2.75e5;
+% array(:,2) = 2.0e5;
 
 
 % select receivers that will be reference stations
@@ -82,20 +91,26 @@ m_parameters(:,:,1:end-1) = make_noise_source( source_type, n_basis_fct );
 m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
 
 
-
 % m_parameters(:,:,end) = m_parameters(:,:,end) + 1e9;
-% m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + 1;
+% m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + rand(nx,nz);
+
 
 if(model_type==666)
     
-    A = imread('../models/rand_20_one_sided1.png');
+    A = imread('../models/random_10_in_lt_array.png');
     m_parameters(:,:,end) = m_parameters(:,:,end) + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
-    m_parameters(:,:,end) = m_parameters(:,:,end) - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';     
-    error('\nwill ich noch nicht\n')
+    m_parameters(:,:,end) = m_parameters(:,:,end) - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
+    
+%     mesh(X,Z,m_parameters(:,:,end)')
+%     hold on
+%     plot3(array(:,1),array(:,2),0*array(:,2)+4.8e10,'x')
+%     axis square
+%     view([0 90])
+%     return
     
 elseif(model_type==888)   
     
-    load('../models/random_0.25_norm.mat');
+    load('../models/random_0.06_norm.mat');
     m_parameters(:,:,end) = m_parameters(:,:,end) + 5.0e9 * signal;
     
     % cali = load('california.mat');
@@ -110,7 +125,7 @@ m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) 
 
 % redirect parameters 
 source_dist = m_parameters(:,:,1:end-1);
-[~, spectrum] = make_noise_source( source_type, n_basis_fct );             % important for n_basis_fct=0
+[~, spectrum] = make_noise_source( source_type, n_basis_fct );             % important for n_basis_fct == 0
 mu = m_parameters(:,:,end);
 [~,rho] = define_material_parameters( nx, nz, model_type );
 
@@ -124,16 +139,17 @@ end
 
 % plot configuration
 if( strcmp(make_plots,'yes') )
+    
     figure
     hold on
     plot( array(:,1), array(:,2), 'o' )
     plot( ref_stat(:,1), ref_stat(:,2), 'x' )
+    axis image
     xlim([0 Lx])
     ylim([0 Lz])
     drawnow
-    axis square
     
-%     return
+    return
     
     figure
     hold on
@@ -143,7 +159,6 @@ if( strcmp(make_plots,'yes') )
     drawnow
     axis image
     
-    return
 end
 
 
@@ -174,11 +189,12 @@ parfor i = 1:n_ref
     
     
     fprintf('%i: calculate Green function\n',i)
-    [G_2] = run_forward1_green_mex( mu, rho, src, 0 );
+    [G_2,~,~] = run_forward1_green_mex( mu, rho, src, rec, 0, [], [] );
     
     
     fprintf('%i: calculate correlation\n',i)
-    [c_it(i,:,:)] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 0 );
+    [c_it(i,:,:)] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 0, [], [] );
+    
     
     fprintf('%i: done\n',i)
     

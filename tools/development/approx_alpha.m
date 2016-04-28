@@ -2,7 +2,8 @@
 function [ alpha, beta ] = approx_alpha( misfit )
 
     [~,~,nx,nz,~,~,~,~,~,n_basis_fct] = input_parameters();
-    [usr_par] = usr_par_init_default_parameters_lbfgs([]);
+    usr_par.network = []; usr_par.data = [];
+    [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
     
     
     if(n_basis_fct == 0)
@@ -15,7 +16,10 @@ function [ alpha, beta ] = approx_alpha( misfit )
     
     
     m_parameters(:,:,1:end-1) = make_noise_source( 'gaussian', n_basis_fct );
-    m_parameters(:,:,end) = define_material_parameters( nx, nz, 200 );
+    m_parameters(:,:,end) = define_material_parameters( nx, nz, 888 );
+    
+    load('../models/random_0.2_norm.mat');
+    m_parameters(:,:,end) = m_parameters(:,:,end) + 5.0e9 * signal;
     
     m_parameters_0(:,:,1:end-1) = make_noise_source( 'homogeneous', n_basis_fct );
     m_parameters_0(:,:,end) = define_material_parameters( nx, nz, 1 );
