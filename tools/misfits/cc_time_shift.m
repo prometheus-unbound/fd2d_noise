@@ -1,7 +1,7 @@
 %==========================================================================
-% compute cross correlation time shift
+% cross correlation time shift
 %
-% function [misfit,adstf] = cc_time_shift(u,u_0,t)
+% [misfit, adstf] = cc_time_shift( u, u_0, win, t)
 %
 % input:
 %--------
@@ -18,7 +18,7 @@
 %==========================================================================
 
 
-function [misfit,adstf] = cc_time_shift(u,u_0,win,t)
+function [misfit, adstf] = cc_time_shift( u, u_0, win, t)
 
 
     %- compute time shift -------------------------------------------------

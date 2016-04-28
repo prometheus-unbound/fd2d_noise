@@ -1,7 +1,7 @@
 %==========================================================================
-% compute and store adjoint sources
+% compute adjoint sources
 %
-% function misfit_n = make_adjoint_sources(u, u_0, t, veldis, measurement, src, rec, i_ref, flip_sr)
+% function [misfit_n,adstf] = make_adjoint_sources(u,u_0,t,veldis,measurement,src,rec)
 %
 % input:
 %-------
@@ -15,12 +15,11 @@
 %               'cc_time_shift'
 % src: source position
 % rec: receiver positions
-% i_ref: number of reference station
-% flip_sr: flip source and receiver, important for structure kernel
 %
 % output:
 %-------
 % misfit_n: misfit of each receivers
+% adstf: adjoint source time functions for each receiver
 %
 %
 % When u_0, i.e. the observed displacement seismograms, are set to zero, 
@@ -29,46 +28,27 @@
 %==========================================================================
 
 
-function misfit = make_adjoint_sources(u, u_0, t, veldis, measurement, src, rec, i_ref, flip_sr)
+function [misfit_n, adstf] = make_adjoint_sources( u, u_0, du, t, veldis, measurement, src, rec, deriv_order )
 
 %==========================================================================
 %- initialisations --------------------------------------------------------
 %==========================================================================
 
-output_specs
-
-%==========================================================================
-% flip sources and receivers if wanted
-%==========================================================================
-if( strcmp(flip_sr,'yes') )
-    tmp = src;
-    src = rec;
-    rec = tmp;
-end
-clear tmp;
-
-
-if( strcmp(flip_sr,'no') )
-    fid_loc = fopen([adjoint_source_path 'source_locations_' num2str(i_ref)],'w');
-else
-    fid_loc = fopen([adjoint_source_path 'source_locations_flip_sr_' num2str(i_ref)],'w');
-end
-
-
 nt = length(t);
 dt = abs( t(2) - t(1) );
-n_receivers = size(rec,1);
-
+n_receivers = size( rec, 1 );
 
 %- convert to velocity if wanted ------------------------------------------
-if strcmp(veldis,'vel')
+if strcmp( veldis, 'vel' )
     
-    v = zeros(n_receivers,nt);
-    v_0 = zeros(n_receivers,nt);
+    v = zeros( n_receivers, nt );
+    v_0 = zeros( n_receivers, nt );
+    
     for k=1:n_receivers
-        v(k,1:nt-1) = diff(u(k,:)) / dt;
-        v_0(k,1:nt-1) = diff(u_0(k,:)) / dt;
+        v(k,1:nt-1) = diff( u(k,:) ) / dt;
+        v_0(k,1:nt-1) = diff( u_0(k,:) ) / dt;
     end
+   
     u = v;
     u_0 = v_0;
     
@@ -79,37 +59,22 @@ end
 %- march through the various recordings -----------------------------------
 %==========================================================================
 
-misfit_n = zeros(n_receivers,1);
-adstf = zeros(n_receivers,nt);
+misfit_n = zeros( n_receivers, 1 );
+adstf = zeros( n_receivers, nt );
+
 for n=1:n_receivers
    
-    if( strcmp(verbose,'yes') )
-        fprintf(1,'station number %d\n',n)
-    end
-    
-    %- plot traces --------------------------------------------------------    
-    plot(t,u(n,:),'k')
-    hold on
-    plot(t,u_0(n,:),'r')
-    plot(t,u(n,:)-u_0(n,:),'k--')
-    hold off
-   
-    title(['receiver ' num2str(n) ' ,original in black, perturbed in red, difference dashed'])
-    xlabel('t [s]')
-    ylabel('displacement [m]')
-   
-    
     %- select time windows ------------------------------------------------   
     % disp('select left window');
     % [left,~] = ginput(1)
     % disp('select_right_window');
     % [right,~] = ginput(1)
-    
+
     if strcmp(measurement,'waveform_difference')
         left = t(1);
         right = t(end);
-
-    else
+    
+    else        
         distance = sqrt( (src(1,1) - rec(n,1)).^2 + (src(1,2) - rec(n,2)).^2 );
         left = distance/4000.0 - 27.0;
         right = distance/4000.0 + 27.0;
@@ -127,89 +92,77 @@ for n=1:n_receivers
         if( left > t(end) )
             error('time series too short?')
         end
-
+        
     end
 
-    
-    win = get_window(t,left,right,'cos_taper');
+
+    win = get_window( t, left, right, 'cos_taper' );
     
     
     %- compute misfit and adjoint source time function --------------------    
     if strcmp(measurement,'waveform_difference')
         
-        [misfit_n(n,:),adstf(n,:)] = waveform_difference(u(n,:),u_0(n,:),win,t);
+        if( strcmp( deriv_order, '1st' ) )
+            [misfit_n(n,:), adstf(n,:)] = waveform_difference( u(n,:), u_0(n,:), du(n,:), win, t, deriv_order );
+        else
+            [~, adstf(n,:)] = waveform_difference( u(n,:), u_0(n,:), du(n,:), win, t, deriv_order );
+        end
         
         
-    elseif strcmp(measurement,'cc_time_shift') 
+    elseif strcmp(measurement,'cc_time_shift')
         
-        [misfit_n_caus,adstf_caus(1,:)] = cc_time_shift(u(n,:),u_0(n,:),win,t);
+        if( strcmp( deriv_order, '2nd' ) )
+            error('\nno Hessian vector products for traveltime measurements\n')
+        end
         
-        [left,right] = swap(-left,-right);
-        win = get_window(t,left,right,'cos_taper');       
-        [misfit_n_acaus,adstf_acaus(1,:)] = cc_time_shift(u(n,:),u_0(n,:),win,t);
+        [misfit_n_caus, adstf_caus(1,:)] = cc_time_shift( u(n,:), u_0(n,:), win, t );
         
-        misfit_n(n,:) = misfit_n_caus + misfit_n_acaus;
+        [left, right] = swap( -left, -right );
+        win = get_window( t, left, right, 'cos_taper' );       
+        [misfit_n_acaus, adstf_acaus(1,:)] = cc_time_shift( u(n,:), u_0(n,:), win, t );
+        
+        if( strcmp( deriv_order, '1st' ) )
+            misfit_n(n,:) = misfit_n_caus + misfit_n_acaus;
+        end
+        
         adstf(n,:) = adstf_caus + adstf_acaus;
         
         
     elseif strcmp(measurement,'amplitude_difference')       
         
-        [misfit_n_caus,adstf_caus(1,:)] = amp_diff(u(n,:),u_0(n,:),win,t);
+        [misfit_n_caus, adstf_caus(1,:)] = amp_diff( u(n,:), u_0(n,:), du(n,:), win, t, deriv_order );
         
-        [left,right] = swap(-left,-right);
-        win = get_window(t,left,right,'cos_taper');       
-        [misfit_n_acaus,adstf_acaus(1,:)] = amp_diff(u(n,:),u_0(n,:),win,t);
+        [left, right] = swap( -left, -right );
+        win = get_window( t, left, right, 'cos_taper' );       
+        [misfit_n_acaus, adstf_acaus(1,:)] = amp_diff( u(n,:), u_0(n,:), du(n,:), win, t, deriv_order );
         
-        misfit_n(n,:) = misfit_n_caus + misfit_n_acaus;
+        if( strcmp( deriv_order, '1st' ) )
+            misfit_n(n,:) = misfit_n_caus + misfit_n_acaus;
+        end
+        
         adstf(n,:) = adstf_caus + adstf_acaus;
         
         
     elseif strcmp(measurement,'log_amplitude_ratio')    
         
-        win = get_window(t,left,right,'hann');
-        [misfit_n(n,:),adstf(n,:)] = log_amp_ratio(u(n,:),u_0(n,:),win,t);
+        win = get_window( t, left, right, 'hann' );
+        
+        if( strcmp( deriv_order, '1st' ) )
+            [misfit_n(n,:), adstf(n,:)] = log_amp_ratio( u(n,:), u_0(n,:), du(n,:), win, t, deriv_order );
+        else
+            [~, adstf(n,:)] = log_amp_ratio( u(n,:), u_0(n,:), du(n,:), win, t, deriv_order );
+        end
+        
         
     end
-    
+     
     
     %- correct adjoint source time function for velocity measurement ------    
     if strcmp(veldis,'vel')
-        adstf(n,1:nt-1) = -diff(adstf(n,:))/dt;
-    end
-    
+        adstf( n, 1:nt-1 ) = -diff( adstf(n,:) ) / dt;
+    end      
 
-    %- plot adjoint source ------------------------------------------------   
-    if( strcmp(make_plots,'yes') )
-        plot(t,adstf(n,:),'k')
-        xlabel('t [s]')
-        title('adjoint source')
-        drawnow
-    end
-   
     
-    %- write adjoint source to file ---------------------------------------   
-    fprintf(fid_loc,'%g %g\n',rec(n,1),rec(n,2));
-    
-    
-    %- write source time functions ----------------------------------------
-    if( strcmp(flip_sr,'no') )
-        fn = [adjoint_source_path 'src_' num2str(i_ref) '_' num2str(n)];
-    else
-        fn = [adjoint_source_path 'src_' num2str(i_ref) '_' num2str(n) '_flip_sr'];
-    end
-    
-    fid_src = fopen(fn,'w');
-    for k=1:nt
-        fprintf(fid_src,'%g\n',adstf(n,k));
-    end
-    fclose(fid_src);
-      
 end
 
-
-%==========================================================================
-%- clean up ---------------------------------------------------------------
-%==========================================================================
-
-fclose(fid_loc);
 

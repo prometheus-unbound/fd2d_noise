@@ -1,9 +1,9 @@
-function [dcheck, dcheck_struct] = optlib_adjoint_stf_check(u,u0,du,t,src,rec,hpmin,hpmax,step,usr_par)
+function [dcheck, dcheck_struct] = optlib_check_adjoint_stf(u,u0,du,t,src,rec,hpmin,hpmax,step,usr_par)
     
 % check if the calculation of a adjoint source time function is working correctly
 %
 
-[j, adj_stf(1,:)] = make_adjoint_sources_inversion( u, u0, t, usr_par.veldis, usr_par.measurement, src, rec );
+[j, adj_stf(1,:)] = make_adjoint_sources( u, u0, 0, t, usr_par.veldis, usr_par.measurement, src, rec, '1st' );
 
 j
 norm_adj_stf = norm(adj_stf)
@@ -18,7 +18,7 @@ for hp=hpmin:step:hpmax
     it=it+1;
     fprintf('current power of 10: %5d \niteration:           %2d/%2d\n', hp, it, (hpmax-hpmin)/step+1 );
     duh = u + 10^hp * du;
-    [jh] = make_adjoint_sources_inversion( duh, u0, t, usr_par.veldis, usr_par.measurement, src, rec );
+    [jh] = make_adjoint_sources( duh, u0, 0, t, usr_par.veldis, usr_par.measurement, src, rec, '1st' );
     jh_vec(it) = jh;
     
     djduh = (jh-j) / (10^hp);
@@ -36,14 +36,9 @@ end
 h1 = figure;
 set(gca,'FontSize',12);
 loglog(dcheck(:,1),dcheck(:,5)*100)
-xlabel('h')
-ylabel('error [%]')
-title('check - adjoint source time function','FontSize',14)
-
-% xlabels = get(gca,'XTick');
-% ylabels = get(gca,'YTick');
-% set(gca,'XTick',downsample(xlabels,2));
-% set(gca,'YTick',downsample(ylabels,2));
+xlabel('h','Interpreter','Latex')
+ylabel('error','Interpreter','Latex')
+title('adstf check - relative error')
 
 j
 jh_vec

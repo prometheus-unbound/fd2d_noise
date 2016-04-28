@@ -1,4 +1,4 @@
-function [displacement_seismograms, t, C_2_dxu_time, C_2_dzu_time] = run_forward2_correlation( mu, rho, G_2, spectrum, source_dist, rec, mode )
+function [ seismograms, t, C_out ] = run_forward2_correlation( mu, rho, G_fft, spectrum, source_dist, rec, mode, dmu, C_in )
 
 %==========================================================================
 % compute correlation wavefield
@@ -7,17 +7,19 @@ function [displacement_seismograms, t, C_2_dxu_time, C_2_dzu_time] = run_forward
 %--------
 % mu [N/m^2]
 % rho [kg/m^3]
-% G_2: Green function of reference station
+% G_fft: Fourier transformed Green function of reference station
 % spectrum: spectrum of noise distribution
 % source_dist: source distribution
 % rec: receiverss
-% mode: integer switch, mode==0 when forward strain is not needed
+% mode: integer switch
+%       == 0 do not save wavefield
+%       == 1 save wavefield
 %
 % output:
 %--------
 % correlation recordings
 % t: time vector
-% C_2_dzu_time & C_2_dzu_time: strain of correlation wavefield
+% C: correlation wavefield
 %
 %==========================================================================
 
@@ -41,9 +43,9 @@ mu = reshape(mu, nx, nz);
 n_noise_sources = size(spectrum, 2);
 
 if( n_basis_fct == 0 )
-    noise_source_distribution = reshape(source_dist, nx, nz, n_noise_sources);
+    source_distribution = reshape(source_dist, nx, nz, n_noise_sources);
 else
-    noise_source_distribution = reshape(source_dist, nx, nz, n_basis_fct);
+    source_distribution = reshape(source_dist, nx, nz, n_basis_fct);
 end
 
 
@@ -94,18 +96,14 @@ u = zeros(nx,nz);
 
 n_fw = floor(nt/fw_nth);
 if( mode ~= 0 )
-    C_2_dxu_time = zeros(nx-1,nz,n_fw,'single');
-    C_2_dzu_time = zeros(nx,nz-1,n_fw,'single');
+    C_out = zeros(nx,nz,n_fw,'single');
 else
-    C_2_dxu_time = single(0.0);
-    C_2_dzu_time = single(0.0);
+    C_out = single(0.0);
 end
-strain_dxu = zeros(nx-1,nz);
-strain_dzu = zeros(nx,nz-1);
 
 
 %- initialise seismograms -------------------------------------------------
-displacement_seismograms = zeros(n_receivers,nt);
+seismograms = zeros(n_receivers,nt);
 
 
 %- initialise absorbing boundary taper a la Cerjan ------------------------
@@ -117,16 +115,15 @@ displacement_seismograms = zeros(n_receivers,nt);
 %==========================================================================
 
 i_ftc = 1;
-i_fw = 1;
+i_fw_out = 1;
+
 for n = 1:nt
 
     
-    %- save strain of correlation wavefield for mu-kernel
+    %- save correlation wavefield -----------------------------------------
     if( mode ~= 0 && mod(n, fw_nth) == 0 )
-        C_2_dxu_time(:,:,i_fw) = single(strain_dxu);
-        C_2_dzu_time(:,:,i_fw) = single(strain_dzu);
-        
-        i_fw = i_fw + 1;
+        C_out(:,:,i_fw_out) = single( u );
+        i_fw_out = i_fw_out + 1;
     end
 
     
@@ -151,7 +148,7 @@ for n = 1:nt
                     ib = ns;
                 end
                 
-                S(:,:,ns) = S(:,:,ns) + spectrum(k,ns) * noise_source_distribution(:,:,ib) .* G_2(:,:,k) * ifft_coeff(i_ftc,k);
+                S(:,:,ns) = S(:,:,ns) + spectrum(k,ns) * source_distribution(:,:,ib) .* G_fft(:,:,k) * ifft_coeff(i_ftc,k);
                 
             end
             
@@ -162,15 +159,7 @@ for n = 1:nt
         i_ftc = i_ftc + 1;
 
     end
-   
-    
-    %- possible perturbation of rhs to test adjoint state -----------------
-    % if( size(df,1)==1 && size(df,2)==1 )
-    %     DS = real( DS + repmat(df,nx,nz) );
-    % else
-    %     DS = real( DS + df(:,:,n) );
-    % end
-    
+       
     
     %- update velocity field ----------------------------------------------
     v = v + dt * DS./rho;
@@ -184,19 +173,22 @@ for n = 1:nt
     strain_dxv = dx_v(v,dx,dz,nx,nz,order);
     strain_dzv = dz_v(v,dx,dz,nx,nz,order);
     
-    sxy = sxy + dt * mu(1:nx-1,:) .* strain_dxv;
-    szy = szy + dt * mu(:,1:nz-1) .* strain_dzv;
+    if( n==nt || isempty(dmu) )
+        sxy = sxy + dt * mu(1:nx-1,:) .* strain_dxv;
+        szy = szy + dt * mu(:,1:nz-1) .* strain_dzv;
+    else
+        sxy = sxy + dt * mu(1:nx-1,:) .* strain_dxv - dmu(1:nx-1,:) .* dx_v( C_in(:,:,n) - C_in(:,:,n+1), dx, dz, nx, nz, order );
+        szy = szy + dt * mu(:,1:nz-1) .* strain_dzv - dmu(:,1:nz-1) .* dz_v( C_in(:,:,n) - C_in(:,:,n+1), dx, dz, nx, nz, order );
+    end
     
     
-    %- calculate displacement and respective strain -----------------------
+    %- calculate displacement ---------------------------------------------
     u = u + v * dt;
-    strain_dxu = dx_v(u,dx,dz,nx,nz,order);
-    strain_dzu = dz_v(u,dx,dz,nx,nz,order);
     
     
-    %- record velocity seismograms ----------------------------------------    
+    %- record seismograms -------------------------------------------------
     for ir = 1:n_receivers
-        displacement_seismograms(ir,n) = u(rec_id(ir,1), rec_id(ir,2));
+        seismograms(ir,n) = u(rec_id(ir,1), rec_id(ir,2));
     end  
     
     

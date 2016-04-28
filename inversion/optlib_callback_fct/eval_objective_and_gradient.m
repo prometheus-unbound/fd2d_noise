@@ -19,7 +19,7 @@ source_dist = m_parameters(:,:,1:end-1);
 
 % material parameters
 mu = m_parameters(:,:,end);
-[~,rho] = define_material_parameters( usr_par.config.nx, usr_par.config.nz, model_type);
+[~,rho] = define_material_parameters( usr_par.config.nx, usr_par.config.nz, model_type );
 
 
 %- loop over reference stations
@@ -41,42 +41,40 @@ parfor i = 1:n_ref
     
     
     % calculate Green function 
-    if( strcmp( usr_par.type, 'source') && exist(['../output/interferometry/G_2_' num2str(i) '.mat'], 'file') )
-        G_2 = parload( ['../output/interferometry/G_2_' num2str(i) '.mat'] );
-    else
+%     if( strcmp( usr_par.type, 'source') && exist(['../output/interferometry/G_2_' num2str(i) '.mat'], 'file') )
+%         G_fft = parload( ['../output/interferometry/G_2_' num2str(i) '.mat'] );
+%     else
         
-        if( strcmp( usr_par.type, 'source' ) )
-            [G_2] = run_forward1_green_mex(mu, rho, src, 0);
-            parsave( ['../output/interferometry/G_2_' num2str(i) '.mat'], G_2 )
-        else
-            [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green_mex(mu, rho, src, 1);
-        end
-        
-    end
+%         if( strcmp( usr_par.type, 'source' ) )
+%             [G_fft] = run_forward1_green_mex(mu, rho, src, [], 0, [], single([]) );
+%             parsave( ['../output/interferometry/G_fft_' num2str(i) '.mat'], G_fft )
+%         else
+            [G_fft, G] = run_forward1_green_mex(mu, rho, src, [], 1, [], single([]));
+%         end
+%         
+%     end
             
     
     % calculate correlation
     if( strcmp( usr_par.type, 'source' ) )
-        [c_it(i,:,:)] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 0 );
+        [c_it(i,:,:)] = run_forward2_correlation_mex( mu, rho, G_fft, spectrum, source_dist, rec, 0, [], single([]) );
     else
-        [c_it(i,:,:), ~, C_2_dxu_time, C_2_dzu_time] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 1 );
+        [c_it(i,:,:), ~, C] = run_forward2_correlation_mex( mu, rho, G_fft, spectrum, source_dist, rec, 1, [], single([]) );
     end
     
     
     % filter correlations if wanted
     if( strcmp( usr_par.filter.apply_filter, 'yes' ) )
-        
         c_data_iref = filter_correlations( usr_par.data.c_data( (i-1)*n_rec + 1 : i*n_rec, : ), t, usr_par.filter.f_min, usr_par.filter.f_max, 4 );
         c_it(i,:,:) = filter_correlations( reshape(c_it(i,:,:),[],nt), t, usr_par.filter.f_min, usr_par.filter.f_max, 4 );       
-        
     else
         c_data_iref = usr_par.data.c_data( (i-1)*n_rec + 1 : i*n_rec, : );
     end
     
     
     % calculate misfits and adjoint source functions
-    [j_n_source, adstf_source] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data_iref, t, usr_par.veldis, usr_par.measurement.source, src, rec );
-    [j_n_structure, adstf_structure] = make_adjoint_sources_inversion( reshape(c_it(i,:,:),[],nt), c_data_iref, t, usr_par.veldis, usr_par.measurement.structure, src, rec );
+    [j_n_source, adstf_source] = make_adjoint_sources( reshape(c_it(i,:,:),[],nt), c_data_iref, 0*c_data_iref, t, usr_par.veldis, usr_par.measurement.source, src, rec, '1st' );
+    [j_n_structure, adstf_structure] = make_adjoint_sources( reshape(c_it(i,:,:),[],nt), c_data_iref, 0*c_data_iref, t, usr_par.veldis, usr_par.measurement.structure, src, rec, '1st' );
     
     
     % build up total misfit and adjoint source time function
@@ -89,21 +87,21 @@ parfor i = 1:n_ref
         % calculate kernel kernel
         if( strcmp( usr_par.type, 'source' ) )
             
-            % mode == 0, do not need structure kernel
-            [grad_i_1, ~] = run_noise_adjoint_mex( mu, rho, single(0.0), single(0.0), complex(adstf), rec, spectrum, source_dist, G_2, 0 );
+            % mode == 0, do not need Fourier transformed adjoint state
+            [grad_i_1, ~] = run_noise_adjoint_mex( mu, rho, [], complex(adstf), rec, [], spectrum, [], G_fft, 0, [], single([]) );
             [grad_i_2] = 0.0 * grad_i_1;
             
         elseif( strcmp( usr_par.type, 'structure' ) )
             
-            % mode == 1, do not need source kernel
-            [grad_i_1, adjoint_state_1] = run_noise_adjoint_mex( mu, rho, C_2_dxu_time, C_2_dzu_time, complex(adstf), rec, spectrum, source_dist, G_2, 1 );
-            [grad_i_2] = run_noise_adjoint_mex( mu, rho, G_2_dxu_time, G_2_dzu_time, adjoint_state_1, rec, spectrum, source_dist, G_2, 1 );
+            % mode == 1, need Fourier transformed adjoint state
+            [grad_i_1, adjoint_state_1] = run_noise_adjoint_mex( mu, rho, C, complex(adstf), rec, [], [], [], [], 1, [], single([]) );
+            [grad_i_2] = run_noise_adjoint_mex( mu, rho, G, adjoint_state_1, rec, [], spectrum, source_dist, [], 0, [], single([]) );
             
         else
             
-            % mode == 2, need both kernels
-            [grad_i_1, adjoint_state_1] = run_noise_adjoint_mex( mu, rho, C_2_dxu_time, C_2_dzu_time, complex(adstf), rec, spectrum, source_dist, G_2, 2 );
-            [grad_i_2] = run_noise_adjoint_mex( mu, rho, G_2_dxu_time, G_2_dzu_time, adjoint_state_1, rec, spectrum, source_dist, G_2, 2 );
+            % mode == 1, need Fourier transformed adjoint state
+            [grad_i_1, adjoint_state_1] = run_noise_adjoint_mex( mu, rho, C, complex(adstf), rec, [], spectrum, [], G_fft, 1, [], single([]) );
+            [grad_i_2] = run_noise_adjoint_mex( mu, rho, G, adjoint_state_1, rec, [], spectrum, source_dist, [], 0, [], single([]) );
             
         end      
             
@@ -114,7 +112,7 @@ parfor i = 1:n_ref
         
         % sum up kernels
         grad_parameters = grad_parameters + grad_parameters_i;
-        % parsave( ['../output/interferometry/grad_parameters_' num2str(i) '.mat'], grad_parameters_i )
+        
         
     end
     
@@ -128,17 +126,9 @@ parfor i = 1:n_ref
 end
 
 
-
-% for i = 1:n_ref
-%     grad_parameters_i = parload( ['../output/interferometry/grad_parameters_' num2str(i) '.mat'] );
-%     grad_parameters = grad_parameters + grad_parameters_i;
-% end
-
-
-
-fprintf('misfit total:      %15.10f\n',j)
-fprintf('misfit source:     %15.10f\n',j_source)
-fprintf('misfit structure:  %15.10f\n',j_structure)
+fprintf( 'misfit total:      %15.10f\n', j )
+fprintf( 'misfit source:     %15.10f\n', j_source )
+fprintf( 'misfit structure:  %15.10f\n', j_structure )
 
 
 %- reorganize correlation vector
@@ -168,5 +158,4 @@ fprintf('misfit with regu.: %15.10f\n',j)
 
 
 end
-
 

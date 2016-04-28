@@ -1,4 +1,4 @@
-function [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green( mu, rho, src, mode )
+function [ G_fft, G_out, seismograms, G_out_2 ] = run_forward1_green( mu, rho, src, rec, mode, dmu, G_in )
 
 %==========================================================================
 % compute Green function for reference station
@@ -8,12 +8,17 @@ function [G_2, G_2_dxu_time, G_2_dzu_time] = run_forward1_green( mu, rho, src, m
 % mu [N/m^2]
 % rho [kg/m^3]
 % src: source position, i.e. the reference station
-% mode: integer switch, mode==0 when forward strain is not needed
+% rec: receiver
+% mode: integer switch 
+%       == 0 do not save wavefield
+%       == 1 save wavefield
+%       == 4 calculate perturbation
 %
 % output:
 %--------
-% G_2: Fourier transformed displacement Green function of reference station
-% G__dxu_time & G__dzu_time: strain of displacemen Green function
+% G_fft: Fourier transformed displacement Green function of reference station
+% G_out: Green function wavefield
+% displacement seismograms
 %
 %==========================================================================
 
@@ -46,12 +51,22 @@ for i = 1:ns
 end
 
 
+%- compute indices for receiver locations ---------------------------------
+n_receivers = size(rec,1);
+rec_id = zeros(n_receivers,2);
+
+for i=1:n_receivers    
+    rec_id(i,1) = min( find( min(abs(x-rec(i,1))) == abs(x-rec(i,1)) ) );
+    rec_id(i,2) = min( find( min(abs(z-rec(i,2))) == abs(z-rec(i,2)) ) );   
+end
+
+
 %- make source time function ----------------------------------------------
 stf = 1.0e9*ones(1,nt);
 
 
 %- Fourier transform of the forward Greens function -----------------------
-G_2 = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
+G_fft = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
 
 
 %- prepare coefficients for Fourier transform -----------------------------
@@ -89,14 +104,20 @@ for n = nt:(2*nt-1)
 end
 
 if( mode ~= 0 )
-    G_2_dxu_time = zeros(nx-1,nz,n_fw,'single');
-    G_2_dzu_time = zeros(nx,nz-1,n_fw,'single');
+    G_out = zeros(nx,nz,n_fw,'single');
 else
-    G_2_dxu_time = single(0.0);
-    G_2_dzu_time = single(0.0);
+    G_out = single(0.0);
 end
-strain_dxv = zeros(nx-1,nz);
-strain_dzv = zeros(nx,nz-1);
+
+if( mode == 5 )
+    G_out_2 = zeros(nx,nz,n_fw,'single');
+else
+    G_out_2 = single(0.0);
+end
+
+
+%- initialise seismograms -------------------------------------------------
+seismograms = zeros(n_receivers,nt);
 
 
 %- initialise absorbing boundary taper a la Cerjan ------------------------
@@ -108,15 +129,23 @@ strain_dzv = zeros(nx,nz-1);
 %==========================================================================
 
 i_ftc = 1;
-i_fw = 1;
+i_fw_out = 1;
+i_fw_out_2 = 1;
+i_fw_in = 1;
+
 for n = 1:nt
     
     
     if( mode ~= 0 && mod(n+nt-1, fw_nth) == 0 )
-        G_2_dxu_time(:,:,i_fw) = single(strain_dxv);
-        G_2_dzu_time(:,:,i_fw) = single(strain_dzv);
-        
-        i_fw = i_fw + 1;
+        G_out(:,:,i_fw_out) = single( v );
+        i_fw_out = i_fw_out + 1;
+    end
+    
+    
+    if( ~isempty( dmu ) )
+        sxy = sxy + dt * dmu(1:nx-1,:) .* dx_v( G_in(:,:,i_fw_in), dx, dz, nx, nz, order );
+        szy = szy + dt * dmu(:,1:nz-1) .* dz_v( G_in(:,:,i_fw_in), dx, dz, nx, nz, order );
+        i_fw_in = i_fw_in + 1;
     end
     
     
@@ -125,8 +154,10 @@ for n = 1:nt
     
     
     %- add point sources --------------------------------------------------    
-    for i=1:ns
-        DS(src_id(i,1),src_id(i,2)) = DS(src_id(i,1),src_id(i,2)) + stf(n);
+    if( isempty( dmu ) )
+        for i=1:ns
+            DS(src_id(i,1),src_id(i,2)) = DS(src_id(i,1),src_id(i,2)) + stf(n);
+        end
     end
         
     
@@ -150,19 +181,31 @@ for n = 1:nt
     if( mod(n+nt-1, freq_samp) == 0 )         
         
         for k = 1:n_sample
-            G_2(:,:,k) = G_2(:,:,k) + v * fft_coeff(i_ftc,k);
+            G_fft(:,:,k) = G_fft(:,:,k) + v * fft_coeff(i_ftc,k);
         end
         i_ftc = i_ftc + 1;
         
     end
-
+    
+    
+    if( mode == 5 && mod(n+nt-1, fw_nth) == 0 )
+        G_out_2(:,:,i_fw_out_2) = v;
+        i_fw_out_2 = i_fw_out_2 + 1;
+    end
+    
+    
+    %- record seismograms -------------------------------------------------
+    for ir = 1:n_receivers
+        seismograms(ir,n) = v(rec_id(ir,1), rec_id(ir,2));
+    end  
+        
     
 end
 
 
-%% return the time reversed Green function
+%- return the time reversed Green function --------------------------------
 for k = 1:n_sample
-    G_2(:,:,k) = conj(G_2(:,:,k));
+    G_fft(:,:,k) = conj(G_fft(:,:,k));
 end
 
 
