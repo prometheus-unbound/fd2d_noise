@@ -6,8 +6,8 @@ clear all
 [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, fw_nth] = input_parameters();
 
 
-path = '~/Desktop/model_65.mat';
-% path2 = '~/Desktop/model_0.mat';
+path = '~/Desktop/model_25.mat';
+% path2 = '~/Desktop/model_125.mat';
 
 
 difftrue = 'no';
@@ -23,6 +23,7 @@ load(path);
 %% set usr_par; solution.mat contains usr_par
 if( strcmp(path(end-11:end),'solution.mat') )
     model.m = mfinal;
+    
 else
     usr_par.network = []; usr_par.data = [];
     
@@ -103,7 +104,7 @@ if( usr_par.config.n_basis_fct > 5 )
     for is = 1:n_sample
         
         for ib = 1:usr_par.config.n_basis_fct
-            if( is>=int_limits(ib,1) && is<=int_limits(ib,1) )
+            if( is >= int_limits(ib,1) && is <= int_limits(ib,2) )
                 break;
             end
         end
@@ -154,10 +155,19 @@ end
 % pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
 % 
 % m_parameters(:,:,end) = pattern' .* m_parameters(:,:,end);
-% m_parameters(:,:,end) = m_parameters(:,:,end) + double( m_parameters(:,:,end) == 0 ) * 4.8e10;
+% m_parameters(:,:,end) = m_parameters(:,:,end) + double( m_parameters(:,:,end) == 0 ) * 4.0e3;
 
 if( ~exist('array', 'var') )
     array = [];
+end
+
+
+%% convert to velocity
+
+% material parameters
+if( isempty( find( m_parameters(:,:,end) < 0, 1 )) )
+    [~,rho] = define_material_parameters( nx, nz, model_type );
+    m_parameters(:,:,end) = sqrt( m_parameters(:,:,end)./rho );
 end
 
 
@@ -167,21 +177,17 @@ if( exist('clim','var') )
 else
     
 %     if( exist('path2', 'var') )
-        cm = cbrewer('div','RdBu',120,'PCHIP');
-        plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no', cm );
+%         cm = cbrewer('div','RdBu',120,'PCHIP');
+%         plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no', cm );
 %     else
-
-%     load clim.mat
-%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 clim(1) clim(2)], 'no', 'no' );
-%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 4.6e10 5.0e10], 'no', 'no' );
-%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 4.73e10 4.87e10], 'no', 'no' );
-
+% 
 %     cm_source_orig = cbrewer('div','RdBu',120,'PCHIP');
 %     cm_source = cm_source_orig(33:120,:);
-%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 3 4.7e10 4.9e10], 'no', 'no', cm_source );
-%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 4.6e10 5.0e10], 'no', 'no' );
-%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no' );
-
+%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 3 3.6e3 4.4e3], 'no', 'no', cm_source );
+% 
+%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 3.8e3 4.2e3], 'no', 'no' );
+    plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no' );
+% 
 %     end
 
 end

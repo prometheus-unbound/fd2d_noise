@@ -46,7 +46,6 @@ u_3_iam_h1g = load('~/Desktop/runs/2016_start/data_scatterer_5e9/data_16_ref_0_h
 
 
 
-
 u_10_10_iaf_h = load('~/Desktop/runs/2016_start/data_scatterer_10e9/data_16_ref_0_h_random_10_in_array_few.mat'); 
 u_10_10_iam_h = load('~/Desktop/runs/2016_start/data_scatterer_10e9/data_16_ref_0_h_random_10_in_array_many.mat'); 
 u_10_10_ltaf_h = load('~/Desktop/runs/2016_start/data_scatterer_10e9/data_16_ref_0_h_random_10_lt_of_array_few.mat'); 
@@ -141,14 +140,14 @@ for i=1:4
 end
 
 
-u_homog_h = load('~/Desktop/runs/2016_start/data_scatterer_5e9/data_16_ref_0_h_homog.mat');
-u_5_ilta_h = load('~/Desktop/runs/2016_start/data_scatterer_5e9/data_16_ref_0_h_random_5_in_lt_array.mat'); 
-u_7_ilta_h = load('~/Desktop/runs/2016_start/data_scatterer_5e9/data_16_ref_0_h_random_7_in_lt_array.mat'); 
-u_10_ilta_h = load('~/Desktop/runs/2016_start/data_scatterer_5e9/data_16_ref_0_h_random_10_in_lt_array.mat'); 
-
-t = u_homog_h.t;
-load('~/Desktop/runs/2016_start/data_iugg/array_16_ref.mat');
-
-misfit_5_ilta = compare_influences( u_homog_h.c_data, u_5_ilta_h.c_data, t, array, ref_stat, 'no' );
-misfit_7_ilta = compare_influences( u_homog_h.c_data, u_7_ilta_h.c_data, t, array, ref_stat, 'no' );
-misfit_10_ilta = compare_influences( u_homog_h.c_data, u_10_ilta_h.c_data, t, array, ref_stat, 'no' );
+% u_homog_h = load('~/Desktop/runs/2016_start/data_scatterer_5e9/data_16_ref_0_h_homog.mat');
+% u_5_ilta_h = load('~/Desktop/runs/2016_start/data_scatterer_5e9/data_16_ref_0_h_random_5_in_lt_array.mat'); 
+% u_7_ilta_h = load('~/Desktop/runs/2016_start/data_scatterer_5e9/data_16_ref_0_h_random_7_in_lt_array.mat'); 
+% u_10_ilta_h = load('~/Desktop/runs/2016_start/data_scatterer_5e9/data_16_ref_0_h_random_10_in_lt_array.mat'); 
+% 
+% t = u_homog_h.t;
+% load('~/Desktop/runs/2016_start/data_iugg/array_16_ref.mat');
+% 
+% misfit_5_ilta = compare_influences( u_homog_h.c_data, u_5_ilta_h.c_data, t, array, ref_stat, 'no' );
+% misfit_7_ilta = compare_influences( u_homog_h.c_data, u_7_ilta_h.c_data, t, array, ref_stat, 'no' );
+% misfit_10_ilta = compare_influences( u_homog_h.c_data, u_10_ilta_h.c_data, t, array, ref_stat, 'no' );

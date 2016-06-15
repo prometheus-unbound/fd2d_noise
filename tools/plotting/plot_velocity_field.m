@@ -28,47 +28,16 @@ if (mod(n,plot_nt)==0)
     xlabel('x [m]');
     ylabel('z [m]');
     
-    if (strcmp(simulation_mode,'forward') || strcmp(simulation_mode,'forward_green'))
-        title('velocity field [m/s]');
-    elseif (strcmp(simulation_mode,'correlation') && t(n)<0)
-        title('acausal correlation field');
-    elseif (strcmp(simulation_mode,'correlation') && t(n)>=0)
-        title('causal correlation field');
-    end
-    
-    
-    %- plot source and receiver positions --------------------------------
-    if ( strcmp(simulation_mode,'forward') || strcmp(simulation_mode,'forward_green') || strcmp(simulation_mode,'correlation') )
-        for k=1:size(src,1)
-            plot(src(k,1),src(k,2),'kx')
-        end
-        
-        for k=1:size(rec,1)
-            plot(rec(k,1),rec(k,2),'ko')
-        end
-    end
-    
-    %- plot adjoint source positions --------------------------------------
-    if ( strcmp(simulation_mode,'noise_source_kernel') || strcmp(simulation_mode,'noise_source_kernel') )
-        for k=1:size(adsrc,1)
-            plot(adsrc(k,1),adsrc(k,2),'kx')
-        end
-    end
-       
     
     %- record movie -------------------------------------------------------
-    if strcmp(make_movie,'yes')
-    
-        if exist('movie_index','var')
-            movie_index=movie_index+1;
-        else
-            movie_index=1;
-        end
+    % if exist('movie_index','var')
+    %     movie_index=movie_index+1;
+    % else
+    %     movie_index=1;
+    % end
+    % 
+    % M(movie_index) = getframe(gcf);
         
-        M(movie_index)=getframe(gcf);
-        
-    end
-    
     
     %- finish -------------------------------------------------------------
     drawnow

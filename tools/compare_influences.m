@@ -11,6 +11,7 @@ distances = zeros(n_ref*n_rec,1);
 veldis = 'dis';
 
 misfit = zeros(n_rec*n_ref, 4);
+adstf = zeros(n_rec*n_ref, length(t));
 for i = 1:n_ref
        
     % each reference station will act as a source once
@@ -22,7 +23,7 @@ for i = 1:n_ref
     
     % calculate misfit
     indices = (i-1)*n_rec + 1 : i*n_rec; 
-    misfit( (i-1)*n_rec + 1 : i*n_rec, 1 ) = make_adjoint_sources( first(indices,:), second(indices,:), 0*first(indices,:), t, veldis, 'log_amplitude_ratio', src, rec, '1st' ); 
+    [misfit( (i-1)*n_rec + 1 : i*n_rec, 1 ), adstf((i-1)*n_rec + 1 : i*n_rec,:) ] = make_adjoint_sources( first(indices,:), second(indices,:), 0*first(indices,:), t, veldis, 'log_amplitude_ratio', src, rec, '1st' ); 
     misfit( (i-1)*n_rec + 1 : i*n_rec, 2 ) = make_adjoint_sources( first(indices,:), second(indices,:), 0*first(indices,:), t, veldis, 'amplitude_difference', src, rec, '1st' );
     misfit( (i-1)*n_rec + 1 : i*n_rec, 3 ) = make_adjoint_sources( first(indices,:), second(indices,:), 0*first(indices,:), t, veldis, 'cc_time_shift', src, rec, '1st' );
     misfit( (i-1)*n_rec + 1 : i*n_rec, 4 ) = make_adjoint_sources( first(indices,:), second(indices,:), 0*first(indices,:), t, veldis, 'waveform_difference', src, rec, '1st' );
@@ -52,10 +53,11 @@ if( strcmp(plotten,'yes') )
     figure
     % % index = 165:180;
     index = 1:n_ref*n_rec;
-    % plot_recordings_windows(first(index,:),t,veldis,'k',true,left(index),right(index));
-    % plot_recordings_windows(second(index,:),t,veldis,'g',true,left(index),right(index));
+%     plot_recordings_windows(first(index,:),t,veldis,'b',true,left(index),right(index));
+%     plot_recordings_windows(second(index,:),t,veldis,'r',true,left(index),right(index));
+    plot_recordings_windows(adstf(index,:),t,veldis,'g',true,left(index),right(index));
     plot_recordings(first(index,:),t,veldis,'b',true);
-    plot_recordings(second(index,:),t,veldis,'r',true);
+%     plot_recordings(second(index,:),t,veldis,'r',true);
 end
 
 

@@ -227,9 +227,9 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         end
         
         
-%         load ../output/interferometry/array_28_ref.mat
-        load ../output/interferometry/array_1_ref.mat
-%         load ../output/interferometry/array_16_ref.mat
+        % load ../output/interferometry/array_28_ref.mat
+        % load ../output/interferometry/array_1_ref_hessian_big.mat
+        load ../output/interferometry/array_16_ref.mat
         % load ../output/interferometry/array_16_ref_small.mat
         % load ../output/interferometry/array_16_ref_center2.mat
         % array = [];
@@ -251,8 +251,8 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
         
 %         cm = cbrewer('div','RdBu',120,'PCHIP');
-%         plot_models( m_parameters, n_basis_fct, array, [-0.2 1.1 4.6e10 5.0e10], 'no', 'no', cm );       
-        plot_models( m_parameters, n_basis_fct, array, [0 0 4.6e10 5.0e10], 'no', 'no' );       
+%         plot_models( m_parameters, n_basis_fct, array, [-0.2 1.1 3.8e3 4.2e3], 'no', 'no', cm );       
+        plot_models( m_parameters, n_basis_fct, array, [0 7 3.8e3 4.2e3], 'no', 'no' );       
         
     end
     

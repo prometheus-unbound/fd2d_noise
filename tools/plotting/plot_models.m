@@ -63,7 +63,7 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     
     %% plot array if given
     if( ~isempty(array) )
-        plot3( array(:,1)/1000, array(:,2)/1000, 2+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
+        plot3( array(:,1)/1000, array(:,2)/1000, 10+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
         legend('array')
     end
     
@@ -170,24 +170,24 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     
     % plot array if given
     if( ~isempty(array) )
-        plot3( array(:,1)/1000, array(:,2)/1000, 5.5e10+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
+        plot3( array(:,1)/1000, array(:,2)/1000, 6e3+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
         legend('array')
     end
     
     mesh(X, Z, m_parameter(:,:,end)' )
     cb = colorbar;
-    ylabel(cb,'[N/m^2]')
+    ylabel(cb,'[m/s]')
     colormap(ax2,cm_structure);
     
     if( clim(3)~=0 || clim(4)~=0 )
         caxis([clim(3) clim(4)]);
         set(cb,'YTick',[clim(3) clim(4)])
     elseif( strcmp(video,'yes') )
-        caxis([4.4 5.2]*1e10)
-        set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10,'FontSize',28)
+        caxis([3.6 4.4]*1e3)
+        set(cb,'YTick',[3.6 4.0 4.4]*1e3,'FontSize',28)
     else
-        % caxis([4.4 5.2]*1e10)
-        % set(cb,'YTick',[4.4 4.6 4.8 5.0 5.2]*1e10)
+        % caxis([3.6 4.4]*1e3)
+        % set(cb,'YTick',[3.6 4.0 4.4]*1e3)
     end
     
     xlabels = [0 1000 2000];
@@ -201,10 +201,10 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     xlim([0 Lx])
     ylim([0 Lz])
         
-    plot3([width,Lx-width],[width,width],[5.5e10,5.5e10],'k--')
-    plot3([width,Lx-width],[Lz-width,Lz-width],[5.5e10,5.5e10],'k--')
-    plot3([width,width],[width,Lz-width],[5.5e10,5.5e10],'k--')
-    plot3([Lx-width,Lx-width],[width,Lz-width],[5.5e10,5.5e10],'k--')
+    plot3([width,Lx-width],[width,width],[4.1e3,4.1e3],'k--')
+    plot3([width,Lx-width],[Lz-width,Lz-width],[4.1e3,4.1e3],'k--')
+    plot3([width,width],[width,Lz-width],[4.1e3,4.1e3],'k--')
+    plot3([Lx-width,Lx-width],[width,Lz-width],[4.1e3,4.1e3],'k--')
     
 %     title('inverted, with equal noise dist.','FontSize',34)
 %     title('inverted, with inverted source','FontSize',34)

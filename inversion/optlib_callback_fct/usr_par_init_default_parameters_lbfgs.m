@@ -34,6 +34,10 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
     end
     
     
+    if( ~isfield( usr_par, 'verbose') )
+        usr_par.verbose = 'no';
+    end
+    
     if( strcmp( usr_par.use_mex, 'no' ) )
         ! cp ../code/run_forward1_green.m ../code/mex_functions/run_forward1_green_mex.m
         ! cp ../code/run_forward2_correlation.m ../code/mex_functions/run_forward2_correlation_mex.m

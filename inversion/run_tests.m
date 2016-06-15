@@ -42,10 +42,10 @@ clear all
 %% check gradient
 % [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
 % 
-% usr_par.network = load('../output/interferometry/array_1_ref.mat');
-% usr_par.data = load('../output/interferometry/data_1_ref_0.mat');
+% usr_par.network = load('../output/interferometry/array_2_ref.mat');
+% usr_par.data = load('../output/interferometry/data_2_ref_10.mat');
 % usr_par.type = 'joint';
-% usr_par.kernel.weighting = 0.5;
+% usr_par.kernel.weighting = 0.0;
 % 
 % usr_par.measurement.source = 'waveform_difference';
 % usr_par.measurement.structure = 'waveform_difference';
@@ -63,17 +63,18 @@ clear all
 % end
 % m_parameters(:,:,end) = define_material_parameters(nx,nz,model_type);
 % 
+% 
 % % convert to optimization variable
 % m = map_parameters_to_m(m_parameters,usr_par);
 % 
 % 
+% % initial model for regularization
 % usr_par.m0 = m;
 % 
-% dm = 0.0 * m_parameters;
-% % dm(:,:,1:end-1) = dm(:,:,1:end-1) + rand(nx,nz);
-% dm(:,:,end) = dm(:,:,end) + rand(nx,nz);
 % 
-% [absbound] = init_absbound();
+% % set up test vector
+% dm = rand( numel(m), 1 );
+% 
 % 
 % %%% TEST %%%
 % % x_source_r = 3.0e4;
@@ -84,22 +85,33 @@ clear all
 % % [X, Z] = define_computational_domain(Lx,Lz,nx,nz);
 % % 
 % % R = ( (X-x_source_r).^2 + (Z-z_source_r).^2 ).^(1/2);
-% 
+% % 
 % % mesh( double(R > (radius-thickness/2) & R < (radius+thickness/2) ) )
 % % return 
-% 
+% % 
 % % dm(:,:,1) = dm(:,:,1) .* double(R > (radius-thickness/2) & R < (radius+thickness/2) );
 % %%% TEST END %%%
 % 
 % 
-% for i = 1:size(dm,3)
-%    dm(:,:,i) =  double( absbound == 1 ) .* dm(:,:,i); 
+% % make sure that test vector is consistent with setup
+% if( strcmp( usr_par.type, 'source' ) && ~isempty(find( dm(end-nx*nz+1:end, 1), 1 )) )
+%     fprintf('\nchanged dm accordingly!\n')
+%     dm( end - nx*nz + 1 : end, 1 ) = 0 * dm( end - nx*nz + 1 : end, 1 );
+% elseif( strcmp( usr_par.type, 'structure' ) && ~isempty(find( dm(1:end-nx*nz, 1), 1 )) )
+%     fprintf('\nchanged dm accordingly!\n')
+%     dm( 1:end-nx*nz, 1 ) = 0 * dm( 1:end-nx*nz, 1 );
+% end
+% 
+% 
+% [absbound] = reshape( init_absbound() , [], 1 );
+% for i = 1:size(dm)/(nx*nz)
+%    dm( ((i-1)*nx*nz+1):i*nx*nz, 1 ) = double( absbound == 1 ) .* dm( ((i-1)*nx*nz+1):i*nx*nz, 1 ); 
 % end
 % 
 % 
 % [dcheck, dcheck_struct] = optlib_check_derivative( m, reshape(dm,[],1), -10, 0, 1, usr_par );
 % 
-% 
+% return
 % keyboard
 % clear all
 
@@ -196,20 +208,24 @@ clear all
 [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
 [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
 
-usr_par.network = load('../output/interferometry/array_2_ref.mat');
-usr_par.data = load('../output/interferometry/data_2_ref_0.mat');
+usr_par.network = load('../output/interferometry/array_1_ref_testing_small.mat');
+usr_par.data = load('../output/interferometry/data_1_ref_0_testing_small.mat');
+
+% usr_par.network = load('../output/interferometry/array_1_ref.mat');
+% usr_par.data = load('../output/interferometry/data_1_ref_0.mat');
 
 usr_par.use_mex = 'no';
+usr_par.type = 'source';
 
-usr_par.type = 'joint';
-usr_par.kernel.weighting = 0.0;
+usr_par.kernel.weighting = 0.5;
 usr_par.measurement.source = 'waveform_difference';
 % usr_par.measurement.source = 'log_amplitude_ratio';
 % usr_par.measurement.source = 'amplitude_difference';
 usr_par.measurement.structure = 'waveform_difference';
 % usr_par.measurement.structure = 'log_amplitude_ratio';
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[50 50], 50);
-% usr_par.regularization.alpha = 1e-9;
+usr_par.regularization.alpha = 0;
+usr_par.regularization.beta = 0;
 
 [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
 
@@ -234,14 +250,19 @@ usr_par.m0 = m;
 
 
 % set up test vectors
-dm1 = 0 * m;
-dm2 = 0 * m;
+dm1 = rand( numel(m), 1 );
+dm2 = rand( numel(m), 1 );
 
-% dm1( 1:nx*nz, 1 ) = rand( nx*nz, 1 );
-dm2( 1:nx*nz, 1 ) = rand( nx*nz, 1 );
 
-dm1( nx*nz+1:end, 1 ) = rand( nx*nz, 1 );
-% dm2( nx*nz+1:end, 1 ) = rand( nx*nz, 1 );
+% make sure that test vectors are consistent with setup
+if( strcmp( usr_par.type, 'source' ) && ~isempty(find( dm1(end-nx*nz+1:end, 1), 1 )) )
+    fprintf('\nchanged dm1 accordingly!\n')
+    dm1( end - nx*nz + 1 : end, 1 ) = 0 * dm1( end - nx*nz + 1 : end, 1 );
+elseif( strcmp( usr_par.type, 'structure' ) && ~isempty(find( dm1(1:end-nx*nz, 1), 1 )) )
+    fprintf('\nchanged dm1 accordingly!\n')
+    dm1( 1:end-nx*nz, 1 ) = 0 * dm1( 1:end-nx*nz, 1 );
+end
+
 
 % set test vectors in absorbing boundary region to zero
 [absbound] = reshape( init_absbound() , [], 1 );
@@ -250,6 +271,8 @@ for i = 1:size(dm1)/(nx*nz)
    dm2( ((i-1)*nx*nz+1):i*nx*nz, 1 ) = double( absbound == 1 ) .* dm2( ((i-1)*nx*nz+1):i*nx*nz, 1 );
 end
 
-% return
-[dcheck, dcheck_struct] = optlib_check_hessian( m, dm1, dm2, -8, -1, 1, usr_par );
+
+tic
+[dcheck, dcheck_struct] = optlib_check_hessian( m, dm1, dm2, -9, -1, 1, usr_par );
+toc
 
