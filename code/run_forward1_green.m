@@ -1,4 +1,4 @@
-function [ G_fft, G_out, seismograms, G_out_2 ] = run_forward1_green( mu, rho, src, rec, mode, dmu, G_in )
+function [ G_fft, G_out, seismograms ] = run_forward1_green( mu, rho, src, rec, mode, dmu, G_in )
 
 %==========================================================================
 % compute Green function for reference station
@@ -12,7 +12,6 @@ function [ G_fft, G_out, seismograms, G_out_2 ] = run_forward1_green( mu, rho, s
 % mode: integer switch 
 %       == 0 do not save wavefield
 %       == 1 save wavefield
-%       == 4 calculate perturbation
 %
 % output:
 %--------
@@ -105,14 +104,10 @@ end
 
 if( mode ~= 0 )
     G_out = zeros(nx,nz,n_fw,'single');
+    % G_out = zeros(nx,nz,n_fw);
 else
     G_out = single(0.0);
-end
-
-if( mode == 5 )
-    G_out_2 = zeros(nx,nz,n_fw,'single');
-else
-    G_out_2 = single(0.0);
+    % G_out = 0.0;
 end
 
 
@@ -130,7 +125,6 @@ seismograms = zeros(n_receivers,nt);
 
 i_ftc = 1;
 i_fw_out = 1;
-i_fw_out_2 = 1;
 i_fw_in = 1;
 
 for n = 1:nt
@@ -138,6 +132,7 @@ for n = 1:nt
     
     if( mode ~= 0 && mod(n+nt-1, fw_nth) == 0 )
         G_out(:,:,i_fw_out) = single( v );
+        % G_out(:,:,i_fw_out) = v;
         i_fw_out = i_fw_out + 1;
     end
     
@@ -150,7 +145,7 @@ for n = 1:nt
     
     
     %- compute divergence of current stress tensor ------------------------    
-    DS = div_s(sxy,szy,dx,dz,nx,nz,order);
+    DS = div_s(sxy,szy,dx,dz,nx,nz,order); 
     
     
     %- add point sources --------------------------------------------------    
@@ -185,13 +180,7 @@ for n = 1:nt
         end
         i_ftc = i_ftc + 1;
         
-    end
-    
-    
-    if( mode == 5 && mod(n+nt-1, fw_nth) == 0 )
-        G_out_2(:,:,i_fw_out_2) = v;
-        i_fw_out_2 = i_fw_out_2 + 1;
-    end
+    end 
     
     
     %- record seismograms -------------------------------------------------

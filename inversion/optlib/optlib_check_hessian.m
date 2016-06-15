@@ -2,45 +2,58 @@ function [dcheck, dcheck_struct] = optlib_check_hessian( m, dm1, dm2, hpmin, hpm
     
 nx = usr_par.config.nx; nz = usr_par.config.nz; 
 
-[Hdm1] = eval_hessian_vector_product( m, dm1, optlib_generate_random_string(8), usr_par);
+if( ~isempty(find( dm1(end-nx*nz+1:end,1), 1 ))  &&  ~isempty(find( dm1(1:end-nx*nz,1), 1 ))  )
+    
+    dm_tmp = 0 * dm1;
+    dm_tmp(1:end-nx*nz,1) = dm1(1:end-nx*nz,1);
+    Hdm1 = eval_hessian_vector_product( m, dm_tmp, optlib_generate_random_string(8), usr_par );
+    
+    dm_tmp = 0 * dm1;
+    dm_tmp(end-nx*nz+1:end,1) = dm1(end-nx*nz+1:end,1);
+    Hdm_tmp = eval_hessian_vector_product( m, dm_tmp, optlib_generate_random_string(8), usr_par );
+    
+    Hdm1 = Hdm1 + Hdm_tmp;
+    
+else
+    Hdm1 = eval_hessian_vector_product( m, dm1, optlib_generate_random_string(8), usr_par );
+    % Hdm1 = eval_hessian_vector_product_source( m, dm1, optlib_generate_random_string(8), usr_par );
+end
+
 [~, g] = eval_objective_and_gradient( m, optlib_generate_random_string(8), usr_par );
 
 Hdm1dm2 = Hdm1' * dm2;
 normg = norm(g)
 
-angle = [0 90];
-
-fig666 = figure(666);
-set(fig666,'units','normalized','position',[.1 .5 0.5 0.4])
-clf
-[Lx,Lz] = input_parameters();
-[X,Z] = define_computational_domain(Lx,Lz,nx,nz);
-uiui = reshape( Hdm1, nx, nz, 2 );
-
-subplot(1,2,1)
-mesh( X, Z, uiui(:,:,1)' )
-hold on
-plot3( usr_par.network.array(:,1), usr_par.network.array(:,2),  0*usr_par.network.array(:,2) + max(max(abs( uiui(:,:,1) ))), 'x' )
-cm = cbrewer('div','RdBu',120,'PCHIP');
-colormap(cm);
-caxis([ -max(max(abs( uiui(:,:,1) )))  max(max(abs( uiui(:,:,1) )))]);
-axis square
-colorbar
-view(angle)
-% zlim([-2 2]*1e-5)
-drawnow
-
-subplot(1,2,2)
-mesh( X, Z, uiui(:,:,end)' )
-hold on
-cm = cbrewer('div','RdBu',120,'PCHIP');
-colormap(cm);
-caxis([ -max(max(abs( uiui(:,:,end) )))  max(max(abs( uiui(:,:,end) )))]);
-axis square
-colorbar
-view(angle)
-% zlim([-5 5]*1e-5)
-drawnow
+% angle = [0 90];
+% 
+% fig666 = figure(666);
+% set(fig666,'units','normalized','position',[.1 .5 0.5 0.4])
+% clf
+% [Lx,Lz] = input_parameters();
+% [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
+% uiui = reshape( Hdm1, nx, nz, 2 );
+% 
+% subplot(1,2,1)
+% mesh( X, Z, uiui(:,:,1)' )
+% hold on
+% plot3( usr_par.network.array(:,1), usr_par.network.array(:,2),  0*usr_par.network.array(:,2) + max(max(abs( uiui(:,:,1) ))), 'x' )
+% cm = cbrewer('div','RdBu',120,'PCHIP');
+% colormap(cm);
+% caxis([ -max(max(abs( uiui(:,:,1) )))  max(max(abs( uiui(:,:,1) )))]);
+% axis square
+% colorbar
+% view(angle)
+% 
+% subplot(1,2,2)
+% mesh( X, Z, uiui(:,:,end)' )
+% hold on
+% cm = cbrewer('div','RdBu',120,'PCHIP');
+% colormap(cm);
+% caxis([ -max(max(abs( uiui(:,:,end) )))  max(max(abs( uiui(:,:,end) )))]);
+% axis square
+% colorbar
+% view(angle)
+% drawnow
 
 
 norm_dm1 = norm(dm1)
@@ -64,34 +77,31 @@ for hp=hpmin:step:hpmax
     dgdhdm = tmp' * dm2;
     
     
-    fig999 = figure(999);
-    set(fig999,'units','normalized','position',[.1 .1 0.5 0.4])
-    tmp2 = reshape(tmp,nx,nz,[]);
-    
-    subplot(1,2,1)
-    cla
-    mesh( X, Z, tmp2(:,:,1)' )
-    hold on
-    plot3( usr_par.network.array(:,1), usr_par.network.array(:,2),  0*usr_par.network.array(:,2) + max(max(abs( tmp2(:,:,1) ))), 'x' )
-    colormap(cm)
-    colorbar
-    caxis([ -max(max(abs( tmp2(:,:,1) )))  max(max(abs( tmp2(:,:,1) )))]);
-    axis square
-    view(angle)
-%     zlim([-2 2]*1e-5)
-    drawnow
-    
-    subplot(1,2,2)
-    cla
-    mesh( X, Z, tmp2(:,:,end)' )
-    hold on
-    colormap(cm)
-    colorbar
-    caxis([ -max(max(abs( tmp2(:,:,end) )))  max(max(abs( tmp2(:,:,end) )))]);
-    axis square
-    view(angle)
-%     zlim([-5 5]*1e-5)
-    drawnow
+%     fig999 = figure(999);
+%     set(fig999,'units','normalized','position',[.1 .1 0.5 0.4])
+%     tmp2 = reshape(tmp,nx,nz,[]);
+%     
+%     subplot(1,2,1)
+%     cla
+%     mesh( X, Z, tmp2(:,:,1)' )
+%     hold on
+%     plot3( usr_par.network.array(:,1), usr_par.network.array(:,2),  0*usr_par.network.array(:,2) + max(max(abs( tmp2(:,:,1) ))), 'x' )
+%     colormap(cm)
+%     colorbar
+%     caxis([ -max(max(abs( tmp2(:,:,1) )))  max(max(abs( tmp2(:,:,1) )))]);
+%     axis square
+%     view(angle)
+%     
+%     subplot(1,2,2)
+%     cla
+%     mesh( X, Z, tmp2(:,:,end)' )
+%     hold on
+%     colormap(cm)
+%     colorbar
+%     caxis([ -max(max(abs( tmp2(:,:,end) )))  max(max(abs( tmp2(:,:,end) )))]);
+%     axis square
+%     view(angle)
+%     drawnow
     
     
     dcheck(it,:) = [10^hp, Hdm1dm2, dgdhdm, abs(Hdm1dm2 - dgdhdm), abs(Hdm1dm2 - dgdhdm) / abs(Hdm1dm2), Hdm1dm2 / dgdhdm];

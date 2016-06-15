@@ -61,14 +61,13 @@ cat <<EOF > inversion.sh
 #SBATCH --time=07-00:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=10240
-#SBATCH --share
 
 ######################
 # Begin work section #
 ######################
 
 module load matlab/r2015a
-matlab -nodisplay -singleCompThread -r start_inversion
+matlab -nodisplay -r start_inversion
 
 EOF
 

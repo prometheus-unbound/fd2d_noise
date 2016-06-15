@@ -72,7 +72,7 @@ usr_par.ring.taper_strength = 70e8;
 
 % load array with reference stations and data
 usr_par.network = load('../output/interferometry/array_16_ref.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_91_h2g_0.3_1_homog_nfft_5.mat');
+usr_par.data = load('../output/interferometry/data_16_ref_0.mat');
 
 
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')
@@ -203,7 +203,7 @@ end
 
 
 % save solution
-save('../output/solution.mat', 'flag', 'mfinal', 'usr_par', '-v7.3')
+save( '../output/solution.mat', 'flag', 'mfinal', 'usr_par', '-v7.3' )
 
 
 % close matlabpool

@@ -41,10 +41,10 @@ parfor i = 1:n_ref
     
     
     % calculate Green function 
-%     if( strcmp( usr_par.type, 'source') && exist(['../output/interferometry/G_2_' num2str(i) '.mat'], 'file') )
-%         G_fft = parload( ['../output/interferometry/G_2_' num2str(i) '.mat'] );
+%     if( strcmp( usr_par.type, 'source') && exist(['../output/interferometry/G_fft_' num2str(i) '.mat'], 'file') )
+%         G_fft = parload( ['../output/interferometry/G_fft_' num2str(i) '.mat'] );
 %     else
-        
+%         
 %         if( strcmp( usr_par.type, 'source' ) )
 %             [G_fft] = run_forward1_green_mex(mu, rho, src, [], 0, [], single([]) );
 %             parsave( ['../output/interferometry/G_fft_' num2str(i) '.mat'], G_fft )
@@ -59,7 +59,7 @@ parfor i = 1:n_ref
     if( strcmp( usr_par.type, 'source' ) )
         [c_it(i,:,:)] = run_forward2_correlation_mex( mu, rho, G_fft, spectrum, source_dist, rec, 0, [], single([]) );
     else
-        [c_it(i,:,:), ~, C] = run_forward2_correlation_mex( mu, rho, G_fft, spectrum, source_dist, rec, 1, [], single([]) );
+        [c_it(i,:,:), C] = run_forward2_correlation_mex( mu, rho, G_fft, spectrum, source_dist, rec, 1, [], single([]) );
     end
     
     
@@ -88,7 +88,7 @@ parfor i = 1:n_ref
         if( strcmp( usr_par.type, 'source' ) )
             
             % mode == 0, do not need Fourier transformed adjoint state
-            [grad_i_1, ~] = run_noise_adjoint_mex( mu, rho, [], complex(adstf), rec, [], spectrum, [], G_fft, 0, [], single([]) );
+            [grad_i_1] = run_noise_adjoint_mex( mu, rho, single([]), complex(adstf), rec, [], spectrum, [], G_fft, 0, [], single([]) );
             [grad_i_2] = 0.0 * grad_i_1;
             
         elseif( strcmp( usr_par.type, 'structure' ) )
@@ -104,14 +104,10 @@ parfor i = 1:n_ref
             [grad_i_2] = run_noise_adjoint_mex( mu, rho, G, adjoint_state_1, rec, [], spectrum, source_dist, [], 0, [], single([]) );
             
         end      
-            
-        
-        % sum up both contributions
-        grad_parameters_i = grad_i_1 + grad_i_2;
         
         
         % sum up kernels
-        grad_parameters = grad_parameters + grad_parameters_i;
+        grad_parameters = grad_parameters + grad_i_1 + grad_i_2;
         
         
     end

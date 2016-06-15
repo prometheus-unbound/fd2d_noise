@@ -1,4 +1,4 @@
-function [ K, stf_fft, u_out, seismograms ] = run_noise_adjoint( mu, rho, u_fwd, adstf, adsrc, rec, spectrum, source_dist, G_fft, mode, dmu, u_in )
+function [ K, stf_fft, u_out, seismograms] = run_noise_adjoint( mu, rho, u_fwd, stf, src, rec, spectrum, source_dist, G_fft, mode, dmu, u_in )
 
 %==========================================================================
 % compute sensitivity kernel for mu (and rho)
@@ -8,8 +8,8 @@ function [ K, stf_fft, u_out, seismograms ] = run_noise_adjoint( mu, rho, u_fwd,
 % mu [N/m^2]
 % rho [kg/m^3]
 % u_fwd: forward wavefield
-% adstf: adjoint source time functions
-% adsrc: adjoint source locations
+% stf: adjoint source time functions
+% src: adjoint source locations
 % spectrum: spectrum of noise distribution
 % source_dist: source distribution
 % G_2: Fourier transformed displacement Green function of reference station
@@ -54,12 +54,12 @@ nt = length(t);
 
 
 %- compute indices for adjoint source locations ---------------------------    
-ns_adj = size(adsrc,1);
-adsrc_id = zeros(ns_adj,2);
+ns_adj = size(src,1);
+src_id = zeros(ns_adj,2);
 
 for i=1:ns_adj
-    adsrc_id(i,1) = min( find( min(abs(x-adsrc(i,1))) == abs(x-adsrc(i,1))) );
-    adsrc_id(i,2) = min( find( min(abs(z-adsrc(i,2))) == abs(z-adsrc(i,2))) );
+    src_id(i,1) = min( find( min(abs(x-src(i,1))) == abs(x-src(i,1))) );
+    src_id(i,2) = min( find( min(abs(z-src(i,2))) == abs(z-src(i,2))) );
 end
 
 
@@ -133,8 +133,10 @@ stf_fft = zeros(nx,nz,n_sample) + 1i*zeros(nx,nz,n_sample);
 if( mode == 11 || mode == 13 )
     n_fw = floor(nt/fw_nth);
     u_out = zeros(nx,nz,n_fw,'single');
+    % u_out = zeros(nx,nz,n_fw);
 else
     u_out = single(0.0);
+    % u_out = 0.0;
 end
 
 
@@ -160,7 +162,7 @@ end
 % strain of Green function is zero in second half, i.e. with time reversal
 % only first half of second adjoint run is necessary
 % !!! however, need the full run for hessian vector product
-if( ( mode == 0 || mode == 1 ) && size(adstf,3) ~= 1 )
+if( ( mode == 0 || mode == 1 ) && size(stf,3) ~= 1 )
     nt = n_zero;
 end
 
@@ -168,49 +170,100 @@ i_ftc = 1;
 i_fw_in = 1;
 i_fw_out = 1;
 
+
+%%% TEST %%%
+if( n_basis_fct == 0 )
+    interpol_matrix = ones( n_sample, 1 );
+else
+    interpol_matrix = zeros( n_sample, n_basis_fct );
+end
+
+if( n_basis_fct ~= 0 )
+    
+    for k = 1:n_sample
+        
+        ib = find( k >= int_limits(:,1) & k <= int_limits(:,2), 1 );
+        indices = int_limits(ib,1) : int_limits(ib,2);
+        ni = length(indices);
+        
+        current = ib;
+        
+        if( all(ib == 1) )
+            below = [];
+            above = 2;
+        elseif( all(ib == n_basis_fct) )
+            below = ib-1;
+            above = [];
+        else
+            below = ib - 1;
+            above = ib + 1;
+        end
+        
+        i = find( indices == k, 1 );
+        if( all(i < (ni)/2) )
+            interpol_matrix( k, current ) = 1 - ((ni)/2-i)/ni;
+            if( ~isempty(below) )
+                interpol_matrix( k, below ) = ((ni)/2-i)/ni;
+            end
+        elseif( all(i == (ni)/2) )
+            interpol_matrix( k, current ) = 1;
+        elseif( all(i > (ni)/2) )
+            interpol_matrix( k, current ) = 1 - (i-(ni)/2)/ni;
+            if( ~isempty(above) )
+                interpol_matrix( k, above ) = (i-(ni)/2)/ni;
+            end
+        end
+        
+    end
+    
+end
+
+distribution = zeros( nx, nz, n_sample );
+
+if( ~isscalar( source_distribution ) )
+    for ix = 1:nx
+        for iz = 1:nz
+            distribution( ix, iz, : ) = interpol_matrix * squeeze( source_distribution( ix, iz, : ) );
+        end
+    end
+end
+%%% END TEST %%%
+
+
 for n = 1:nt
     
     
     %- save adjoint field -------------------------------------------------
     if( ( mode == 11 || mode == 13 ) && mod(n, fw_nth) == 0 )
         u_out(:,:,i_fw_out) = single( u );
+        % u_out(:,:,i_fw_out) = u;
         i_fw_out = i_fw_out + 1;
     end
-    
+
     
     %- compute divergence of current stress tensor ------------------------    
-    DS = div_s(sxy,szy,dx,dz,nx,nz,order);
+    DS = div_s(sxy,szy,dx,dz,nx,nz,order); 
     
     
     %- add adjoint source time function -----------------------------------
-    if( size(adstf,3) == 1 && ~isempty(adstf) )
+    if( size(stf,3) == 1 && ~isempty(stf) )
         
         for i=1:ns_adj
-            DS(adsrc_id(i,1),adsrc_id(i,2)) = DS(adsrc_id(i,1),adsrc_id(i,2)) + real(adstf(i,n));
+            DS(src_id(i,1),src_id(i,2)) = DS(src_id(i,1),src_id(i,2)) + real(stf(i,n));
         end
 
-    elseif( size(adstf,3) ~= 1 && ~isempty(adstf) )
+    elseif( size(stf,3) ~= 1 && ~isempty(stf) )
         
-        if( mod(n,freq_samp) == 0 && t(n) < 0.0 )
-            
+        if( mod(n,freq_samp) == 0 ) % && t(n) < 0.0 )
             T = zeros(nx,nz) + 1i*zeros(nx,nz);
             for ns = 1:n_noise_sources
-                
-                if( n_basis_fct ~= 0 )
-                    ib = find( k >= int_limits(:,1) & k <= int_limits(:,2) );
-                else
-                    ib = ns;
+                for k = 1:n_sample
+                    T = T + spectrum(k,ns) * distribution(:,:,k) .* conj( stf(:,:,k) ) * ifft_coeff(i_ftc,k);
                 end
-                
-                for k = 1:n_sample                   
-                    T = T + spectrum(k,ns) * source_distribution(:,:,ib) .* conj(adstf(:,:,k)) * ifft_coeff(i_ftc,k);                    
-                end
-                
             end
             
             i_ftc = i_ftc + 1;
             DS = DS + real(T);
-            
         end
         
     end
@@ -229,7 +282,7 @@ for n = 1:nt
     strain_dzv = dz_v(v,dx,dz,nx,nz,order);
 
     
-    if( n==nt || isempty(dmu) )
+    if( n == length(t) || isempty(dmu) || size( u_in, 3 ) ~= length(t) )
         sxy = sxy + dt * mu(1:nx-1,:) .* strain_dxv;
         szy = szy + dt * mu(:,1:nz-1) .* strain_dzv;
     else
@@ -245,36 +298,24 @@ for n = 1:nt
     
     
     %- build up source kernel ---------------------------------------------
-    if( ~isempty(G_fft) && mod(n,freq_samp) == 0 && t(end-n+1) <= 0.0 )
-        
+    % if( ~isempty(G_fft) && size( G_fft, 3 ) == n_sample && mod(n,freq_samp) == 0 && t(n) >= 0.0 )
+    if( ~isempty(G_fft) && size( G_fft, 3 ) == n_sample && mod(n,freq_samp) == 0 )
         
         if( n_basis_fct == 0 )
             M_tn = zeros(nx,nz,1) + 1i*zeros(nx,nz,1);
         else
             M_tn = zeros(nx,nz,n_basis_fct) + 1i*zeros(nx,nz,n_basis_fct);
         end
-        
-        
-        for k = 1:n_sample
             
-            % funny construction with tmp variable needed for mex generation
-            if( n_basis_fct == 0 )
-                ib = 1;
-                tmp = repmat( spectrum(k) * G_fft(:,:,k) * ifft_coeff2(end-n+1, k), 1, 1, 1);
-            else
-                ib = find( k >= int_limits(:,1) & k <= int_limits(:,2) );
-                tmp = repmat( spectrum(k) * G_fft(:,:,k) * ifft_coeff2(end-n+1, k), 1, 1, n_basis_fct);
-            end           
-            
-            M_tn(:,:,ib) = M_tn(:,:,ib) + tmp(:,:,ib);
-            
+        for ix = 1:nx
+            for iz = 1:nz
+                M_tn(ix,iz,:) = interpol_matrix' * ( spectrum .* conj(squeeze(G_fft(ix,iz,:))) .* ifft_coeff2(n, :).' );
+            end
         end
-        
         
         for ib = 1:size(M_tn,3)
             K_s(:,:,ib) = K_s(:,:,ib) + real( M_tn(:,:,ib) .* u );
         end
-        
         
     end
     
@@ -294,15 +335,12 @@ for n = 1:nt
     if( ( mode == 1 || mode == 12 || mode == 13 ) )
         
         if( mod(n,freq_samp) == 0 )
-            
-            if( t(n) >= 0.0 )
+            % if( t(n) >= 0.0 )
                 for k = 1:n_sample
                     stf_fft(:,:,k) = stf_fft(:,:,k) + u * fft_coeff(i_ftc,k);
                 end 
-            end
-
+            % end
             i_ftc = i_ftc + 1;
-
         end
         
     end
