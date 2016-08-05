@@ -63,7 +63,7 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     
     %% plot array if given
     if( ~isempty(array) )
-        plot3( array(:,1)/1000, array(:,2)/1000, 10+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
+        plot3( array(:,1)/1000, array(:,2)/1000, 7+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
         legend('array')
     end
     
@@ -123,7 +123,7 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
 
     
     cb = colorbar;
-    ylabel(cb,'[kg^2/m^2/s^2]')
+    ylabel(cb,'[kg^2 m^{-2} s^{-2}]')
     colormap(ax1,cm_source)
             
     if( clim(1)~=0 || clim(2)~=0 )
@@ -175,6 +175,7 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     end
     
     mesh(X, Z, m_parameter(:,:,end)' )
+    contour3(X, Z, m_parameter(:,:,end)', [3900 3950 3975 4025 4050 4100] ,'LineColor', 'k', 'LineWidth', 2 )
     cb = colorbar;
     ylabel(cb,'[m/s]')
     colormap(ax2,cm_structure);
@@ -186,8 +187,8 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
         caxis([3.6 4.4]*1e3)
         set(cb,'YTick',[3.6 4.0 4.4]*1e3,'FontSize',28)
     else
-        % caxis([3.6 4.4]*1e3)
-        % set(cb,'YTick',[3.6 4.0 4.4]*1e3)
+%         caxis([3.87 4.13]*1e3)
+%         set(cb,'YTick',[3.9 4.0 4.1]*1e3)
     end
     
     xlabels = [0 1000 2000];

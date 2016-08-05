@@ -32,21 +32,13 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
     f_peak = [1/11, 1/7];
     bandwidth = [0.035, 0.025];
     strength = [0.3, 1];
-    
-%     f_peak = [1/7];
-%     bandwidth = [0.025];
-%     strength = [0.7];
-
 
     % narrow non-overlapping spectra
-%     f_peak = [1/15, 1/7];
-%     bandwidth = [0.01, 0.01];
-%     strength = [1, 1];
+    % f_peak = [1/15, 1/7];
+    % bandwidth = [0.01, 0.01];
+    % strength = [1, 1];
 
-%     f_peak = [1/7];
-%     bandwidth = [0.01];
-%     strength = [1];
-   
+    
     
     %- different source types --------------------------------------------- 
     
@@ -70,22 +62,22 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
             sourcearea_width = [2.0e5, 1.5e5, 1.8e5];
             magnitude = [6.0, 5.0, 3.0];
             
-%             x_sourcem = [0.4e6];
-%             z_sourcem = [1.0e6];
-%             sourcearea_width = [0.3e5];
-%             magnitude = [6.0];
+            % x_sourcem = [0.4e6];
+            % z_sourcem = [1.0e6];
+            % sourcearea_width = [0.3e5];
+            % magnitude = [6.0];
             
-%             % laura
-%             x_sourcem = 1.3e6;
-%             z_sourcem = 0.8e6;
-%             sourcearea_width = 1.5e5;
-%             magnitude = 6.0;
+            % laura
+            % x_sourcem = 1.3e6;
+            % z_sourcem = 0.8e6;
+            % sourcearea_width = 1.5e5;
+            % magnitude = 6.0;
                       
-%             % ring test
-%             x_sourcem = 0.5e6;
-%             z_sourcem = 0.8e6;
-%             sourcearea_width = 1.5e5;
-%             magnitude = 6.0;
+            % ring test
+            % x_sourcem = 0.5e6;
+            % z_sourcem = 0.8e6;
+            % sourcearea_width = 1.5e5;
+            % magnitude = 6.0;
 
         end
 
@@ -229,10 +221,10 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         
         % load ../output/interferometry/array_28_ref.mat
         % load ../output/interferometry/array_1_ref_hessian_big.mat
-        load ../output/interferometry/array_16_ref.mat
+        % load ../output/interferometry/array_16_ref.mat
         % load ../output/interferometry/array_16_ref_small.mat
         % load ../output/interferometry/array_16_ref_center2.mat
-        % array = [];
+        array = [];
         
         if( n_basis_fct == 0 )
             m_parameters = zeros( nx, nz, 2);
@@ -246,12 +238,13 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         usr_par.network = [];
         usr_par.data = [];
         usr_par.config.n_basis_fct = n_basis_fct;
+        % usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
 %         usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
         [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
         m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
         
-%         cm = cbrewer('div','RdBu',120,'PCHIP');
-%         plot_models( m_parameters, n_basis_fct, array, [-0.2 1.1 3.8e3 4.2e3], 'no', 'no', cm );       
+        % cm = cbrewer('div','RdBu',120,'PCHIP');
+        % plot_models( m_parameters, n_basis_fct, array, [-0.2 1.1 3.8e3 4.2e3], 'no', 'no', cm );       
         plot_models( m_parameters, n_basis_fct, array, [0 7 3.8e3 4.2e3], 'no', 'no' );       
         
     end

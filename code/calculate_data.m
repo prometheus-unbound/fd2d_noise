@@ -35,30 +35,41 @@ usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
 % define receiver array
 nr_x = 4;
-nr_z = 2;
-array = zeros(nr_x*nr_z*2,2);
+nr_z = 4;
+array = zeros(nr_x*nr_z,2);
 for i = 1:nr_x
     for j = 1:nr_z        
-%         array( (i-1)*nr_z + j, 1 ) = 0.9e6 + ( i-1 ) * 0.25e6;
-%         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 ) * 0.25e6;
-
-%         array( (i-1)*nr_z + j, 1 ) = 1.8e5 + ( i-1 ) * 0.5e5;
-%         array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 ) * 0.5e5;
-
-%         array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
-%         array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.8e5;
-
-        array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
-        array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.4e5;
         
-        array( nr_x*nr_z + (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
-        array( nr_x*nr_z + (i-1)*nr_z + j, 2 ) = 2.8e5 + ( j-1 ) * 0.4e5;
+        % big - normal config
+        array( (i-1)*nr_z + j, 1 ) = 0.9e6 + ( i-1 ) * 0.25e6;
+        array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 ) * 0.25e6;
+
         
-%         array( (i-1)*nr_z + j, 1 ) = 0.5e6 + ( i-1 ) * 0.1e6;
-%         array( (i-1)*nr_z + j, 2 ) = 1.0e6;
+        % small - normal config
+        % array( (i-1)*nr_z + j, 1 ) = 1.8e5 + ( i-1 ) * 0.5e5;
+        % array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 ) * 0.5e5;
+
+        % small - full coverage
+        % array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
+        % array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.8e5;
+
+        % small - japan
+        % array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
+        % array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.4e5;
         
-%         array( (i-1)*nr_z + j, 1 ) = 1.0e5 + ( i-1 ) * 0.1e5;
-%         array( (i-1)*nr_z + j, 2 ) = 2.0e5;
+        % small - japan
+        % array( nr_x*nr_z + (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
+        % array( nr_x*nr_z + (i-1)*nr_z + j, 2 ) = 2.8e5 + ( j-1 ) * 0.4e5;
+
+                
+        % big - line setup
+        %array( (i-1)*nr_z + j, 1 ) = 0.5e6 + ( i-1 ) * 0.1e6;
+        % array( (i-1)*nr_z + j, 2 ) = 1.0e6;
+        
+        % small - line setup
+        % array( (i-1)*nr_z + j, 1 ) = 1.0e5 + ( i-1 ) * 0.1e5;
+        % array( (i-1)*nr_z + j, 2 ) = 2.0e5;
+        
     end
 end
 
@@ -197,12 +208,12 @@ parfor i = 1:n_ref
     rec = array( find(~ismember(array,src,'rows') ) , :);
     
     fprintf( '%i: calculate Green function\n', i )
-    G_2 = run_forward1_green_mex( mu, rho, src, rec, 0, [], single([]) );
+    G = run_forward1_green_mex( mu, rho, src, rec, 0, [], single([]) );
     
     fprintf( '%i: calculate correlation\n', i )    
-    c_it(i,:,:) = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 0, [], single([]) );
+    c_it(i,:,:) = run_forward2_correlation_mex( mu, rho, G, spectrum, source_dist, rec, 0, [], single([]) );
     
-    % [c_it(i,:,:), C] = run_forward2_correlation_mex( mu, rho, G_2, spectrum, source_dist, rec, 0, [], single([]) );    
+    % [c_it(i,:,:), C] = run_forward2_correlation_mex( mu, rho, G, spectrum, source_dist, rec, 0, [], single([]) );    
     % parsave( ['../output/interferometry/C_' num2str(i) '.mat'], C )
     
     fprintf( '%i: done\n', i )

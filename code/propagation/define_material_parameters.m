@@ -116,7 +116,7 @@ elseif (model_type==999)
     % structure_2: 2.0e9
     % structure_3: 1.0e9
     for i=1:size(x_sourcem,2)
-        mu = mu + (-1)^i * 4.0e9 * exp( -( (X-x_sourcem(i)).^2 ) / x_width(i)^2 )' .* exp( -( (Z-z_sourcem(i)).^2 ) / z_width(i)^2 )' ;
+        mu = mu + (-1)^i * 1.0e10 * exp( -( (X-x_sourcem(i)).^2 ) / x_width(i)^2 )' .* exp( -( (Z-z_sourcem(i)).^2 ) / z_width(i)^2 )' ;
     end
     
     
@@ -198,11 +198,11 @@ if( strcmp(make_plots,'yes') )
     
     usr_par.network = []; usr_par.data = [];
     
-    load('../models/random_0.1_norm.mat');
-    m_parameters(:,:,end) = m_parameters(:,:,end) + 150.0e9 * signal;% .* pattern';
+%     load('../models/random_0.1_norm.mat');
+%     m_parameters(:,:,end) = m_parameters(:,:,end) + 150.0e9 * signal; % .* pattern';
     usr_par.kernel.imfilter.source = fspecial('gaussian', [1 1], 1);
-%     usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
-    % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
+    usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
+%     usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
     % usr_par.kernel.imfilter.source = fspecial('gaussian',[20 20], 10);
     usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
     [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
@@ -210,7 +210,7 @@ if( strcmp(make_plots,'yes') )
     m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
     m_parameters(:,:,end) = sqrt( m_parameters(:,:,end) ./ rho );
     
-    plot_models( m_parameters, n_basis_fct, array, [0 7 3000 5000] );
+    plot_models( m_parameters, n_basis_fct, array, [0 7 0 0] );
     
 end
 

@@ -1,4 +1,4 @@
-function [ seismograms, C_out ] = run_forward2_correlation( mu, rho, G_fft, spectrum, source_dist, rec, mode, dmu, C_in )
+function [ seismograms, C_out ] = run_forward2_correlation( mu, rho, G_fft, spectrum, source_dist, rec, mode, dmu, C_in ) % , test_G_in )
 
 %==========================================================================
 % compute correlation wavefield
@@ -10,7 +10,7 @@ function [ seismograms, C_out ] = run_forward2_correlation( mu, rho, G_fft, spec
 % G_fft: Fourier transformed Green function of reference station
 % spectrum: spectrum of noise distribution
 % source_dist: source distribution
-% rec: receiverss
+% rec: receivers
 % mode: integer switch
 %       == 0 do not save wavefield
 %       == 1 save wavefield
@@ -71,18 +71,23 @@ nt = length(t);
 
 %- prepare coefficients for Fourier transform and its inverse -------------
 n_ftc = floor(nt/freq_samp);
-fft_coeff = zeros(n_ftc,n_sample) + 1i*zeros(n_ftc,n_sample);
 ifft_coeff = zeros(n_ftc,n_sample) + 1i*zeros(n_ftc,n_sample);
 i_ftc = 1;
 for n = 1:nt
     if( mod(n,freq_samp) == 0 )
         
         for k = 1:n_sample
-            fft_coeff(i_ftc,k) =  1/sqrt(2*pi) * exp(-1i*w_sample(k)*t(n) ) * dt;
             ifft_coeff(i_ftc,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t(n) ) * dw;
         end
         i_ftc = i_ftc + 1;
         
+    end
+end
+
+ifft_coeff_2 = zeros(n_ftc,n_sample) + 1i*zeros(n_ftc,n_sample);
+for n = 1:nt
+    for k = 1:n_sample
+        ifft_coeff_2(n,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t(n) ) * dw;
     end
 end
 
@@ -166,15 +171,34 @@ if( n_basis_fct ~= 0 )
     
 end
 
-tic
+% tic
 distribution = zeros( nx, nz, n_sample );
 for ix = 1:nx
     for iz = 1:nz
         distribution( ix, iz, : ) = interpol_matrix * squeeze( source_distribution( ix, iz, : ) );        
     end
 end
-toc
+% toc
 %%% END TEST %%%
+
+
+
+%%% TEST 2 %%%
+% for ns = 1:n_noise_sources
+%     for k = 1:n_sample
+%         distribution(:,:,k) = distribution(:,:,k) + spectrum(k,ns) * distribution(:,:,k);
+%     end
+% end
+% 
+% x_time_ifft = fftshift( ifft( ifftshift( distribution ) * nt, [], 3 ) );
+
+
+% for ix = 1:nx
+%     for iz = 1:nz
+%         test_G_in(ix, iz, :) = conv( squeeze(test_G_in( ix, iz, : )), squeeze(S( ix, iz, : )), 'same' );
+%     end
+% end
+%%% END TEST 2 %%%
 
 
 
@@ -196,25 +220,28 @@ for n = 1:nt
     %- add source of the correlation field --------------------------------
     % if( mod(n,freq_samp) == 0 && t(n) <= 0.0 )
     if( mod(n,freq_samp) == 0 )
-
+        
         %- transform on the fly to the time domain
         S = zeros(nx,nz,n_noise_sources) + 1i*zeros(nx,nz,n_noise_sources);
-
+        
         % calculate source for correlation wavefield
         for ns = 1:n_noise_sources
             
             for k = 1:n_sample
                 S(:,:,ns) = S(:,:,ns) + spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) * ifft_coeff(i_ftc,k);
+                % S(:,:,ns) = S(:,:,ns) + spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) * ifft_coeff(i_ftc,k) ./ ( sum(sum( spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) .* conj(G_fft(:,:,k)), 1 ), 2) + 0.01 );
             end
-
+            
             DS = DS + real(S(:,:,ns));
-
+            
         end
-
+        
         i_ftc = i_ftc + 1;
-
+        
     end
 
+    % DS = DS + S(:,:,n);
+    
     
     %- update velocity field ----------------------------------------------
     v = v + dt * DS./rho;

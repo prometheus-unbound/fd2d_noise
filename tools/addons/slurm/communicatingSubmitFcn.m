@@ -85,7 +85,7 @@ jobName = sprintf('Job%d', job.ID);
 % You may also wish to supply additional submission arguments to
 % the sbatch command here.
 % % additionalSubmitArgs = sprintf('--partition=fichtner_compute_wk --time=07-00:00:00 --nodes=16 --ntasks-per-node=1 --mem-per-cpu=32768 --ntasks=%d', props.NumberOfTasks);
-additionalSubmitArgs = sprintf('--partition=fichtner_compute_wk --time=07-00:00:00 --nodes=2 --ntasks-per-node=8 --mem-per-cpu=4096 --ntasks=%d', props.NumberOfTasks);
+additionalSubmitArgs = sprintf('--partition=fichtner_compute_wk --time=07-00:00:00 --nodes=4 --ntasks-per-node=4 --mem-per-cpu=8192 --ntasks=%d', props.NumberOfTasks);
 % additionalSubmitArgs = sprintf('--partition=fichtner_compute --time=00-05:00:00 --nodes=2 --ntasks-per-node=8 --mem-per-cpu=4096 --ntasks=%d', props.NumberOfTasks);
 % additionalSubmitArgs = sprintf('--partition=fichtner_compute --time=01-00:00:00 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=32768 --ntasks=%d', props.NumberOfTasks);
 % additionalSubmitArgs = sprintf('--partition=other_largemem --time=00-05:00:00 --nodes=2 --ntasks-per-node=8 --mem-per-cpu=8192 --ntasks=%d', props.NumberOfTasks);

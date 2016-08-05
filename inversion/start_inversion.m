@@ -49,14 +49,14 @@ usr_par.measurement.structure = 'waveform_difference';
 % 'cc_time_shift';
 
 
-% define weighting for kernels
+% define weighting for kernels - only necessary for joint inversion
 usr_par.kernel.weighting = 0.5;
 
 
 % design gaussian filter for smoothing of kernel (set second input variable to [1,1] to turn it off)
-% usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
+usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
-usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
+% usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
 usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
@@ -72,7 +72,7 @@ usr_par.ring.taper_strength = 70e8;
 
 % load array with reference stations and data
 usr_par.network = load('../output/interferometry/array_16_ref.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_0.mat');
+usr_par.data = load('../output/interferometry/data_16_ref_0_h1g_iugg_smooth.mat');
 
 
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')
@@ -87,7 +87,7 @@ usr_par.filter.f_max = 1/7 + 0.01;
 
 % regularization j_total = dj/dm + alpha * ||m_source-m0_source||^2 + beta * ||m_structure-m0_structure||^2 
 % (i.e. set alpha or beta to zero to turn it off)
-usr_par.regularization.alpha = 0;
+usr_par.regularization.alpha = 1e-6;
 usr_par.regularization.beta = 0;
 usr_par.regularization.weighting = weighting( nx, nz );
 

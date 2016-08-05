@@ -5,13 +5,10 @@ clc
 
 load sensorData
 
-
-
-
 s1 = s1(1:length(s2));
 
-s1 = repmat(s1,500,1);
-s2 = repmat(s2,500,1);
+s1 = repmat(s1,50,1);
+s2 = repmat(s2,50,1);
 
 s1_p = [ s1(1:length(s2)); zeros(length(s2)-1,1)];
 s2_p = [zeros(length(s2)-1,1); s2];
@@ -33,5 +30,5 @@ toc
 
 figure
 hold on
-plot(corr,'b')
-plot(acor,'r')
+plot(corr,'bx')
+plot(acor,'rx')

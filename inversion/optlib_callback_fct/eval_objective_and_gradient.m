@@ -41,18 +41,18 @@ parfor i = 1:n_ref
     
     
     % calculate Green function 
-%     if( strcmp( usr_par.type, 'source') && exist(['../output/interferometry/G_fft_' num2str(i) '.mat'], 'file') )
-%         G_fft = parload( ['../output/interferometry/G_fft_' num2str(i) '.mat'] );
-%     else
-%         
-%         if( strcmp( usr_par.type, 'source' ) )
-%             [G_fft] = run_forward1_green_mex(mu, rho, src, [], 0, [], single([]) );
-%             parsave( ['../output/interferometry/G_fft_' num2str(i) '.mat'], G_fft )
-%         else
+    if( strcmp( usr_par.type, 'source') && exist(['../output/interferometry/G_fft_' num2str(i) '.mat'], 'file') )
+        G_fft = parload( ['../output/interferometry/G_fft_' num2str(i) '.mat'] );
+    else
+        
+        if( strcmp( usr_par.type, 'source' ) )
+            [G_fft] = run_forward1_green_mex(mu, rho, src, [], 0, [], single([]) );
+            parsave( ['../output/interferometry/G_fft_' num2str(i) '.mat'], G_fft )
+        else
             [G_fft, G] = run_forward1_green_mex(mu, rho, src, [], 1, [], single([]));
-%         end
-%         
-%     end
+        end
+        
+    end
             
     
     % calculate correlation

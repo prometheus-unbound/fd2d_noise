@@ -87,3 +87,4 @@ for i=1:4
 end
 
 legend(handle, 'homog h to structure h1g', 'homog h1g to structure h1g')
+

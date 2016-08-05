@@ -47,7 +47,7 @@ end
 fprintf('loga:  %8.4f,   max: %8.4f,   mean: %8.4f\n', sum(abs(misfit(:,1))), max(abs(misfit(:,1))), mean(abs(misfit(:,1))) )
 fprintf('amp:   %8.4f,   max: %8.4f,   mean: %8.4f\n', sum(abs(misfit(:,2))), max(abs(misfit(:,2))), mean(abs(misfit(:,2))) )
 fprintf('cc:    %8.4f,   max: %8.4f,   mean: %8.4f\n', sum(abs(misfit(:,3))), max(abs(misfit(:,3))), mean(abs(misfit(:,3))) )
-fprintf('wd:    %8.4f,   max: %8.4f,   mean: %8.4f\n', sum(abs(misfit(:,4))), max(abs(misfit(:,4))), mean(abs(misfit(:,4))) )
+fprintf('wd:    %8.4f,   max: %8.4f,   mean: %8.4f\n\n', sum(abs(misfit(:,4))), max(abs(misfit(:,4))), mean(abs(misfit(:,4))) )
 
 if( strcmp(plotten,'yes') )
     figure

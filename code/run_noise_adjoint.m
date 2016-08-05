@@ -251,7 +251,7 @@ for n = 1:nt
         for i=1:ns_adj
             DS(src_id(i,1),src_id(i,2)) = DS(src_id(i,1),src_id(i,2)) + real(stf(i,n));
         end
-
+        
     elseif( size(stf,3) ~= 1 && ~isempty(stf) )
         
         if( mod(n,freq_samp) == 0 ) % && t(n) < 0.0 )
@@ -267,6 +267,7 @@ for n = 1:nt
         end
         
     end
+    
     
     
     %- update velocity field ----------------------------------------------

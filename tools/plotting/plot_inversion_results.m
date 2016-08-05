@@ -6,8 +6,8 @@ clear all
 [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, fw_nth] = input_parameters();
 
 
-path = '~/Desktop/model_25.mat';
-% path2 = '~/Desktop/model_125.mat';
+path = '~/Desktop/model_21.mat';
+% path2 = '~/Desktop/model_23.mat';
 
 
 difftrue = 'no';
@@ -46,15 +46,19 @@ else
     if( isfield(model.imfilter, 'source') )
         usr_par.kernel.imfilter.source = model.imfilter.source;
         usr_par.kernel.imfilter.structure = model.imfilter.structure;
-        usr_par.config.n_basis_fct = model.config.n_basis_fct;
+        % usr_par.config.n_basis_fct = model.config.n_basis_fct;
     else
         usr_par.kernel.imfilter.source = model.imfilter;
         usr_par.kernel.imfilter.structure = model.imfilter;
-        usr_par.config.n_basis_fct = model.config.n_basis_fct;
+        % usr_par.config.n_basis_fct = model.config.n_basis_fct;
     end
     
-    if( isfield(model.config, 'n_basis_fct') )
-        usr_par.config.n_basis_fct = model.config.n_basis_fct;
+    if( isfield(model, 'config') )
+        if( isfield(model.config, 'n_basis_fct') )
+            usr_par.config.n_basis_fct = model.config.n_basis_fct;
+        else
+            usr_par.config.n_basis_fct = n_basis_fct;
+        end
     else
         usr_par.config.n_basis_fct = n_basis_fct;
     end
@@ -144,7 +148,7 @@ end
 
 
 %% load array
-% load ../output/interferometry/array_16_ref.mat
+load ../output/interferometry/array_16_ref.mat
 
 % [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
 % min_x = min(array(:,1));
@@ -186,7 +190,7 @@ else
 %     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 3 3.6e3 4.4e3], 'no', 'no', cm_source );
 % 
 %     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 3.8e3 4.2e3], 'no', 'no' );
-    plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no' );
+    plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 6 0 0], 'no', 'no' );
 % 
 %     end
 

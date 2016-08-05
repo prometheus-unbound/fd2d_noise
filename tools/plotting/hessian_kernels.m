@@ -6,8 +6,10 @@ clear all
 [width] = absorb_specs();
 
 
+load ~/Desktop/hessian_kernels/
+
 % load ~/Desktop/hessian_kernels/hessian_joint_dsource_center_wd.mat
-load ~/Desktop/hessian_kernels/hessian_joint_dsource_left_wd_sym.mat
+% load ~/Desktop/hessian_kernels/hessian_joint_dsource_left_wd_sym.mat
 
 % load ~/Desktop/hessian_kernels/hessian_joint_dstructure_center_wd_sym.mat
 % load ~/Desktop/hessian_kernels/hessian_joint_dstructure_left_wd_sym.mat
