@@ -1,4 +1,4 @@
-function [y] = parload(filename)
+function [y] = parload( filename )
 
     foo = load(filename);
     whichVariables = fieldnames(foo);

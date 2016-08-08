@@ -1,4 +1,4 @@
-function [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz)
+function [X, Z, x, z, dx, dz] = define_computational_domain(Lx, Lz, nx, nz)
 
 %==========================================================================
 % define the geometry and discretisation of the computational domain
@@ -15,10 +15,10 @@ function [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz)
 % dx, dz: grid sizes in x- and z-directions
 %==========================================================================
 
-dx = Lx/(nx-1);
-dz = Lz/(nz-1);
+dx = Lx / (nx-1);
+dz = Lz / (nz-1);
 
 x = 0:dx:Lx;
 z = 0:dz:Lz;
 
-[X,Z] = meshgrid(x,z);
+[X, Z] = meshgrid(x, z);

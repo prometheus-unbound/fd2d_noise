@@ -1,4 +1,4 @@
-% plot_recordings(u,t,veldis,color,normalize)
+% plot_recordings(u, t, veldis, color, normalize)
 %
 % u: displacement recordings
 % t: time axis
@@ -9,7 +9,7 @@
 function h = plot_recordings(u,t,veldis,color,normalize)
 
 spacing = 2;
-a = 0;
+offset = 0;
 
 %- convert to velocity if wanted ------------------------------------------
 
@@ -29,7 +29,7 @@ if strcmp(veldis,'vel')
 end
 
 
-%- plot recordings with ---------------------------------------------------
+%- plot recordings --------------------------------------------------------
 
 set(gca,'FontSize',20)
 hold on
@@ -44,7 +44,7 @@ for k=1:size(u,1)
     end
     
     % plot recordings
-    h = plot(t,spacing*(k+a)+u(k,:)/m,'color',color,'LineWidth',1);
+    h = plot(t, spacing * k + u(k,:) / m + offset, 'color', color, 'LineWidth', 1);
        
 end
 
