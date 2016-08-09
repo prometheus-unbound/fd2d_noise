@@ -3,7 +3,7 @@ function [dcheck, dcheck_struct] = optlib_check_adjoint_stf(u,u0,du,t,src,rec,hp
 % check if the calculation of a adjoint source time function is working correctly
 %
 
-[j, adj_stf(1,:)] = make_adjoint_sources( u, u0, 0, t, usr_par.veldis, usr_par.measurement, src, rec, '1st' );
+[j, adj_stf(1,:)] = make_adjoint_sources( u, u0, t, usr_par.measurement, src, rec );
 
 j
 norm_adj_stf = norm(adj_stf)
@@ -18,7 +18,7 @@ for hp=hpmin:step:hpmax
     it=it+1;
     fprintf('current power of 10: %5d \niteration:           %2d/%2d\n', hp, it, (hpmax-hpmin)/step+1 );
     duh = u + 10^hp * du;
-    [jh] = make_adjoint_sources( duh, u0, 0, t, usr_par.veldis, usr_par.measurement, src, rec, '1st' );
+    [jh] = make_adjoint_sources( duh, u0, t, usr_par.measurement, src, rec );
     jh_vec(it) = jh;
     
     djduh = (jh-j) / (10^hp);

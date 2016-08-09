@@ -97,22 +97,6 @@ usr_par.regularization.weighting = weighting( nx, nz );
 % inversion parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%% FOR LBFGS
-options.tolerance = 1e-3;
-options.successive_change = 1e-16;
-options.successive_iterations = 400;
-options.max_iterations = 500;
-options.wolfe_try_to_increase_step_length = false;
-options.verbose = true;
-
-if( ~strcmp( usr_par.type, 'source' ) && strcmp( usr_par.measurement.structure, 'cc_time_shift') )
-    options.init_step_length = 0.025;
-elseif( strcmp( usr_par.type, 'source' ) && strcmp( usr_par.measurement.source, 'log_amplitude_ratio') )
-    options.init_step_length = 8.0;
-else
-    options.init_step_length = 1.0;
-end
-
 
 %%% FOR STEEPEST DESCENT
 % options.init_step_length = 1.0;

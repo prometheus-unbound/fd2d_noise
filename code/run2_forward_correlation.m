@@ -1,4 +1,4 @@
-function [ seismograms, C_out ] = run_forward2_correlation( structure, noise_source, G_fft, rec, mode )
+function [ seismograms, C_out ] = run2_forward_correlation( structure, noise_source, G_fft, rec, mode )
 
 %==========================================================================
 % compute correlation wavefield
@@ -69,7 +69,7 @@ if( mode ~= 0 )
     C_out = zeros(nx,nz,n_fw,'single');
     % C_out = zeros(nx,nz,n_fw);
 else
-    C_out = [];
+    C_out = single([]);
 end
 
 

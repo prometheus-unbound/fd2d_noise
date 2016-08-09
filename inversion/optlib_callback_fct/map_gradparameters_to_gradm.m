@@ -21,23 +21,8 @@ temp = 0.0 * grad_parameters;
 [absbound] = init_absbound();
 [ix,iz] = find( absbound == 1, 1, 'first' );
 
-
-if( strcmp( usr_par.ring.switch, 'yes' ) )
-    
-    [Lx, Lz] = input_parameters();
-    [X, Z] = define_computational_domain( Lx, Lz, usr_par.config.nx, usr_par.config.nz );
-    
-    R = ( ( X - usr_par.ring.x_center_ring ).^2 + ( Z - usr_par.ring.z_center_ring ).^2 ).^(1/2);
-    
-    temp(:,:,1) = grad_parameters(:,:,1) .*  exp( -abs( R - usr_par.ring.radius ).^2 / usr_par.ring.taper_strength ) .* double(R > (usr_par.ring.radius-usr_par.ring.thickness/2) & R < (usr_par.ring.radius+usr_par.ring.thickness/2) );
-    temp(ix:end-ix+1, iz:end-iz+1, end ) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, end), usr_par.kernel.imfilter.structure, 'circular' );
-    
-else
-    
-    temp(ix:end-ix+1, iz:end-iz+1, 1:end-1) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, 1:end-1), usr_par.kernel.imfilter.source, 'circular' );
-    temp(ix:end-ix+1, iz:end-iz+1, end) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, end), usr_par.kernel.imfilter.structure, 'circular' );
-     
-end
+temp(ix:end-ix+1, iz:end-iz+1, 1:end-1) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, 1:end-1), usr_par.kernel.imfilter.source, 'circular' );
+temp(ix:end-ix+1, iz:end-iz+1, end) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, end), usr_par.kernel.imfilter.structure, 'circular' );
 
 temp(:,:,end) = usr_par.initial.mu_0 * temp(:,:,end);
 

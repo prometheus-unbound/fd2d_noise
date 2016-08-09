@@ -1,22 +1,44 @@
 
-function [misfit, grad_m, c_iteration] = eval_objective_and_gradient( m, ModRandString, usr_par )
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user input
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+usr_par.use_mex = 'yes';
+% 'yes' (if startup.m indicates a successful compilation)
+% 'no' (default)
 
 
-[~, ~, nx, nz] = input_parameters();
+usr_par.type = 'source';
+% 'source'
+% 'structure'
 
 
-% inversion toolbox requires m to be a vector
-m_parameters = reshape( m, nx, nz, [] );
+usr_par.measurement= 'log_amplitude_ratio';
+% 'log_amplitude_ratio';
+% 'amplitude_difference';
+% 'waveform_difference';
+% 'cc_time_shift';
 
 
-% material parameters
-structure.mu = m_parameters(:,:,1);
-structure.rho = usr_par.structure.rho;
+% load data, array and reference stations
+usr_par.network = load('../output/array_1_ref.mat');
+usr_par.data = load('../output/data_1_ref_model_1_source_gaussian.mat');
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% calculate kernels
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[~,~,nx,nz,~,~,~,~,~,~,make_plots] = input_parameters();
+
+
+% set necessary fields that might not have been set
+[usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
 
 
 % get source and material
-noise_source.distribution = m_parameters(:,:,2);
-noise_source.spectrum = usr_par.noise_source.spectrum;
+noise_source = make_noise_source('no');
+structure = define_material_parameters('no');
 
 
 % loop over reference stations
@@ -64,7 +86,7 @@ for i_ref = 1:n_ref
     misfit = misfit + sum(misfit_iref);
     
     
-    % calculate kernel and sum them up for all reference stations
+    % calculate gradient and sum them up for all reference stations
     if( strcmp( usr_par.type, 'source' ) )
         
         gradient_iref = run3_adjoint( structure, noise_source, G_fft, rec, adjstf_iref, [], 0 );
@@ -91,18 +113,4 @@ c_iteration = zeros( n_ref*n_rec, length(t) );
 for i_ref = 1:n_ref
     c_iteration( (i_ref-1)*n_rec + 1 : i_ref*n_rec, :) = c_iref(i_ref,:,:);
 end
-
-
-% set gradient in absorbing boundaries to zero
-absbound = init_absbound();
-for i = 1:2
-   gradient(:,:,i) = double( absbound == 1 ) .* gradient(:,:,i); 
-end
-
-
-% inversion toolbox requires a vector
-grad_m = reshape( gradient, [], 1 );
-
-
-end
-
+toc

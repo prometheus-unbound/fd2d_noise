@@ -1,4 +1,4 @@
-function [ G_fft, G_out ] = run_forward1_green( structure, src, mode )
+function [ G_fft, G_out ] = run1_forward_green( structure, src, mode )
 
 %==========================================================================
 % compute Green function for reference station
@@ -73,7 +73,7 @@ if( mode ~= 0 )
     G_out = zeros(nx,nz,n_fwd,'single');
     % G_out = zeros(nx,nz,n_fw);
 else
-    G_out = [];
+    G_out = single([]);
 end
 
 

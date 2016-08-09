@@ -1,4 +1,4 @@
-function [K_source, K_mu, stf_fft] = run_adjoint( structure, noise_source, G_fft, adj_src, adj_stf, u_fwd, mode )
+function [K, stf_fft] = run3_adjoint( structure, noise_source, G_fft, adjsrc, adjstf, wavefield_fwd, mode )
 
 %==========================================================================
 % compute sensitivity kernel for mu (and rho)
@@ -51,12 +51,12 @@ end
 
 
 %- compute indices for adjoint source locations ---------------------------    
-ns_adj = size(adj_src,1);
+ns_adj = size(adjsrc,1);
 src_id = zeros(ns_adj,2);
 
 for i=1:ns_adj
-    src_id(i,1) = min( find( min(abs(x-adj_src(i,1))) == abs(x-adj_src(i,1))) );
-    src_id(i,2) = min( find( min(abs(z-adj_src(i,2))) == abs(z-adj_src(i,2))) );
+    src_id(i,1) = min( find( min(abs(x-adjsrc(i,1))) == abs(x-adjsrc(i,1))) );
+    src_id(i,2) = min( find( min(abs(z-adjsrc(i,2))) == abs(z-adjsrc(i,2))) );
 end
 
 
@@ -87,7 +87,7 @@ K_source = zeros(nx,nz);
 %==========================================================================
 
 %- only need first half of second adjoint run
-if( ( mode == 0 || mode == 1 ) && size(adj_stf,3) ~= 1 )
+if( ( mode == 0 || mode == 1 ) && size(adjstf,3) ~= 1 )
     nt = n_zero;
 end
 
@@ -101,19 +101,19 @@ for n = 1:nt
     
     
     %- add adjoint source time function -----------------------------------
-    if( size(adj_stf,3) == 1 && ~isempty(adj_stf) )
+    if( size(adjstf,3) == 1 && ~isempty(adjstf) )
         
         for i=1:ns_adj
-            DS(src_id(i,1),src_id(i,2)) = DS(src_id(i,1),src_id(i,2)) + real(adj_stf(i,n));
+            DS(src_id(i,1),src_id(i,2)) = DS(src_id(i,1),src_id(i,2)) + real(adjstf(i,n));
         end
         
-    elseif( size(adj_stf,3) ~= 1 && ~isempty(adj_stf) )
+    elseif( size(adjstf,3) ~= 1 && ~isempty(adjstf) )
         
         if( mod(n,freq_samp) == 0 )
             T = zeros(nx,nz) + 1i*zeros(nx,nz);
             
             for k = 1:n_sample
-                T = T + noise_source.spectrum(k) * noise_source.distribution .* conj( adj_stf(:,:,k) ) * ifft_coeff(n,k);
+                T = T + noise_source.spectrum(k) * noise_source.distribution .* conj( adjstf(:,:,k) ) * ifft_coeff(n,k);
             end
             
             DS = DS + real(T);
@@ -151,7 +151,7 @@ for n = 1:nt
         M_tn = zeros(nx,nz) + 1i*zeros(nx,nz);
         
         for k = 1:n_sample
-            M_tn = M_tn + spectrum(k) .* G_fft(:,:,k) * ifft_coeff(n,k);
+            M_tn = M_tn + noise_source.spectrum(k) .* G_fft(:,:,k) * ifft_coeff(n,k);
         end
         
         for ib = 1:size(M_tn,3)
@@ -162,10 +162,10 @@ for n = 1:nt
     
        
     %- build up structure kernel ------------------------------------------
-    if( ~isempty( u_fwd ) && size( u_fwd, 3 ) >= i_fw_in && mod( n, store_fwd_nth ) == 0 )
+    if( ~isempty( wavefield_fwd ) && size( wavefield_fwd, 3 ) >= i_fw_in && mod( n, store_fwd_nth ) == 0 )
                     
-        K_mu(1:nx-1,:) = K_mu(1:nx-1,:) - strain_dxu .* dx_v( u_fwd(:,:,end-i_fw_in+1), dx, dz, nx, nz, order ) * store_fwd_nth;
-        K_mu(:,1:nz-1) = K_mu(:,1:nz-1) - strain_dzu .* dz_v( u_fwd(:,:,end-i_fw_in+1), dx, dz, nx, nz, order ) * store_fwd_nth;
+        K_mu(1:nx-1,:) = K_mu(1:nx-1,:) - strain_dxu .* dx_v( wavefield_fwd(:,:,end-i_fw_in+1), dx, dz, nx, nz, order ) * store_fwd_nth;
+        K_mu(:,1:nz-1) = K_mu(:,1:nz-1) - strain_dzu .* dz_v( wavefield_fwd(:,:,end-i_fw_in+1), dx, dz, nx, nz, order ) * store_fwd_nth;
         
         i_fw_in = i_fw_in + 1;
 
@@ -185,6 +185,12 @@ for n = 1:nt
     
     
 end
+
+
+%- concatenate kernels ----------------------------------------------------
+K = zeros(nx, nz, 2);
+K(:,:,1) = K_mu;
+K(:,:,2) = K_source;
 
 
 end

@@ -1,5 +1,5 @@
 
-function win = get_window(t, t_min, t_max, type)
+function win = get_window( t, t_min, t_max, type )
     
     % initialization
     win = ones(1,length(t)); 
