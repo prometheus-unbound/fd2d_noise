@@ -29,7 +29,7 @@ function plot_models( structure, source, array, clim )
     
     % open figure, set size, etc.
     fig1 = figure;
-    set(fig1,'units','normalized','position',[.1 .3 0.5 0.4])
+    set(fig1,'units','normalized','position',[.1 .3 0.8 0.6])
     orient landscape
     handle = [];
     legend_string = [];
@@ -39,7 +39,7 @@ function plot_models( structure, source, array, clim )
     if( ~isempty( source ) )
         
         if( ~isempty( structure ) )
-            ax1 = subplot(1,2,1);
+            ax1 = subplot(1,2,2);
         else
             ax1 = gca;
             set(ax1,'position',[0.35 0.11 0.3347 0.815]);
@@ -52,32 +52,39 @@ function plot_models( structure, source, array, clim )
         
         % plot absorbing boundaries
         level = [1.1*max(max(source)), 1.1*max(max(source))];
-        handle(end+1,:) = plot3([width,Lx-width],[width,width],level,'k--');
-        plot3([width,Lx-width],[Lz-width,Lz-width],level,'k--')
-        plot3([width,width],[width,Lz-width],level,'k--')
-        plot3([Lx-width,Lx-width],[width,Lz-width],level,'k--')
-        legend_string{end+1} = 'absorbing boundaries';
+        if( ~any(any( source<0 )) )
+            handle(end+1,:) = plot3([width,Lx-width],[width,width],level,'k--');
+            plot3([width,Lx-width],[Lz-width,Lz-width],level,'k--')
+            plot3([width,width],[width,Lz-width],level,'k--')
+            plot3([Lx-width,Lx-width],[width,Lz-width],level,'k--')
+            legend_string{end+1} = 'absorbing boundaries';
+        end
         
         % plot array if given
         if( ~isempty(array) )
-            handle(end+1,:) = plot3( array(:,1), array(:,2), level(1) + 0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 );
+            handle(end+1,:) = plot3( array(:,1), array(:,2), level(1) + 0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8 );
             legend_string{end+1} = 'array';
         end
         
         legend(handle,legend_string,'position',[0.44 0.06 0.1 0.05])
         cb = colorbar;
         ylabel(cb,'[kg^2 m^{-2} s^{-2}]')
-        colormap(ax1,cm_source)
         
-        if( clim(1)~=0 || clim(2)~=0 )
-            caxis([clim(1) clim(2)]);
+        if( any(any( source<0 )) )
+            colormap(ax1,cm)
         else
-            
+            colormap(ax1,cm_source)
+        end
+        
+        if( clim(3)~=0 || clim(4)~=0 )
+            caxis([clim(3) clim(4)]);
+        elseif( any(any( source<0 )) )
+            m = max(max(abs(source)));
+            caxis([-0.6*m 0.6*m])
         end
         
         clabels = get(cb,'YTick');
         set(cb,'YTick',[clabels(1) clabels( ceil(length(clabels)/2) ) clabels(end)])
-        
         
         xlabels = [0 200 400];
         ylabels = [0 200 400];
@@ -93,7 +100,7 @@ function plot_models( structure, source, array, clim )
         grid on
         box on
         set(ax1,'LineWidth',2)
-        axis image
+        axis square
         
     end
     
@@ -106,7 +113,7 @@ function plot_models( structure, source, array, clim )
     
     %% concerning structure
     if( ~isempty( source ) )
-        ax2 = subplot(1,2,2);
+        ax2 = subplot(1,2,1);
     else
         ax2 = gca;
         set(ax2,'position',[0.35 0.11 0.3347 0.815]);
@@ -127,7 +134,7 @@ function plot_models( structure, source, array, clim )
     
     % plot array if given
     if( ~isempty(array) )
-        handle(end+1,:)  = plot3( array(:,1), array(:,2), level(1) + 0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 );
+        handle(end+1,:)  = plot3( array(:,1), array(:,2), level(1) + 0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8 );
         legend_string{end+1} = 'array';
     end
     
@@ -139,9 +146,9 @@ function plot_models( structure, source, array, clim )
     ylabel(cb,'[m/s]')
     colormap(ax2,cm);
     
-    if( clim(3)~=0 || clim(4)~=0 )
-        caxis([clim(3) clim(4)]);
-        set(cb,'YTick',[clim(3) clim(4)])
+    if( clim(1)~=0 || clim(2)~=0 )
+        caxis([clim(1) clim(2)]);
+        set(cb,'YTick',[clim(1) clim(2)])
     else
         
     end
@@ -166,7 +173,7 @@ function plot_models( structure, source, array, clim )
     grid on
     box on
     set(ax2,'LineWidth',2)
-    axis image
+    axis square
     
     drawnow
     

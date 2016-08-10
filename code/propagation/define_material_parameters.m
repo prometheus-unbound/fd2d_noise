@@ -4,13 +4,14 @@ function [structure] = define_material_parameters( make_plots )
 % generate material parameters mu [N/m^2] and rho [kg/m^3]
 %==========================================================================
     
-    [~, ~, nx, nz, ~, ~, ~, model_type] = input_parameters();
 
-    
     % define make_plots if not specified
     if( nargin < 1 )
         make_plots = 'yes';
     end
+    
+    
+    [~, ~, nx, nz, ~, ~, ~, model_type] = input_parameters();
     
     
     if( model_type == 1 )

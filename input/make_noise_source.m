@@ -19,17 +19,17 @@ function [ noise_source ] = make_noise_source( make_plots )
     %======================================================================
     
     % specify spectrum
-    f_peak = 1/11;
-    bandwidth = 0.035;
+    f_peak = 1/9;
+    bandwidth = 0.04;
     strength = 1;
     
     % point source
     if( strcmp(source_type, 'point') )
         
-        x_source = 1.0e5;
-        z_source = 1.6e5;
-        source_width = 4e4;
-        magnitude = 6.0;
+        x_source = 2.0e5;
+        z_source = 1.7e5;
+        source_width = 5e3;
+        magnitude = 3.0;
         
     % gaussian anomaly
     elseif( strcmp(source_type, 'gaussian') )
@@ -37,7 +37,7 @@ function [ noise_source ] = make_noise_source( make_plots )
         x_source = 1.0e5;
         z_source = 1.6e5;
         source_width = 4e4;
-        magnitude = 6.0;
+        magnitude = 90.0;
         
     elseif( ~strcmp(source_type, 'homogeneous')  )
        
@@ -70,7 +70,8 @@ function [ noise_source ] = make_noise_source( make_plots )
     % gaussian anomaly
     elseif( strcmp(source_type, 'gaussian') )
         
-        noise_source.distribution = magnitude * exp( -( (X-x_source).^2 + (Z-z_source).^2 ) / source_width^2 )';
+        noise_source.distribution = ones(nx, nz);
+        noise_source.distribution = noise_source.distribution + magnitude * exp( -( (X-x_source).^2 + (Z-z_source).^2 ) / source_width^2 )';
  
     end   
     
@@ -88,8 +89,13 @@ function [ noise_source ] = make_noise_source( make_plots )
         plot( f_sample, noise_source.spectrum, 'r')
         xlabel('frequency [Hz]');
         xlim([f_sample(1) f_sample(end)])
-
-        array = [];
+        
+        if( exist([ fd2d_path() 'output' filesep 'array_1_ref.mat' ], 'file' ) )
+            load([ fd2d_path() 'output' filesep 'array_1_ref.mat' ]);
+        else
+            array = [];
+        end
+        
         plot_models( [], noise_source.distribution, array, [0 0 0 0]);
         
     end

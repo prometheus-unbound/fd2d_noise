@@ -23,7 +23,7 @@ nx = 300;                   % grid points in x-direction
 nz = 300;                   % grid points in z-direction
 
 dt = 0.09;                  % time step [s]
-nt = 900;                   % number of iterations
+nt = 800;                   % number of iterations
 
 
 order = 4;                  % finite-difference order (2 or 4)
@@ -59,7 +59,7 @@ source_type = 'homogeneous';
 % plotting parameters
 %==========================================================================
 
-make_plots = 'yes';         % 'yes' or 'no'
+make_plots = 'no';         % 'yes' or 'no'
 plot_nth = 100;             % plot every nth time step
 
 

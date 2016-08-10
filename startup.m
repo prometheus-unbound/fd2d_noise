@@ -1,48 +1,66 @@
 
-fprintf( [ '\nIMPORTANT IMPORTANT:\n\n' ...
-'When MATLAB tells you:\n' ...
-'File ... is not found in the current folder or on the MATLAB path.\n\n' ...
-'Please only click ''Change Folder'' and NOT on ''Add to Path''!\n\n\n' ] )
 
-% cd tools
-% addpath(genpath('../code'))
-% addpath(genpath('../input'))
-% addpath(genpath('../inversion'))
-% addpath(genpath('../output'))
-% addpath(genpath('../tools'))
-% cd ..
-
+% get current working directory
 current_path = pwd;
-delimiter = current_path(1);
-if( isempty( strfind(pwd, [delimiter 'fd2d_noise'] ) ) )
-    error('\nPlease do not change the name of the parent folder ''fd2d_noise''.')
+
+
+% for later runs, get path of fd2d_noise
+folders = strsplit( current_path, filesep );
+id_project_folder = find( strncmp( folders, 'fd2d_noise', 10 ), 1, 'last');
+if( isempty( id_project_folder ) )
+    error('Please stay within the ''fd2d_noise'' folder and keep the name ''fd2d_noise*'' (* = wildcard)!')
+end
+fd2d_path = fullfile( filesep, folders{1:id_project_folder }, filesep );
+
+
+% set path
+addpath( genpath( [fd2d_path filesep() 'code'] ) )
+addpath( genpath( [fd2d_path filesep() 'input'] ) )
+addpath( genpath( [fd2d_path filesep() 'inversion'] ) )
+addpath( genpath( [fd2d_path filesep() 'output'] ) )
+addpath( genpath( [fd2d_path filesep() 'tools'] ) )
+
+
+% check if mex functions can be used
+version_control = ver;
+if( any( strcmpi( {version_control.Name}, 'matlab coder' ) ) )    
+    fprintf('\nYou can use mex-functions!\n')    
 end
 
 
-version_control = ver;
+% cleanup
+clear folders; clear id_project_folder
+clear fd2d_path; clear version_control
+return
+
 
 if( any( strcmpi( {version_control.Name}, 'matlab coder' ) ) )
     
-    fprintf('You can use mex-functions!\n')
     fprintf('Try to compile wave propagation functions now...\n\n')
-    cd code/mex_functions
+    cd([fd2d_path 'code' filesep 'mex_functions'])
+    
+    S = warning();
     warning('off','all')
     compile_green
     compile_correlation
-    % warning('on','all')
-    cd ../..
+    warning(S);
+    
+    cd(fd2d_path)
     
     if( exit_code == 0 )
-        fprintf('\nCompilation successful! Set use_mex to ''yes''!\n')
+        fprintf('\nCompilation successful! Set use_mex to ''yes''!\n\n')
     else
-        fprintf('\nCompilation NOT successful! Set use_mex to ''no''!\n')
+        fprintf('\nCompilation NOT successful! Set use_mex to ''no''!\n\n')
     end
     
 else
     
-    fprintf('You do not have MATLAB Coder. Please set use_mex to ''no''.\n')
+    fprintf('You do not have MATLAB Coder. Please set use_mex to ''no''.\n\n')
     
 end
 
-clear version_control
-clear exit_code
+% cleanup
+clear folders; clear id_project_folder
+clear fd2d_path; clear version_control
+clear S
+

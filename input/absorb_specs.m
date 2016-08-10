@@ -6,7 +6,7 @@ function [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_
 %==========================================================================
 
 % width = 5000;                   % width of the boundary layer in km
-width = 30000;                  % width of the boundary layer in km
+width = 50000;                  % width of the boundary layer in km
 
 absorb_left = 1;                % absorb waves on the left boundary
 absorb_right = 1;               % absorb waves on the right boundary

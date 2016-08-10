@@ -50,9 +50,9 @@ for i_ref = 1:n_ref
     
     % calculate correlation
     if( strcmp( usr_par.type, 'source' ) )
-        c_iref(i_ref,:,:) = run2_forward_correlation_mex( structure, noise_source, G_fft, rec, 0 );
+        c_iref(i_ref,:,:) = run2_forward_correlation_mex( structure, noise_source, G_fft, src, rec, 0 );
     else
-        [c_iref(i_ref,:,:), C] = run2_forward_correlation_mex( structure, noise_source, G_fft, rec, 1 );
+        [c_iref(i_ref,:,:), C] = run2_forward_correlation_mex( structure, noise_source, G_fft, src, rec, 1 );
     end
     
     
