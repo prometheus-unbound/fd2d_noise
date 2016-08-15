@@ -37,7 +37,7 @@ function [misfit, adjstf] = amp_diff( u, u_0, win, t )
     
     
     %- compute adoint source time function --------------------------------
-    adjstf = 2 * measurement * win.^2 .* u / sum( (win .* u_0).^2 );
+    adjstf = 2 * measurement * win.^2 .* u * dt / ( energy_0 + eps );
     
     
     % time reverse adjoint source time function ---------------------------

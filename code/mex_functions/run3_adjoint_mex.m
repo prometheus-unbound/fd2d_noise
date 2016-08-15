@@ -1,4 +1,4 @@
-function [K, stf_fft] = run3_adjoint( structure, noise_source, G_fft, adjsrc, adjstf, wavefield_fwd, mode )
+function [K, stf_fft] = run3_adjoint( structure, noise_source, G_fft, src, rec, adjstf, wavefield_fwd, mode )
 
 %==========================================================================
 % compute sensitivity kernel for mu (and rho)
@@ -27,8 +27,8 @@ function [K, stf_fft] = run3_adjoint( structure, noise_source, G_fft, adjsrc, ad
 
 
 %- basic configuration ----------------------------------------------------
-[Lx, Lz, nx, nz, dt, nt, order, ~, ~, store_fwd_nth] = input_parameters();
-[~,~,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
+[Lx, Lz, nx, nz, dt, nt, order, ~, ~, store_fwd_nth, make_plots, plot_nth] = input_parameters();
+[X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 
 
 %- time axis --------------------------------------------------------------
@@ -50,13 +50,13 @@ for n=1:nt
 end
 
 
-%- compute indices for adjoint source locations ---------------------------    
-ns_adj = size(adjsrc,1);
-src_id = zeros(ns_adj,2);
+%- compute indices for receivers, i.e. the adjoint source locations -------    
+n_receivers = size(rec,1);
+rec_id = zeros(n_receivers,2);
 
-for i=1:ns_adj
-    src_id(i,1) = min( find( min(abs(x-adjsrc(i,1))) == abs(x-adjsrc(i,1))) );
-    src_id(i,2) = min( find( min(abs(z-adjsrc(i,2))) == abs(z-adjsrc(i,2))) );
+for i=1:n_receivers
+    rec_id(i,1) = min( find( min(abs(x-rec(i,1))) == abs(x-rec(i,1))) );
+    rec_id(i,2) = min( find( min(abs(z-rec(i,2))) == abs(z-rec(i,2))) );
 end
 
 
@@ -82,6 +82,50 @@ K_mu = zeros(nx,nz);
 K_source = zeros(nx,nz);
 
 
+%- prepare figure for kernel building process -----------------------------
+if( strcmp( make_plots, 'yes' ) && isempty( wavefield_fwd ) )
+    
+    fig = figure;
+    set(fig,'units','normalized','position',[0.1 0.3 0.6 0.5])   
+    
+    ax1 = subplot(1,2,1);
+    hold on
+    set(ax1,'FontSize',18);
+    xlabel('x [km]')
+    ylabel('z [km]')
+    set(ax1,'XTick',[0 200 400])
+    set(ax1,'YTick',[0 200 400])
+    title('forward and adjoint wavefield','FontSize',22)
+    cm = cbrewer('div','RdBu',120,'PCHIP');
+    colormap(cm)
+    axis square
+    box on
+    set(gca,'LineWidth',2)
+    
+    
+    ax2 = subplot(1,2,2);
+    hold on
+    set(ax2,'FontSize',18);
+    xlabel('x [km]')
+    set(ax2,'XTick',[0 200 400])
+    set(ax2,'YTick',[])
+    title('kernel build-up','FontSize',22)
+    colormap(cm)
+    axis square
+    box on
+    set(gca,'LineWidth',2)
+    
+    cb2 = colorbar('peer',ax2,'Position',[0.50 0.34 0.02 0.37],'TickLabels',{'-','+'});
+    set(cb2,'AxisLocation','in')
+    cb2.Label.String = 'fields and kernels are normalized';
+    
+    [width] = absorb_specs();
+    max_u = 0;
+    max_M_tn = 0;
+    
+end
+
+
 %==========================================================================
 % iterate
 %==========================================================================
@@ -103,8 +147,8 @@ for n = 1:nt
     %- add adjoint source time function -----------------------------------
     if( size(adjstf,3) == 1 && ~isempty(adjstf) )
         
-        for i=1:ns_adj
-            DS(src_id(i,1),src_id(i,2)) = DS(src_id(i,1),src_id(i,2)) + real(adjstf(i,n));
+        for i=1:n_receivers
+            DS(rec_id(i,1),rec_id(i,2)) = DS(rec_id(i,1),rec_id(i,2)) + real(adjstf(i,n));
         end
         
     elseif( size(adjstf,3) ~= 1 && ~isempty(adjstf) )
@@ -154,9 +198,7 @@ for n = 1:nt
             M_tn = M_tn + noise_source.spectrum(k) .* G_fft(:,:,k) * ifft_coeff(n,k);
         end
         
-        for ib = 1:size(M_tn,3)
-            K_source(:,:,ib) = K_source(:,:,ib) + real( M_tn(:,:,ib) .* u );
-        end
+        K_source = K_source + real( M_tn .* u );
         
     end
     
@@ -170,6 +212,68 @@ for n = 1:nt
         i_fw_in = i_fw_in + 1;
 
     end
+    
+    
+    
+    %- plot correlation wavefield -----------------------------------------
+    if( strcmp( make_plots, 'yes' ) && isempty( wavefield_fwd ) )
+        
+        if( mod(n, plot_nth) == 0 || n == nt )
+                            
+            subplot(1,2,1)
+            cla
+            
+            max_u = max( max_u, max(max(abs(u+eps))) );
+            max_M_tn = max( max_M_tn, max(max(abs(real(M_tn+eps)))) );
+            
+            if( t(n) >= 0 )
+                pcolor( X/1000, Z/1000, u'/max_u + real( M_tn )'/max_M_tn );
+            elseif any( max(adjstf(:,1:n),[],2) > 0.05*max( adjstf(:,1:n_zero),[],2) )
+                pcolor( X/1000, Z/1000, u'/max_u );
+            else
+                pcolor( X/1000, Z/1000, 0*u' );
+            end
+            caxis([-0.2 0.2])
+            
+            plot( src(:,1)/1000, src(:,2)/1000, 'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 8 )
+            plot( rec(:,1)/1000, rec(:,2)/1000, 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8 )
+            
+            plot([width,Lx-width]/1000,[width,width]/1000,'k--');
+            plot([width,Lx-width]/1000,[Lz-width,Lz-width]/1000,'k--')
+            plot([width,width]/1000,[width,Lz-width]/1000,'k--')
+            plot([Lx-width,Lx-width]/1000,[width,Lz-width]/1000,'k--')
+            
+            shading interp
+            
+            
+            subplot(1,2,2)
+            if( t(n) >= 0 )
+                pcolor( X/1000, Z/1000, K_source' )
+                m = max(max(abs(K_source)));
+                caxis([-0.6*m 0.6*m]);
+            else
+                pcolor( X/1000, Z/1000, 0*K_source' );
+            end
+            
+            plot( src(:,1)/1000, src(:,2)/1000, 'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 8 )
+            plot( rec(:,1)/1000, rec(:,2)/1000, 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8 )
+            
+            plot([width,Lx-width]/1000,[width,width]/1000,'k--');
+            plot([width,Lx-width]/1000,[Lz-width,Lz-width]/1000,'k--')
+            plot([width,width]/1000,[width,Lz-width]/1000,'k--')
+            plot([Lx-width,Lx-width]/1000,[width,Lz-width]/1000,'k--')
+            xlim([0 Lx/1000])
+            ylim([0 Lz/1000])
+            
+            set(cb2,'Ticks',get(cb2,'Limits'))
+            
+            shading interp
+            drawnow
+            
+        end
+        
+    end
+    
 
 
     %- save Fourier transformed adjoint state for second run --------------

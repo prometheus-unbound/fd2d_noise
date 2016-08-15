@@ -13,7 +13,7 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
 % nz = 50;                    % grid points in z-direction
 % 
 % dt = 0.09;                  % time step [s]
-% nt = 50;                    % number of iterations
+% nt = 50;                    % number of time steps
 
 
 % setup for kernel calculation
@@ -23,7 +23,7 @@ nx = 300;                   % grid points in x-direction
 nz = 300;                   % grid points in z-direction
 
 dt = 0.09;                  % time step [s]
-nt = 800;                   % number of iterations
+nt = 800;                   % number of time steps
 
 
 order = 4;                  % finite-difference order (2 or 4)
@@ -43,23 +43,23 @@ store_fwd_nth = 1;           % store forward wavefield every nth time step
 model_type = 1;
 
 % 1 = homogeneous 
-% 2 = ?
+% 2 = two anomalies
 
 
 %==========================================================================
 % source type
 %==========================================================================
 
-source_type = 'homogeneous';
+% source_type = 'homogeneous';
 % source_type = 'point';
-% source_type = 'gaussian';
+source_type = 'gaussian';
 
 
 %==========================================================================
 % plotting parameters
 %==========================================================================
 
-make_plots = 'no';         % 'yes' or 'no'
+make_plots = 'yes';         % 'yes' or 'no'
 plot_nth = 100;             % plot every nth time step
 
 

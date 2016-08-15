@@ -57,7 +57,7 @@ for i_ref = 1:n_ref
     
     
     % calculate misfits and adjoint source functions
-    [misfit_iref, adjstf_iref] = make_adjoint_sources( reshape(c_iref(i_ref,:,:),[],nt), usr_par.data.c_data( (i_ref-1)*n_rec + 1 : i_ref*n_rec, : ), t, usr_par.measurement, src, rec );
+    [misfit_iref, adjstf_iref] = make_adjoint_sources( reshape(c_iref(i_ref,:,:),[],nt), usr_par.data.correlations( (i_ref-1)*n_rec + 1 : i_ref*n_rec, : ), t, usr_par.measurement.type, src, rec, usr_par.measurement.mode );
     
     
     % sum up misfits for all reference stations

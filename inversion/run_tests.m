@@ -3,34 +3,35 @@ clear all
 
 
 %% check adjoint source time functions
-% load('../output/array_1_ref.mat')
-% u = load('../output/data_1_ref_model_1_source_homogeneous.mat');
-% u0 = load('../output/data_1_ref_model_1_source_gaussian.mat');
-% 
-% % choose du randomly
-% du = 2 * (rand(1,length(u.t)) - 0.5);
-% 
-% % choose one reference station and one receiver
-% i_ref = 1;
-% rec_id = 1;
-% 
-% src = ref_stat(i_ref,:);
-% rec = array( ~ismember(array,src,'rows'), : );
-% index = (i_ref-1)*size(rec,1) + 1 : i_ref*size(rec,1);
-% index = index(rec_id);
-% rec = rec(rec_id,:);
-% 
-% % specify type of measurement and units of correlation
+load([fd2d_path() 'output' filesep 'array_nref-1.mat'])
+u = load([fd2d_path() 'output' filesep 'correlations_nref-1_model-1_source-homogeneous.mat']);
+u0 = load([fd2d_path() 'output' filesep 'correlations_nref-1_model-1_source-gaussian.mat']);
+
+% choose du randomly
+du = 2 * (rand(1,length(u.t)) - 0.5);
+
+% choose one reference station and one receiver
+i_ref = 1;
+rec_id = 1;
+
+src = ref_stat(i_ref,:);
+rec = array( ~ismember(array,src,'rows'), : );
+index = (i_ref-1)*size(rec,1) + 1 : i_ref*size(rec,1);
+index = index(rec_id);
+rec = rec(rec_id,:);
+
+% specify type of measurement and units of correlation
 % usr_par.measurement = 'waveform_difference';
-% % usr_par.measurement = 'log_amplitude_ratio';
-% % usr_par.measurement = 'amplitude_difference';
-% 
-% 
-% [dcheck, dcheck_struct] = optlib_check_adjoint_stf( u.c_data(index,:), u0.c_data(index,:), du, u.t, src, rec, -10, -2, 0.1, usr_par );
-% 
-% 
-% keyboard
-% clear all
+usr_par.measurement = 'log_amplitude_ratio';
+% usr_par.measurement = 'amplitude_difference';
+
+
+[dcheck, dcheck_struct] = optlib_check_adjoint_stf( u.correlations(index,:), u0.correlations(index,:), du, u.t, src, rec, -10, -2, 0.1, usr_par );
+
+
+return
+keyboard
+clear all
 
 
 
@@ -38,9 +39,9 @@ clear all
 %% check gradient
 [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
 
-usr_par.network = load('../output/array_1_ref_testing.mat');
-usr_par.data = load('../output/data_1_ref_testing.mat');
-usr_par.type = 'structure';
+usr_par.network = load([fd2d_path() 'output' filesep 'array_1_ref_testing.mat']);
+usr_par.data = load([fd2d_path() 'output' filesep 'correlations_1_ref_testing.mat']);
+usr_par.type = 'source';
 usr_par.measurement = 'waveform_difference';
 
 

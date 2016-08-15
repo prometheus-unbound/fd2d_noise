@@ -36,8 +36,8 @@ function [ noise_source ] = make_noise_source( make_plots )
         
         x_source = 1.0e5;
         z_source = 1.6e5;
-        source_width = 4e4;
-        magnitude = 90.0;
+        source_width = 3e4;
+        magnitude = 15.0;
         
     elseif( ~strcmp(source_type, 'homogeneous')  )
        
@@ -89,6 +89,7 @@ function [ noise_source ] = make_noise_source( make_plots )
         plot( f_sample, noise_source.spectrum, 'r')
         xlabel('frequency [Hz]');
         xlim([f_sample(1) f_sample(end)])
+        title('spectrum for noise source','FontSize',18)
         
         if( exist([ fd2d_path() 'output' filesep 'array_1_ref.mat' ], 'file' ) )
             load([ fd2d_path() 'output' filesep 'array_1_ref.mat' ]);
@@ -96,7 +97,7 @@ function [ noise_source ] = make_noise_source( make_plots )
             array = [];
         end
         
-        plot_models( [], noise_source.distribution, array, [0 0 0 0]);
+        plot_models( [], noise_source.distribution, array, [0 0 0 90]);
         
     end
     

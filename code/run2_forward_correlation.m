@@ -24,7 +24,7 @@ function [ seismograms, C_out ] = run2_forward_correlation( structure, noise_sou
 
 
 %- basic configuration ----------------------------------------------------
-[Lx, Lz, nx, nz, dt, nt, order, ~, ~, store_fwd_nth, make_plots, plot_nth] = input_parameters();
+[Lx, Lz, nx, nz, dt, nt, order, ~, source_type, store_fwd_nth, make_plots, plot_nth] = input_parameters();
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 
 
@@ -41,15 +41,6 @@ for n=1:nt
     for k = 1:n_sample
         ifft_coeff(n,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t(n) ) * dw;
     end
-end
-
-
-%- compute indices for source locations -----------------------------------
-ns = size(src,1);
-src_id = zeros(ns,2);
-for i = 1:ns
-    src_id(i,1) = min( find( min(abs(x-src(i,1))) == abs(x-src(i,1)) ) );
-    src_id(i,2) = min( find( min(abs(z-src(i,2))) == abs(z-src(i,2)) ) );
 end
 
 
@@ -90,6 +81,7 @@ seismograms = zeros(n_receivers,nt);
 if( strcmp( make_plots, 'yes' ) )
     
     fig = figure;
+    set(fig,'units','normalized','position',[0.1 0.3 0.3 0.5])
     set(gca,'FontSize',18);
     hold on
     
@@ -98,26 +90,16 @@ if( strcmp( make_plots, 'yes' ) )
     set(gca,'XTick',[0 200 400])
     set(gca,'YTick',[0 200 400])
     
-    title('correlation wavefield')
+    title('correlation wavefield','FontSize',22)
     cm = cbrewer('div','RdBu',120,'PCHIP');
     colormap(cm)
-    colorbar
-    axis image
-    
-%     pcolor( X/1000, Z/1000, u' )
-%     shading interp
-%     
-%     plot( src(:,1)/1000, src(:,2)/1000, 'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 8 )
-%     plot( rec(:,1)/1000, rec(:,2)/1000, 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8 )
-%     
-    [width] = absorb_specs(); 
-%     plot([width,Lx-width]/1000,[width,width]/1000,'k--');
-%     plot([width,Lx-width]/1000,[Lz-width,Lz-width]/1000,'k--')
-%     plot([width,width]/1000,[width,Lz-width]/1000,'k--')
-%     plot([Lx-width,Lx-width]/1000,[width,Lz-width]/1000,'k--')
-%     
-%     drawnow
-    
+    cb = colorbar;
+    axis square   
+    box on
+    set(gca,'LineWidth',2)
+         
+    [width] = absorb_specs();
+     
 end
 
 
@@ -189,12 +171,23 @@ for n = 1:nt
     if( strcmp( make_plots, 'yes' ) )
         
         if( n > 0.1*nt && n < 0.9*nt && mod(n, plot_nth) == 0 )
-            cla
+            
             pcolor( X/1000, Z/1000, u' )
             shading interp
             
-            m = max(max(abs(u)));
-            caxis([-0.8*m 0.8*m])
+            if( strcmp( source_type, 'homogeneous' ) )
+                caxis([-0.08 0.08]);
+            elseif( strcmp( source_type, 'point' ) )
+                caxis([-0.5 0.5]);
+            elseif( strcmp( source_type, 'gaussian' ) )
+                caxis([-0.3 0.3]);
+            else
+                m = max(max( abs(u) ));
+                caxis([-0.8*m 0.8*m]);
+            end
+            
+            clabels = get(cb,'YTick');
+            set(cb,'YTick',[clabels(1) clabels( ceil(length(clabels)/2) ) clabels(end)])
             
             plot( src(:,1)/1000, src(:,2)/1000, 'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 8 )
             plot( rec(:,1)/1000, rec(:,2)/1000, 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8 )
@@ -205,11 +198,17 @@ for n = 1:nt
             plot([Lx-width,Lx-width]/1000,[width,Lz-width]/1000,'k--')
     
             drawnow
+            
         end
         
     end
     
     
+end
+
+
+if( strcmp( make_plots, 'yes' ) )
+    close(fig)
 end
 
 

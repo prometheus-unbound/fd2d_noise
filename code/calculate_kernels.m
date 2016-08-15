@@ -1,4 +1,6 @@
 
+clear all
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -13,16 +15,26 @@ usr_par.type = 'structure';
 % 'structure'
 
 
-usr_par.measurement= 'waveform_difference';
+usr_par.measurement.type = 'waveform_difference';
 % 'log_amplitude_ratio';
 % 'amplitude_difference';
 % 'waveform_difference';
 % 'cc_time_shift';
 
 
+usr_par.measurement.mode = 'auto';
+% manual
+% auto
+
+
+usr_par.data_independent = 'no';
+% yes
+% no
+
+
 % provide name of array and of data file
-array_file = 'array_1_ref.mat';
-data_file = 'correlations_1_ref_model_1_source_gaussian.mat';
+array_file = 'array_nref-1.mat';
+data_file = 'correlations_nref-1_model-2_source-gaussian.mat';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,11 +47,22 @@ check_mex_files( usr_par.use_mex );
 
 
 [~,~,nx,nz,dt,nt,~,model_type,source_type,~,make_plots] = input_parameters();
+t = -(nt-1)*dt:dt:(nt-1)*dt;
+nt = length(t);
 
 
-% load data 
+% load array 
 usr_par.network = load([fd2d_path() 'output' filesep array_file]);
-usr_par.data = load([fd2d_path() 'output' filesep data_file]);
+n_ref = size(usr_par.network.ref_stat,1);
+n_rec = size(usr_par.network.array,1)-1;
+
+
+% load data
+if( strcmp(usr_par.data_independent,'no') )
+    usr_par.data = load([fd2d_path() 'output' filesep data_file]);
+else
+    usr_par.data.correlations = zeros( n_ref, n_rec, nt );
+end
 
 
 % set necessary fields that might not have been set
@@ -52,11 +75,6 @@ structure = define_material_parameters('no');
 
 
 % loop over reference stations
-n_ref = size(usr_par.network.ref_stat,1);
-n_rec = size(usr_par.network.array,1)-1;
-t = -(nt-1)*dt:dt:(nt-1)*dt;
-nt = length(t);
-
 if( ~exist( filename('correlations', n_ref), 'file') )
     correlations = zeros(n_ref,n_rec,nt);
 else
@@ -65,8 +83,6 @@ end
 
 misfit = 0;
 gradient = zeros( nx, nz, 2 );
-
-fprintf('\n')
 
 tic
 for i_ref = 1:n_ref
@@ -81,13 +97,16 @@ for i_ref = 1:n_ref
     if( strcmp( usr_par.type, 'source' ) )
         
         if( ~exist( filename('G_fft', i_ref), 'file' ) )
+            fprintf( 'ref %i: calculate Green function\n', i_ref )
             G_fft = run1_forward_green_mex( structure, src, 0 );
             parsave( filename('G_fft', i_ref), G_fft, [] )
         else
+            fprintf( 'ref %i: load pre-computed Green function\n', i_ref )
             G_fft = parload( filename('G_fft', i_ref) );
         end
         
     else
+        fprintf( 'ref %i: calculate Green function\n', i_ref )
         [G_fft, G] = run1_forward_green_mex( structure, src, 1 );
     end
     
@@ -96,16 +115,22 @@ for i_ref = 1:n_ref
     if( strcmp( usr_par.type, 'source' ) )
         
         if( ~exist( filename('correlations', n_ref), 'file') )
+            fprintf( 'ref %i: calculate correlations\n', i_ref )
             correlations(i_ref,:,:) = run2_forward_correlation_mex( structure, noise_source, G_fft, src, rec, 0 );
+        else
+            fprintf( 'ref %i: use pre-computed correlations\n', i_ref )    
         end
         
     else
+        fprintf( 'ref %i: calculate correlations\n', i_ref )
         [correlations(i_ref,:,:), C] = run2_forward_correlation_mex( structure, noise_source, G_fft, src, rec, 1 );
     end
     
     
     % calculate misfits and adjoint source functions
-    [misfit_iref, adjstf_iref] = make_adjoint_sources( reshape(correlations(i_ref,:,:),[],nt), reshape(usr_par.data.correlations( i_ref,:,:),[],nt), t, usr_par.measurement, src, rec );
+    [misfit_iref, adjstf_iref] = make_adjoint_sources( ...
+        reshape(correlations(i_ref,:,:),[],nt), reshape(usr_par.data.correlations( i_ref,:,:),[],nt), ...
+        t, usr_par.measurement.type, src, rec, usr_par.measurement.mode );
     
     
     % sum up misfits for all reference stations
@@ -115,17 +140,24 @@ for i_ref = 1:n_ref
     % calculate gradient and sum them up for all reference stations
     if( strcmp( usr_par.type, 'source' ) )
         
-        gradient_iref = run3_adjoint( structure, noise_source, G_fft, rec, adjstf_iref, [], 0 );
+        fprintf( 'ref %i: calculate source kernel\n', i_ref )
+        gradient_iref = run3_adjoint( structure, noise_source, G_fft, src, rec, adjstf_iref, [], 0 );
         gradient = gradient + gradient_iref;
         
     else
         
-        [gradient_iref_1, adjoint_state] = run3_adjoint( structure, noise_source, [], rec, adjstf_iref, C, 1 );
-        gradient_iref_2 = run3_adjoint( structure, noise_source, [], rec, adjoint_state, G, 0 );
+        fprintf( 'ref %i: calculate structure kernel - part 1\n', i_ref )
+        [gradient_iref_1, adjoint_state] = run3_adjoint( structure, noise_source, [], src, rec, adjstf_iref, C, 1 );
+        
+        fprintf( 'ref %i: calculate structure kernel - part 2\n', i_ref )
+        gradient_iref_2 = run3_adjoint( structure, noise_source, [], src, rec, adjoint_state, G, 0 );
         
         gradient = gradient + gradient_iref_1 + gradient_iref_2;
         
     end
+    
+    
+    fprintf( 'ref %i: done\n', i_ref )
     
     
 end
@@ -134,14 +166,11 @@ toc
 
 fprintf( 'misfit:   %15.10f\n', misfit )
 if( ~exist( filename('correlations', n_ref), 'file') )
-    save( filename('correlations', n_ref), correlations, [])
+    save( filename('correlations', n_ref), 'correlations', 't' )
 end
 
 
-%% plot kernel missing
-if( strcmp( usr_par.type, 'source' ) )
-    plot_models( [], gradient(:,:,2), usr_par.network.array, [0 0 0 0]);
-else
-    plot_models( gradient(:,:,1), [], usr_par.network.array, [0 0 0 0]);
-end
+% plot kernel missing
+plot_kernel( gradient, usr_par )
+
 
