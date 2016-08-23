@@ -1,54 +1,54 @@
 
 
-% get current working directory
+%- get current working directory ------------------------------------------
 current_path = pwd;
 
 
-% for later runs, get path of fd2d_noise
-folders = strsplit( current_path, filesep );
-id_project_folder = find( strncmp( folders, 'fd2d_noise', 10 ), 1, 'last');
-if( isempty( id_project_folder ) )
+%- for later runs, get path of fd2d_noise ---------------------------------
+folders = strsplit(current_path, filesep);
+id_project_folder = find(strncmp(folders, 'fd2d_noise', 10), 1, 'last');
+if (isempty(id_project_folder))
     error('Please stay within the ''fd2d_noise'' folder and keep the name ''fd2d_noise*'' (* = wildcard)!')
 end
-fd2d_path = fullfile( filesep, folders{1:id_project_folder }, filesep );
+fd2d_path = fullfile(filesep, folders{1:id_project_folder }, filesep);
 
 
-% set path
-addpath( genpath( [fd2d_path filesep() 'code'] ) )
-addpath( genpath( [fd2d_path filesep() 'input'] ) )
-addpath( genpath( [fd2d_path filesep() 'inversion'] ) )
-addpath( genpath( [fd2d_path filesep() 'output'] ) )
-addpath( genpath( [fd2d_path filesep() 'tools'] ) )
+%- set path ---------------------------------------------------------------
+addpath(genpath([fd2d_path, filesep(), 'code']))
+addpath(genpath([fd2d_path, filesep(), 'input']))
+addpath(genpath([fd2d_path, filesep(), 'inversion']))
+addpath(genpath([fd2d_path, filesep(), 'output']))
+addpath(genpath([fd2d_path, filesep(), 'tools']))
 
 
-% check if mex functions can be used
-version_control = ver;
-if( any( strcmpi( {version_control.Name}, 'matlab coder' ) ) )    
-    fprintf('\nYou can use mex-functions!\n')    
-end
+%- check if mex functions can be used -------------------------------------
+% version_control = ver;
+% if( any( strcmpi( {version_control.Name}, 'matlab coder' ) ) )
+%     fprintf('\nYou can use mex-functions!\n')
+% end
 
 
-% cleanup
+%- cleanup ----------------------------------------------------------------
 clear current_path
 clear folders; clear id_project_folder
 clear fd2d_path; clear version_control
 return
 
 
-if( any( strcmpi( {version_control.Name}, 'matlab coder' ) ) )
+if (any(strcmpi({version_control.Name}, 'matlab coder')))
     
     fprintf('Try to compile wave propagation functions now...\n\n')
-    cd([fd2d_path 'code' filesep 'mex_functions'])
+    cd([fd2d_path, 'code', filesep, 'mex_functions'])
     
     S = warning();
-    warning('off','all')
+    warning('off', 'all')
     compile_green
     compile_correlation
     warning(S);
     
     cd(fd2d_path)
     
-    if( exit_code == 0 )
+    if (exit_code == 0)
         fprintf('\nCompilation successful! Set use_mex to ''yes''!\n\n')
     else
         fprintf('\nCompilation NOT successful! Set use_mex to ''no''!\n\n')
@@ -60,8 +60,9 @@ else
     
 end
 
-% cleanup
+%- cleanup ----------------------------------------------------------------
 clear folders; clear id_project_folder
 clear fd2d_path; clear version_control
 clear S
+
 

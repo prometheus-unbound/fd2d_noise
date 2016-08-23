@@ -16,17 +16,20 @@ function [grad_m] = map_gradparameters_to_gradm( m, grad_parameters, usr_par )
 % See also MAP_M_TO_PARAMETERS.
 
 
-temp = 0.0 * grad_parameters;
-
 [absbound] = init_absbound();
 [ix,iz] = find( absbound == 1, 1, 'first' );
 
-temp(ix:end-ix+1, iz:end-iz+1, 1:end-1) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, 1:end-1), usr_par.kernel.imfilter.source, 'circular' );
-temp(ix:end-ix+1, iz:end-iz+1, end) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, end), usr_par.kernel.imfilter.structure, 'circular' );
+[Lx, Lz, nx, nz] = input_parameters();
+[~, ~, x, z] = define_computational_domain(Lx, Lz, nx, nz);
 
-temp(:,:,end) = usr_par.initial.mu_0 * temp(:,:,end);
+grad_parameters(ix:end-ix+1, iz:end-iz+1, 1) = gaussblur2d(grad_parameters(ix:end-ix+1, iz:end-iz+1, 1), x(ix:end-ix+1), z(iz:end-iz+1), usr_par.smoothing.sigma);
+grad_parameters(ix:end-ix+1, iz:end-iz+1, 2) = gaussblur2d(grad_parameters(ix:end-ix+1, iz:end-iz+1, 2), x(ix:end-ix+1), z(iz:end-iz+1), usr_par.smoothing.sigma);
 
-grad_m = reshape(temp, [], 1);
+for i = 1:2
+    grad_parameters(:,:,i) = double(absbound == 1) .* grad_parameters(:,:,i);
+end
+
+grad_m = reshape(grad_parameters, [], 1);
 
 
 end

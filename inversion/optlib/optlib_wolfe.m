@@ -1,5 +1,5 @@
-function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,verbose,usr_par)
-%
+function [sig, model] = optlib_wolfe(xj, s, stg, f, del, theta, sig0, try_larger_steps, verbose, usr_par)
+
 % Determines stepsize satisfying the Powell-Wolfe conditions
 %
 % Input:  xj       current point
@@ -15,109 +15,110 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
 % Output: sig      stepsize sig satisfying the Armijo condition
 %         xn       new point xn=xj-sig*s
 %         fn       fn=f(xn)
-%
-    sig=sig0;
-    xn=xj-sig*s;
-    
+
+
+    sig = sig0;
+    xn = xj - sig * s;
+
     xn_string = optlib_generate_random_string(8);
-    
+
     if (verbose)
-        fprintf( 'requesting misfit to test Armijo-Goldstein condition.\n' );
-        fprintf( 'testing step length %f...\n', sig);
+        fprintf('requesting misfit to test Armijo-Goldstein condition.\n');
+        fprintf('testing step length %f...\n', sig);
     end
-    
+
     % [fn] = eval_objective(xn, xn_string, usr_par);
-    [fn,gn,cn] = eval_objective_and_gradient(xn, xn_string, usr_par);
-     
+    [fn, gn, cn] = eval_objective_and_gradient(xn, xn_string, usr_par);
+
     % Determine maximal sig=sig0/2^k satisfying Armijo
-    while (f-fn<del*sig*stg)
-        sig=0.5*sig;
+    while (f - fn < del * sig * stg)
+        sig = 0.5 * sig;
         % if sig < 0.01 * sig0
         %     fprintf( 'seems that we''re not in a descent direction at all... sig = %f.\n', sig );
         %     sig = 0.0;
         %     model = 0.0;
         %     return
         % end
-        xn=xj-sig*s;
+        xn = xj - sig * s;
         xn_string = optlib_generate_random_string(8);
         if (verbose)
-            fprintf( 'requesting new misfit to test Armijo-Goldstein condition.\n' );
-            fprintf( 'testing step length %f...\n', sig);
+            fprintf('requesting new misfit to test Armijo-Goldstein condition.\n');
+            fprintf('testing step length %f...\n', sig);
         end
         [fn] = eval_objective(xn, xn_string, usr_par);
     end
     if (verbose)
-        fprintf( 'step length %f satisfies Armijo-Goldstein condition.\n', sig );
-        fprintf( 'requesting gradient to test Wolfe condition...\n' );
+        fprintf('step length %f satisfies Armijo-Goldstein condition.\n', sig);
+        fprintf('requesting gradient to test Wolfe condition...\n');
     end
-    
-    if( sig~=sig0 )
-        [gn,cn] = eval_grad_objective(xn, xn_string, usr_par);
+
+    if (sig ~= sig0)
+        [gn, cn] = eval_grad_objective(xn, xn_string, usr_par);
     end
 
     % check wolfe condition
-    if ( gn'*s<=theta*stg )
-       wolfe_condition_satisfied = true; 
+    if (gn' * s <= theta * stg)
+        wolfe_condition_satisfied = true;
     else
-        wolfe_condition_satisfied = false; 
+        wolfe_condition_satisfied = false;
     end
-    
+
     sig_armijo = sig;
     x_armijo = xn;
     g_armijo = gn;
     f_armijo = fn;
     c_armijo = cn;
     string_armijo = xn_string;
-    
-    
+
+
     % If sig=sig0 satisfies Armijo then try sig=2^k*sig0
     % until sig satisfies also the Wolfe condition
     % or until sigp=2^(k+1)*sig0 violates the Armijo condition
-    if (~wolfe_condition_satisfied || try_larger_steps )
+    if (~wolfe_condition_satisfied || try_larger_steps)
 
-        if (sig==sig0)
-            xnn=xj-2*sig*s;
+        if (sig == sig0)
+            xnn = xj - 2 * sig * s;
             xnn_string = optlib_generate_random_string(8);
-            fprintf( 'requesting new misfit to test Wolfe condition.\n' );
-            fprintf( 'testing step length %f...\n', 2*sig);
-            [fnn,gnn,cnn] = eval_objective_and_gradient(xnn, xnn_string, usr_par);
+            fprintf('requesting new misfit to test Wolfe condition.\n');
+            fprintf('testing step length %f...\n', 2 * sig);
+            [fnn, gnn, cnn] = eval_objective_and_gradient(xnn, xnn_string, usr_par);
 
-            while (gn'*s>theta*stg)&&(f-fnn>=2*del*sig*stg)
-                sig=2*sig;
-                xn=xnn;
-                fn=fnn;
-                gn=gnn;
-                cn=cnn;
+            while (gn' * s > theta * stg) && (f - fnn >= 2 * del * sig * stg)
+                sig = 2 * sig;
+                xn = xnn;
+                fn = fnn;
+                gn = gnn;
+                cn = cnn;
                 xn_string = xnn_string;
-                xnn=xj-2*sig*s;
+                xnn = xj - 2 * sig * s;
                 xnn_string = optlib_generate_random_string(8);
                 if (verbose)
-                    fprintf( 'requesting new misfit to test Wolfe condition.\n' );
-                    fprintf( 'testing step length %f...\n', 2*sig);
+                    fprintf('requesting new misfit to test Wolfe condition.\n');
+                    fprintf('testing step length %f...\n', 2 * sig);
                 end
-                [fnn,gnn,cnn] = eval_objective_and_gradient(xnn, xnn_string, usr_par);            
+                [fnn, gnn, cnn] = eval_objective_and_gradient(xnn, xnn_string, usr_par);
             end
         end
-        sigp=2*sig;
+        sigp = 2 * sig;
 
         % Perform bisection until sig satisfies also the Wolfe condition
         it_bisec = 1; bisec_max = 5;
-        while (gn'*s>theta*stg)
-            
+        while (gn' * s > theta * stg)
+
             % stop bisection after 5 iterations
             if it_bisec > bisec_max
                 if sig > eps % 0.0001
-                    
-                    fprintf( 'Hurrah! get out of here!\n' );
-                    
+
+                    fprintf('Hurrah! get out of here!\n');
+
                     % assign the step that satisfies Armijo
-                    sig = sig_armijo;           % step
-                    xn  = x_armijo;             % model
-                    gn  = g_armijo;             % gradient
-                    fn  = f_armijo;             % objective
-                    cn  = c_armijo;             % correlation
-                    xn_string = string_armijo;  % model name
-                    
+                    sig = sig_armijo; % step
+                    xn = x_armijo; % model
+                    gn = g_armijo; % gradient
+                    fn = f_armijo; % objective
+                    cn = c_armijo; % correlation
+                    xn_string = string_armijo; % model name
+
                     % and exit the bisection loop
                     break
                 else
@@ -125,26 +126,26 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
                     error('Seems we''re stuck in bisection...');
                 end
             end
-            
-            sigb=0.5*(sig+sigp);
-            xb=xj-sigb*s;
+
+            sigb = 0.5 * (sig + sigp);
+            xb = xj - sigb * s;
             xb_string = optlib_generate_random_string(8);
             if (verbose)
-                fprintf( 'inside bisection loop: %d of %d \n', it_bisec, bisec_max );
-                fprintf( 'requesting new misfit to test Wolfe condition.\n' );
-                fprintf( 'testing step length %f...\n',  sigb);
+                fprintf('inside bisection loop: %d of %d \n', it_bisec, bisec_max);
+                fprintf('requesting new misfit to test Wolfe condition.\n');
+                fprintf('testing step length %f...\n', sigb);
             end
-            [fnn,gnn,cnn] = eval_objective_and_gradient(xb, xb_string, usr_par);
+            [fnn, gnn, cnn] = eval_objective_and_gradient(xb, xb_string, usr_par);
 
-            if (f-fnn>=del*sigb*stg)
-                sig=sigb;
-                xn=xb;
-                fn=fnn;
-                gn=gnn;
-                cn=cnn;
+            if (f - fnn >= del * sigb * stg)
+                sig = sigb;
+                xn = xb;
+                fn = fnn;
+                gn = gnn;
+                cn = cnn;
                 xn_string = xb_string;
             else
-                sigp=sigb;
+                sigp = sigb;
             end
             it_bisec = it_bisec + 1;
         end
@@ -157,4 +158,5 @@ function [sig,model]=optlib_wolfe(xj,s,stg,f,del,theta,sig0,try_larger_steps,ver
     model.correlation = cn;
     model.name = xn_string;
     
+
 end

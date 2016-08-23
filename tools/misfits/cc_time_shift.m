@@ -18,37 +18,36 @@
 %==========================================================================
 
 
-function [misfit, adjstf] = cc_time_shift( u, u_0, win, t )
+function [misfit, adjstf] = cc_time_shift(u, u_0, win, t)
 
 
     %- compute time shift -------------------------------------------------
-    [cc,t_cc] = cross_correlation_td( win.*u, win.*u_0, t);
-    [~,i_max] = max(cc);
+    [cc, t_cc] = cross_correlation_td(win .* u, win .* u_0, t);
+    [~, i_max] = max(cc);
     T = t_cc(i_max);
-    if( abs(T) > 3.5 )
-        T=0;
+    if (abs(T) > 3.5)
+        T = 0;
     end
 
 
     %- compute misfit -----------------------------------------------------
-    misfit = T^2/2.0;
+    misfit = T ^ 2 / 2.0;
 
 
     %- compute adjoint source time function -------------------------------
-    dt = abs( t(2)-t(1) );
+    dt = abs(t(2) - t(1));
     nt = length(t);
 
-    v = zeros(1,nt);
-    v(1:nt-1) = diff(u) / dt;
+    v = zeros(1, nt);
+    v(1:nt - 1) = diff(u) / dt;
 
-    adjstf = T * (win.^2 .* v) / ( sum( (win .* v).^2) * dt ) ;
+    adjstf = T * (win .^ 2 .* v) / (sum((win .* v) .^ 2) * dt);
 
 
     % time reverse adjoint source time function ---------------------------
     adjstf = fliplr(adjstf);
-    
-    
-end
 
+
+end
 
 

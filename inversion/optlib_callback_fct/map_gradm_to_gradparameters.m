@@ -14,8 +14,8 @@ function [grad_parameters] = map_gradm_to_gradparameters( m, grad_m, usr_par )
 % See also MAP_PARAMETERS_TO_M and MAP_GRADPARAMETERS_TO_GRADM.
 
 
-grad_parameters = reshape( grad_m, usr_par.config.nx, usr_par.config.nz, [] );
-grad_parameters(:,:,end) = grad_parameters(:,:,end) / usr_par.initial.mu_0;
+[~, ~, nx, nz] = input_parameters();
+grad_parameters = reshape( grad_m, nx, nz, 2 );
 
 
 end

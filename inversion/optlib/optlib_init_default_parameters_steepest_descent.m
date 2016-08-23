@@ -14,7 +14,7 @@ function [options] = optlib_init_default_parameters_steepest_descent(options)
     end
 
     if (~isfield (options, 'output_file') )
-        options.output_file = 'iterations_lbfgs.tab';
+        options.output_file = 'iterations_steepest_descent.tab';
     end
 
     if (~isfield (options, 'max_iterations') )

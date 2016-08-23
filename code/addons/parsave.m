@@ -1,10 +1,20 @@
 
-function parsave(fname, x, y)
-    
-    if( isempty(y) )
-        save(fname, 'x')
-    else
-        save(fname, 'x', 'y')
-    end
-    
+%==========================================================================
+% saving function for parfor-loops (only for one variable)
+%
+% parsave( filename, x )
+%
+% input:
+%--------
+% filename: name for file
+% x: variable
+%
+%==========================================================================
+
+
+function parsave(filename, x)
+
+    save(filename, 'x')
+
 end
+

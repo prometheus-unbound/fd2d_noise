@@ -1,7 +1,7 @@
 
-function [g, c] = eval_grad_objective(m, ModRandString, usr_par)
+function [g] = eval_grad_objective(m, ModRandString, usr_par)
     
-    [~, g, c] = eval_objective_and_gradient(m, ModRandString, usr_par);
+    [~, g] = eval_objective_and_gradient(m, ModRandString, usr_par);
 
 end
 

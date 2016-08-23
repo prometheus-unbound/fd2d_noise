@@ -1,7 +1,8 @@
+
 %==========================================================================
 % waveform difference
 %
-% function [misfit, adjstf] = waveform_difference( u, u_0, win, t )
+% [misfit, adjstf] = waveform_difference( u, u_0, win, t )
 %
 % input:
 %--------
@@ -18,15 +19,15 @@
 %==========================================================================
 
 
-function [misfit, adjstf] = waveform_difference( u, u_0, win, t )
+function [misfit, adjstf] = waveform_difference(u, u_0, win, t)
 
 
-    dt = abs( t(2) - t(1) );
+    dt = abs(t(2) - t(1));
 
 
     %- compute misfit and adjoint source time function --------------------
-    misfit = 1/2 * sum( win.^2 .* (u - u_0).^2 ) * dt;
-    adjstf = win.^2 .* (u - u_0) * dt;
+    misfit = 1 / 2 * sum(win .^ 2 .* (u - u_0) .^ 2) * dt;
+    adjstf = win .^ 2 .* (u - u_0) * dt;
 
 
     % time reverse adjoint source time function ---------------------------
@@ -34,3 +35,4 @@ function [misfit, adjstf] = waveform_difference( u, u_0, win, t )
 
 
 end
+
