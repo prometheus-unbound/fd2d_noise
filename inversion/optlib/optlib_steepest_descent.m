@@ -20,7 +20,7 @@ function [flag, mfinal, usr_par] = optlib_steepest_descent(m0, options, usr_par)
     normg = normg0;
 
     it = 0;
-    fid = fopen([fd2d_path() filesep 'inversion' filesep options.output_file], 'a+');
+    fid = fopen([fd2d_path(), 'inversion', filesep, options.output_file], 'a+');
 
     fprintf(fid, 'it=%d   j=%e   ||g||=%e  \n', it, j, normg);
     fprintf('it=%d   j=%e   ||g||=%e  \n', it, j, normg);
@@ -50,7 +50,7 @@ function [flag, mfinal, usr_par] = optlib_steepest_descent(m0, options, usr_par)
         g = gn;
         normg = norm(g);
 
-        % save(sprintf([fd2d_path(), filesep, 'inversion', filesep, 'models', filesep, 'model_%i.mat'], it), 'm', 'gn', 'jn')
+        % save(sprintf([fd2d_path(), 'inversion', filesep, 'models', filesep, 'model_%i.mat'], it), 'm', 'gn', 'jn')
         fprintf(fid, 'it=%3.d   f=%e   ||g||=%e   sig=%5.3f\n', it, j, normg, sigma);
         fprintf('it=%3.d   f=%e   ||g||=%e   sig=%5.3f\n', it, j, normg, sigma);
     end

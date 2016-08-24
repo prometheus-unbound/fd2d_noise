@@ -1,12 +1,11 @@
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%==========================================================================
 % user input
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%==========================================================================
 
 usr_par.type = 'source';
 % 'source'
 % 'structure'
-% 'joint'
 
 
 usr_par.measurement.type = 'waveform_difference';
@@ -22,7 +21,7 @@ usr_par.measurement.mode = 'auto';
 
 
 % for design of gaussian filter for smoothing of kernel
-usr_par.smoothing.sigma = [1 1];
+usr_par.smoothing.sigma = [10 10];
 
 
 % provide name of array and of data file
@@ -32,16 +31,16 @@ data_file = 'correlations_nref-1_model-1_source-gaussian.mat';
 % data_file = 'correlations_nref-1_testing.mat';
 
 
-usr_par.verbose = true;
+usr_par.verbose = false;
 % true
 % false
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%==========================================================================
 % inversion parameters - steepest descent
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%==========================================================================
 
-options.init_step_length = 1.0;
+options.init_step_length = 1024.0;
 options.stepsize = 1.0;
 options.verbose = true;
 options.output_file = 'iterations_steepest_descent.tab';
@@ -49,9 +48,13 @@ options.max_iterations = 100;
 options.tolerance = 1e-2;
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%==========================================================================
 % running the inversion
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%==========================================================================
+
+%- check path -------------------------------------------------------------
+fd2d_path = fd2d_path();
+
 
 %- load array and data ----------------------------------------------------
 usr_par.network = load([fd2d_path(), 'output', filesep, array_file]);

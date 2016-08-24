@@ -40,10 +40,10 @@ function [usr_par] = usr_par_init_default_parameters(usr_par)
 
     if (isfield(usr_par, 'smoothing'))
         if (~isfield(usr_par.smoothing, 'sigma'))
-            usr_par.smoothing.sigma = [10 10];
+            usr_par.smoothing.sigma = [1 1];
         end
     else
-        usr_par.smoothing.sigma = [10 10];
+        usr_par.smoothing.sigma = [1 1];
     end
 
 

@@ -35,34 +35,35 @@ clear fd2d_path; clear version_control
 return
 
 
-if (any(strcmpi({version_control.Name}, 'matlab coder')))
-    
-    fprintf('Try to compile wave propagation functions now...\n\n')
-    cd([fd2d_path, 'code', filesep, 'mex_functions'])
-    
-    S = warning();
-    warning('off', 'all')
-    compile_green
-    compile_correlation
-    warning(S);
-    
-    cd(fd2d_path)
-    
-    if (exit_code == 0)
-        fprintf('\nCompilation successful! Set use_mex to ''yes''!\n\n')
-    else
-        fprintf('\nCompilation NOT successful! Set use_mex to ''no''!\n\n')
-    end
-    
-else
-    
-    fprintf('You do not have MATLAB Coder. Please set use_mex to ''no''.\n\n')
-    
-end
 
-%- cleanup ----------------------------------------------------------------
-clear folders; clear id_project_folder
-clear fd2d_path; clear version_control
-clear S
+% if (any(strcmpi({version_control.Name}, 'matlab coder')))
+%     
+%     fprintf('Try to compile wave propagation functions now...\n\n')
+%     cd([fd2d_path, 'code', filesep, 'mex_functions'])
+%     
+%     S = warning();
+%     warning('off', 'all')
+%     compile_green
+%     compile_correlation
+%     warning(S);
+%     
+%     cd(fd2d_path)
+%     
+%     if (exit_code == 0)
+%         fprintf('\nCompilation successful! Set use_mex to ''yes''!\n\n')
+%     else
+%         fprintf('\nCompilation NOT successful! Set use_mex to ''no''!\n\n')
+%     end
+%     
+% else
+%     
+%     fprintf('You do not have MATLAB Coder. Please set use_mex to ''no''.\n\n')
+%     
+% end
+% 
+% %- cleanup ----------------------------------------------------------------
+% clear folders; clear id_project_folder
+% clear fd2d_path; clear version_control
+% clear S
 
 

@@ -21,8 +21,8 @@ function plot_kernel(gradient, usr_par)
 
     %- convert to km ------------------------------------------------------
     X = X / 1000; Z = Z / 1000;
-    % Lx = Lx / 1000; Lz = Lz / 1000;
-    % width = width / 1000;
+    Lx = Lx / 1000; Lz = Lz / 1000;
+    width = width / 1000;
 
 
     %- open figure, set size, etc. ----------------------------------------
@@ -61,12 +61,12 @@ function plot_kernel(gradient, usr_par)
 
 
     %- plot absorbing boundaries ------------------------------------------
-    % level = [1.1 * m, 1.1 * m];
-    % handle(end + 1,:) = plot3([width, Lx - width], [width, width], level, 'k--');
-    % plot3([width, Lx - width], [Lz - width, Lz - width], level, 'k--')
-    % plot3([width, width], [width, Lz - width], level, 'k--')
-    % plot3([Lx - width, Lx - width], [width, Lz - width], level, 'k--')
-    % legend_string{end + 1} = 'absorbing boundaries';
+    level = [1.1 * m, 1.1 * m];
+    handle(end + 1,:) = plot3([width, Lx - width], [width, width], level, 'k--');
+    plot3([width, Lx - width], [Lz - width, Lz - width], level, 'k--')
+    plot3([width, width], [width, Lz - width], level, 'k--')
+    plot3([Lx - width, Lx - width], [width, Lz - width], level, 'k--')
+    legend_string{end + 1} = 'absorbing boundaries';
 
 
     %- legend -------------------------------------------------------------

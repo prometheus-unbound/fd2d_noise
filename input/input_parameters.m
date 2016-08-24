@@ -57,8 +57,8 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
     % source type
     %======================================================================
 
-    source_type = 'homogeneous';
-    % source_type = 'point';
+    % source_type = 'homogeneous';
+    source_type = 'point';
     % source_type = 'gaussian';
 
 

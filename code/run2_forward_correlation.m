@@ -175,7 +175,7 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 if (strcmp(source_type, 'homogeneous'))
                     caxis([-0.08, 0.08]);
                 elseif (strcmp(source_type, 'point'))
-                    caxis([-0.002, 0.002]);
+                    caxis([-0.003, 0.003]);
                 elseif (strcmp(source_type, 'gaussian'))
                     caxis([-0.2, 0.2]);
                 else
