@@ -5,42 +5,42 @@ clear all
 % check adjoint source time functions
 %==========================================================================
 
-load([fd2d_path() 'output' filesep 'array_nref-1.mat'])
-u = load([fd2d_path() 'output' filesep 'correlations_nref-1_model-1_source-homogeneous.mat']);
-u0 = load([fd2d_path() 'output' filesep 'correlations_nref-1_model-1_source-gaussian.mat']);
-
-
-%- choose du randomly -----------------------------------------------------
-du = 2 * (rand(1,length(u.t)) - 0.5);
-
-%- choose one reference station and one receiver --------------------------
-i_ref = 1;
-rec_id = 1;
-
-src = ref_stat(i_ref,:);
-rec = array(~ismember(array,src,'rows'), :);
-index = (i_ref - 1) * size(rec, 1) + 1 : i_ref * size(rec, 1);
-index = index(rec_id);
-rec = rec(rec_id,:);
-
-
-%- specify type of measurement and units of correlation -------------------
-usr_par.measurement.type = 'waveform_difference';
-% usr_par.measurement.type = 'log_amplitude_ratio';
-% usr_par.measurement.type = 'amplitude_difference';
-usr_par.measurement.mode = 'auto';
-
-
-%- run check --------------------------------------------------------------
-[dcheck, dcheck_struct] = optlib_check_adjoint_stf( u.correlations(index,:), u0.correlations(index,:), du, u.t, src, rec, -13, -2, 0.1, usr_par );
+% load([fd2d_path() 'output' filesep 'array_nref-1.mat'])
+% u = load([fd2d_path() 'output' filesep 'correlations_nref-1_model-1_source-homogeneous.mat']);
+% u0 = load([fd2d_path() 'output' filesep 'correlations_nref-1_model-1_source-gaussian.mat']);
+% 
+% 
+% %- choose du randomly -----------------------------------------------------
+% du = 2 * (rand(1,length(u.t)) - 0.5);
+% 
+% %- choose one reference station and one receiver --------------------------
+% i_ref = 1;
+% rec_id = 1;
+% 
+% src = ref_stat(i_ref,:);
+% rec = array(~ismember(array,src,'rows'), :);
+% index = (i_ref - 1) * size(rec, 1) + 1 : i_ref * size(rec, 1);
+% index = index(rec_id);
+% rec = rec(rec_id,:);
+% 
+% 
+% %- specify type of measurement and units of correlation -------------------
+% usr_par.measurement.type = 'waveform_difference';
+% % usr_par.measurement.type = 'log_amplitude_ratio';
+% % usr_par.measurement.type = 'amplitude_difference';
+% usr_par.measurement.mode = 'auto';
+% 
+% 
+% %- run check --------------------------------------------------------------
+% [dcheck, dcheck_struct] = optlib_check_adjoint_stf( u.correlations(index,:), u0.correlations(index,:), du, u.t, src, rec, -13, -2, 0.1, usr_par );
 
 
 %==========================================================================
 % wait till user starts gradient test 
 %==========================================================================
 
-keyboard
-clear all
+% keyboard
+% clear all
 
 
 %==========================================================================
@@ -54,10 +54,11 @@ clear all
 %- set user parameters ----------------------------------------------------
 usr_par.network = load([fd2d_path() 'output' filesep 'array_nref-1_testing.mat']);
 usr_par.data = load([fd2d_path() 'output' filesep 'correlations_nref-1_testing.mat']);
-usr_par.type = 'source';
+usr_par.type = 'structure';
 usr_par.measurement.type = 'waveform_difference';
 usr_par.measurement.mode = 'auto';
-usr_par.smoothing.sigma = [1e3 1e3];
+usr_par.smoothing.sigma = [1e-3 1e-3];
+usr_par.verbose = false;
 
 
 %- set up initial model ---------------------------------------------------

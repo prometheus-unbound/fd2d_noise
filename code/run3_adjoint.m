@@ -253,7 +253,7 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 else
                     pcolor(X / 1000, Z / 1000, 0 * u');
                 end
-                caxis([- 0.2, 0.2])
+                caxis([-0.2, 0.2])
 
                 plot(ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ...
                     'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 8)

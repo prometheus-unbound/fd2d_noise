@@ -11,9 +11,13 @@
 
 % array for kernel computation
 array = zeros(2, 2);
-array(1, 1) = 1.6e5;
-array(2, 1) = 2.4e5;
-array(:, 2) = 2.0e5;
+array(1, 1) = 1.4e5;
+array(2, 1) = 2.6e5;
+array(1:2, 2) = 2.0e5;
+
+% array(3:4, 1) = 2.0e5;
+% array(3, 2) = 1.4e5;
+% array(4, 2) = 2.6e5;
 
 % select receivers that will be reference stations
 ref_stat = array(1,:);
@@ -95,22 +99,23 @@ end
 
 
 % if( strcmp(make_plots,'yes') )
-%
+% 
 %     fig = figure;
 %     set(fig,'units','normalized','position',[0.1 0.3 0.6 0.5])
 %     list = dir([fd2d_path 'output' filesep 'correlations_nref*']);
+%     handle = [];
 %     legend_string = [];
 %     colors = hsv(size(list,1));
 %     for i = 1:size(list,1)
-%
+% 
 %         tmp = load( list(i).name );
-%         plot_recordings(tmp.correlations, t, colors(i,:), true);
+%         handle(end + 1,:) = plot_recordings(tmp.correlations, t, colors(i,:), false);
 %         legend_string{end+1} = list(i).name;
-%
+% 
 %     end
-%
-%     legend(legend_string,'Interpreter','none','Location','best')
-%
+% 
+%     legend(handle,legend_string,'Interpreter','none','Location','best')
+% 
 % end
 
 

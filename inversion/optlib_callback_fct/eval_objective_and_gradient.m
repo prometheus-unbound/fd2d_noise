@@ -26,7 +26,7 @@ misfit = 0;
 gradient = zeros(size(m_parameters, 1), size(m_parameters, 2), 2);
 
 
-parfor i_ref = 1:n_ref
+for i_ref = 1:n_ref
     
     
     % each reference station will act as a source once --------------------

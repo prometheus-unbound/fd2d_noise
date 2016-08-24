@@ -67,7 +67,6 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
 
         fig = figure;
         set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5])
-        set(gca, 'FontSize', 18);
         hold on
 
         xlabel('x [km]')
@@ -95,11 +94,10 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
     u = zeros(nx, nz);
     seismograms = zeros(n_receivers, nt);
 
-    i_fw_out = 1;
-    n_fw = floor(nt / store_fwd_nth);
+    i_fwd_out = 1;
+    n_fwd = floor(nt / store_fwd_nth);
     if (mode ~= 0)
-        C_out = zeros(nx, nz, n_fw, 'single');
-        % C_out = zeros(nx,nz,n_fw);
+        C_out = zeros(nx, nz, n_fwd, 'single');
     else
         C_out = single([]);
     end
@@ -114,9 +112,8 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
 
         %- save correlation wavefield -------------------------------------
         if (mode ~= 0 && mod(n, store_fwd_nth) == 0)
-            C_out(:,:, i_fw_out) = single(u);
-            % C_out(:,:,i_fw_out) = u;
-            i_fw_out = i_fw_out + 1;
+            C_out(:,:, i_fwd_out) = single(u);
+            i_fwd_out = i_fwd_out + 1;
         end
 
 
@@ -176,11 +173,11 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 shading interp
 
                 if (strcmp(source_type, 'homogeneous'))
-                    caxis([- 0.08, 0.08]);
+                    caxis([-0.08, 0.08]);
                 elseif (strcmp(source_type, 'point'))
-                    caxis([- 0.002, 0.002]);
+                    caxis([-0.002, 0.002]);
                 elseif (strcmp(source_type, 'gaussian'))
-                    caxis([- 0.3, 0.3]);
+                    caxis([-0.2, 0.2]);
                 else
                     m = max(max(abs(u)));
                     caxis([- 0.8 * m, 0.8 * m]);
@@ -198,7 +195,8 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 plot([width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
                 plot([width, width] / 1000, [width, Lz - width] / 1000, 'k--')
                 plot([Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
-
+                
+                set(gca, 'FontSize', 18, 'position', [0.17, 0.204, 0.599, 0.624]);
                 drawnow
 
             end

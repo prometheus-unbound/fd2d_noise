@@ -121,7 +121,7 @@ function [misfit, adjstf] = make_adjoint_sources(u, u_0, t, measurement, src, re
 
         elseif (strcmp(measurement, 'log_amplitude_ratio'))
 
-            win = get_window(t, left, right, 'hann');
+            % win = get_window(t, left, right, 'hann');
             [misfit(i_rec,:), adjstf(i_rec,:)] = log_amp_ratio(u(i_rec,:), u_0(i_rec,:), win, t);
 
 

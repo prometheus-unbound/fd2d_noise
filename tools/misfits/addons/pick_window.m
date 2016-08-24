@@ -26,15 +26,20 @@ function [left, right] = pick_window(u, u_0, t, measurement)
     set(gca, 'FontSize', 14);
     hold on
     box on
+    legend_string = [];
 
 
     %- plot seismograms ---------------------------------------------------
     plot(t, u, 'r')
-    plot(t, u_0, 'k')
+    legend_string{end + 1} = 'synthetics';
+    if( sum(u_0) ~= 0 )
+        plot(t, u_0, 'k')
+        legend_string{end + 1} = 'data';
+    end
 
 
     % legend, labels, title, limits ---------------------------------------
-    legend('synthetics', 'data')
+    legend(legend_string)
     xlabel('time [s]')
     title('pick measurement window', 'FontSize', 16)
     xlim([t(1), t(end)])

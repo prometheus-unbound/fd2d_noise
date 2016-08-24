@@ -75,7 +75,6 @@ function [G_fft, G_out] = run1_forward_green(structure, ref_station, mode)
 
     if (mode ~= 0)
         G_out = zeros(nx, nz, n_fwd, 'single');
-        % G_out = zeros(nx,nz,n_fw);
     else
         G_out = single([]);
     end
@@ -90,7 +89,6 @@ function [G_fft, G_out] = run1_forward_green(structure, ref_station, mode)
 
         if (mode ~= 0 && mod(n + nt - 1, store_fwd_nth) == 0)
             G_out(:,:, i_fwd_out) = single(v);
-            % G_out(:,:,i_fw_out) = v;
             i_fwd_out = i_fwd_out + 1;
         end
 

@@ -1,7 +1,4 @@
 
-[~, ~, nx, nz, ~, ~, ~, model_type, source_type, n_basis_fct] = input_parameters();
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,10 +66,12 @@ usr_par.data = load([fd2d_path(), 'output', filesep, data_file]);
 noise_source = make_noise_source('no');
 structure = define_material_parameters('no');
 
-m_parameters = zeros(nx, nz, 2);
+m_parameters = zeros(size(structure.mu,1), size(structure.mu,2), 2);
 m_parameters(:,:,1) = structure.mu;
 m_parameters(:,:,2) = noise_source.distribution;
 
+
+%- include density and spectrum to usr_par --------------------------------
 usr_par.structure.rho = structure.rho;
 usr_par.noise_source.spectrum = noise_source.spectrum;
 
@@ -92,6 +91,7 @@ plot_models( sqrt( m_parameters_final(:,:,1)  ./ structure.rho), ...
 
 
 %- save solution ----------------------------------------------------------
-save([fd2d_path() filesep 'inversion' filesep 'solution.mat'], 'flag', 'mfinal', 'usr_par', '-v7.3')
+save([fd2d_path() filesep 'inversion' filesep 'solution.mat'], ...
+    'flag', 'mfinal', 'usr_par', '-v7.3')
 
 

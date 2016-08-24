@@ -31,7 +31,7 @@ function [noise_source] = make_noise_source(make_plots)
     point.x_source = 2.0e5;
     point.z_source = 1.7e5;
     point.source_width = 5e3;
-    point.magnitude = 3.0;
+    point.magnitude = 5.0;
 
     % specify location, width and strength of Gaussian anomaly
     gaussian.x_source = 1.0e5;
@@ -97,7 +97,7 @@ function [noise_source] = make_noise_source(make_plots)
             array = [];
         end
 
-        plot_models([], noise_source.distribution, array, [0, 0, 0, 90]);
+        plot_models([], noise_source.distribution, array, [0, 0, 0, 0]);
 
     end
 
