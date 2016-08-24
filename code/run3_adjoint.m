@@ -77,13 +77,13 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
         ax1 = subplot(1, 2, 1);
         hold on
-        set(ax1, 'FontSize', 18);
+        set(ax1, 'FontSize', 12);
         xlabel('x [km]')
         ylabel('z [km]')
         set(ax1, 'XTick', [0, 200, 400])
         set(ax1, 'YTick', [0, 200, 400])
-        title('forward and adjoint wavefield', 'FontSize', 22)
-        cm = cbrewer('div', 'RdBu', 120, 'PCHIP');
+        title('forward and adjoint wavefield', 'FontSize', 14)
+        cm = cbrewer('div', 'RdBu', 120);
         colormap(cm)
         axis square
         box on
@@ -92,11 +92,11 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
         ax2 = subplot(1, 2, 2);
         hold on
-        set(ax2, 'FontSize', 18);
+        set(ax2, 'FontSize', 12);
         xlabel('x [km]')
         set(ax2, 'XTick', [0, 200, 400])
         set(ax2, 'YTick', [])
-        title('kernel build-up', 'FontSize', 22)
+        title('kernel build-up', 'FontSize', 14)
         colormap(cm)
         axis square
         box on

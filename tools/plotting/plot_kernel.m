@@ -28,14 +28,14 @@ function plot_kernel(gradient, usr_par)
     %- open figure, set size, etc. ----------------------------------------
     fig = figure;
     set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5])
-    set(gca, 'FontSize', 16);
+    set(gca, 'FontSize', 12);
     hold on
 
     xlabel('x [km]')
     ylabel('z [km]')
     set(gca, 'XTick', [0, 200, 400])
     set(gca, 'YTick', [0, 200, 400])
-    title([usr_par.type, ' kernel'], 'FontSize', 20)
+    title([usr_par.type, ' kernel'], 'FontSize', 14)
 
     handle = [];
     legend_string = [];
@@ -53,7 +53,7 @@ function plot_kernel(gradient, usr_par)
 
 
     %- colormap and colorbar ----------------------------------------------
-    cm = cbrewer('div', 'RdBu', 120, 'PCHIP');
+    cm = cbrewer('div', 'RdBu', 120);
     colormap(cm)
     cb = colorbar;
     clabels = get(cb, 'YTick');

@@ -46,7 +46,7 @@ function [h] = plot_recordings(u, t, color, normalize)
 
 
     %- plot recordings ----------------------------------------------------
-    set(gca, 'FontSize', 18)
+    set(gca, 'FontSize', 12)
     hold on
     k = 1;
     for i_ref = 1:size(u, 1)

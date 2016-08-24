@@ -74,8 +74,8 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
         set(gca, 'XTick', [0, 200, 400])
         set(gca, 'YTick', [0, 200, 400])
 
-        title('correlation wavefield', 'FontSize', 22)
-        cm = cbrewer('div', 'RdBu', 120, 'PCHIP');
+        title('correlation wavefield', 'FontSize', 14)
+        cm = cbrewer('div', 'RdBu', 120);
         colormap(cm)
         cb = colorbar;
         axis square
@@ -196,7 +196,7 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 plot([width, width] / 1000, [width, Lz - width] / 1000, 'k--')
                 plot([Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
                 
-                set(gca, 'FontSize', 18, 'position', [0.17, 0.204, 0.599, 0.624]);
+                set(gca, 'FontSize', 12, 'position', [0.17, 0.204, 0.599, 0.624]);
                 drawnow
 
             end

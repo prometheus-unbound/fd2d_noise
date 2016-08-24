@@ -28,7 +28,7 @@ function plot_models(structure, source, array, clim)
 
 
     %- colormaps ----------------------------------------------------------
-    cm = cbrewer('div', 'RdBu', 120, 'PCHIP');
+    cm = cbrewer('div', 'RdBu', 120);
     cm_source = cm(50:120,:);
 
 
@@ -58,7 +58,7 @@ function plot_models(structure, source, array, clim)
             set(ax1, 'position', [0.17, 0.18, 0.705, 0.745]);
         end
 
-        set(ax1, 'FontSize', 18);
+        set(ax1, 'FontSize', 12);
         hold on
 
 
@@ -109,7 +109,7 @@ function plot_models(structure, source, array, clim)
         ylim([0, Lz])
         xlabel('x [km]')
         ylabel('z [km]')
-        title('structure', 'FontSize', 22)
+        title('structure', 'FontSize', 14)
 
 
         %- layout ---------------------------------------------------------
@@ -136,7 +136,7 @@ function plot_models(structure, source, array, clim)
             set(ax2, 'position', [0.17, 0.18, 0.705, 0.745]);
         end
 
-        set(ax2, 'FontSize', 18);
+        set(ax2, 'FontSize', 12);
         hold on
 
 
@@ -192,7 +192,7 @@ function plot_models(structure, source, array, clim)
             set(ax2, 'YTick', []);
         end
 
-        title('source', 'FontSize', 22)
+        title('source', 'FontSize', 14)
 
 
         %- layout ---------------------------------------------------------
