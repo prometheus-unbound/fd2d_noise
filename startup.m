@@ -1,24 +1,24 @@
 
 
 %- get current working directory ------------------------------------------
-current_path = pwd;
-
-
-%- for later runs, get path of fd2d_noise ---------------------------------
-folders = strsplit(current_path, filesep);
-id_project_folder = find(strncmp(folders, 'fd2d_noise', 10), 1, 'last');
-if (isempty(id_project_folder))
-    error('Please stay within the ''fd2d_noise'' folder and keep the name ''fd2d_noise*'' (* = wildcard)!')
-end
-fd2d_path = fullfile(filesep, folders{1:id_project_folder }, filesep);
+% current_path = pwd;
 
 
 %- set path ---------------------------------------------------------------
-addpath(genpath([fd2d_path, filesep(), 'code']))
-addpath(genpath([fd2d_path, filesep(), 'input']))
-addpath(genpath([fd2d_path, filesep(), 'inversion']))
-addpath(genpath([fd2d_path, filesep(), 'output']))
-addpath(genpath([fd2d_path, filesep(), 'tools']))
+addpath(genpath([pwd, filesep, 'code']))
+addpath(genpath([pwd, filesep, 'input']))
+addpath(genpath([pwd, filesep, 'inversion']))
+addpath(genpath([pwd, filesep, 'output']))
+addpath(genpath([pwd, filesep, 'tools']))
+
+
+%- for later runs, get path of fd2d_noise ---------------------------------
+% folders = strsplit(current_path, filesep);
+% id_project_folder = find(strncmp(folders, 'fd2d_noise', 10), 1, 'last');
+% if (isempty(id_project_folder))
+%     error('Please stay within the ''fd2d_noise'' folder and keep the name ''fd2d_noise*'' (* = wildcard)!')
+% end
+% fd2d_path = fullfile(filesep, folders{1:id_project_folder }, filesep);
 
 
 %- check if mex functions can be used -------------------------------------
@@ -30,8 +30,8 @@ addpath(genpath([fd2d_path, filesep(), 'tools']))
 
 %- cleanup ----------------------------------------------------------------
 clear current_path
-clear folders; clear id_project_folder
-clear fd2d_path; clear version_control
+% clear folders; clear id_project_folder
+% clear fd2d_path; clear version_control
 return
 
 

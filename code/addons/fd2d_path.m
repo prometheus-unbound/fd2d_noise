@@ -18,24 +18,28 @@ function [code_path] = fd2d_path()
         error('Please stay within the ''fd2d_noise'' folder and keep the name ''fd2d_noise*'' (* = wildcard)!')
     end
 
-    code_path = fullfile(filesep, folders{1:id_project_folder}, filesep);
+    if (strcmp(filesep,'/'))
+        code_path = fullfile(filesep, folders{1:id_project_folder}, filesep);
+    else
+        code_path = fullfile(folders{1:id_project_folder}, filesep);
+    end
 
-    dir_content = ls(code_path);
-    if (isempty(strfind(dir_content, 'code')))
-        error('There is no code folder!')
-    end
-    if (isempty(strfind(dir_content, 'input')))
-        error('There is no input folder!')
-    end
-    if (isempty(strfind(dir_content, 'inversion')))
-        error('There is no inversion folder!')
-    end
-    if (isempty(strfind(dir_content, 'output')))
-        error('There is no output folder!')
-    end
-    if (isempty(strfind(dir_content, 'tools')))
-        error('There is no tools folder!')
-    end
+%     dir_content = ls(code_path);
+%     if (isempty(strfind(dir_content, 'code')))
+%         error('There is no code folder!')
+%     end
+%     if (isempty(strfind(dir_content, 'input')))
+%         error('There is no input folder!')
+%     end
+%     if (isempty(strfind(dir_content, 'inversion')))
+%         error('There is no inversion folder!')
+%     end
+%     if (isempty(strfind(dir_content, 'output')))
+%         error('There is no output folder!')
+%     end
+%     if (isempty(strfind(dir_content, 'tools')))
+%         error('There is no tools folder!')
+%     end
 
 
 end
