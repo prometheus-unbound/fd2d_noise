@@ -89,13 +89,13 @@ save(filename('correlations', n_ref), 'correlations', 't')
 
 
 %- plot data --------------------------------------------------------------
-if (strcmp(make_plots, 'yes'))
+% if (strcmp(make_plots, 'yes'))
     
     fig = figure;
     set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.6, 0.5])
     plot_recordings(correlations, t, 'k', true);
     
-end
+% end
 
 
 % if( strcmp(make_plots,'yes') )
