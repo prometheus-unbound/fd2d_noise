@@ -1,5 +1,9 @@
 
 
+%- do not show warnings ---------------------------------------------------
+warning off
+
+
 %- get current working directory ------------------------------------------
 % current_path = pwd;
 
@@ -10,10 +14,6 @@ addpath(genpath([pwd, filesep, 'input']))
 addpath(genpath([pwd, filesep, 'inversion']))
 addpath(genpath([pwd, filesep, 'output']))
 addpath(genpath([pwd, filesep, 'tools']))
-
-
-%- do not show warnings ---------------------------------------------------
-warning off
 
 
 %- for later runs, get path of fd2d_noise ---------------------------------

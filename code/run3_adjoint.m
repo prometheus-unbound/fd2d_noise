@@ -82,7 +82,6 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
         ylabel(ax1, 'z [km]')
         set(ax1, 'XTick', [0, 200, 400])
         set(ax1, 'YTick', [0, 200, 400])
-        title(ax1, 'forward and adjoint wavefield', 'FontSize', 14)
         cm = cbrewer('div', 'RdBu', 120);
         colormap(ax1,cm)
         axis(ax1, 'square')
@@ -96,23 +95,32 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
         xlabel(ax2, 'x [km]')
         set(ax2, 'XTick', [0, 200, 400])
         set(ax2, 'YTick', [])
-        title(ax2, 'kernel build-up', 'FontSize', 14)
+        
         colormap(ax2,cm)
         axis(ax2,'square')
         box(ax2,'on')
         set(ax2, 'LineWidth', 2, 'FontSize', 12)
 
-        if( exist('OCTAVE_VERSION', 'builtin') ~= 0 )
-            cb1 = colorbar('Position', [0.50, 0.34, 0.02, 0.37]);
-            ylabel(cb1, 'fields and kernels are normalized')
-        else
+        
+        %- colorbar and title different for octave ------------------------
+        if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
+            
+            title(ax1, 'forward and adjoint wavefield', 'FontSize', 14)
+            title(ax2, 'kernel build-up', 'FontSize', 14)
+            
             cb1 = colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
                 'Ticks', [], 'AxisLocation', 'in');
             ylabel(cb1, 'fields and kernels are normalized')
             colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
                 'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out');
+            
+        else
+            title(ax1, 'forward and adjoint wavefield (normalized)', 'FontSize', 14)
+            title(ax2, 'kernel build-up (normalized)', 'FontSize', 14)
         end
 
+        
+        %- get absorbing boundary width and initialize max-variables ------
         [width] = absorb_specs();
         max_u = 0;
         max_M_tn = 0;
