@@ -1,8 +1,8 @@
 
 %==========================================================================
-% loading function for parfor-loops (only for 2 variables)
+% loading function for parfor-loops (only for 1 variable)
 %
-% [x, y] = parload( filename )
+% [x] = parload( filename )
 %
 % input:
 %--------
@@ -10,12 +10,12 @@
 %
 % output:
 %--------
-% x and y: variables contained in file
+% x: variable contained in file
 %
 %==========================================================================
 
 
-function [x, y] = parload(filename)
+function [x] = parload(filename)
 
 
     foo = load(filename);
@@ -23,10 +23,6 @@ function [x, y] = parload(filename)
 
     if (numel(whichVariables) == 1)
         x = foo.(whichVariables{1});
-        y = [];
-    elseif (numel(whichVariables) == 2)
-        x = foo.(whichVariables{1});
-        y = foo.(whichVariables{2});
     else
         error(['Problem with ', filename, '!']);
     end

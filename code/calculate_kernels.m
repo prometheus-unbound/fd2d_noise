@@ -76,7 +76,7 @@ structure = define_material_parameters('no');
 if (~exist(filename('correlations', n_ref), 'file'))
     correlations = zeros(n_ref, n_rec, nt);
 else
-    correlations = parload(filename('correlations', n_ref));
+    load(filename('correlations', n_ref), 'correlations');
 end
 
 misfit = 0;
