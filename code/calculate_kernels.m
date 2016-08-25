@@ -3,7 +3,7 @@
 % user input
 %==========================================================================
 
-usr_par.type = 'structure';
+usr_par.type = 'source';
 % 'source'
 % 'structure'
 

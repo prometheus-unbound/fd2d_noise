@@ -257,7 +257,9 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 end
 
                 % pcolor(ax1, X / 1000, Z / 1000, u' / max_u + wavefield_fwd(:,:,end-n+1)' / max_wavefield_fwd);                
+                
                 caxis(ax1, [-0.3, 0.3])
+                shading(ax1, 'interp')
 
                 
                 %- plot array ---------------------------------------------
@@ -272,8 +274,6 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 plot(ax1, [width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
                 plot(ax1, [width, width] / 1000, [width, Lz - width] / 1000, 'k--')
                 plot(ax1, [Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
-
-                shading(ax1, 'interp')
 
 
                 
@@ -291,6 +291,8 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 % m = max(max(abs(K_mu)));
                 % caxis(ax2, [- 0.6 * m, 0.6 * m]);
                 
+                shading(ax2, 'interp')
+                
                 
                 %- plot array ---------------------------------------------
                 plot(ax2, ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ...
@@ -304,11 +306,10 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 plot(ax2, [width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
                 plot(ax2, [width, width] / 1000, [width, Lz - width] / 1000, 'k--')
                 plot(ax2, [Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
-                xlim(ax2, [0, Lx / 1000])
-                ylim(ax2, [0, Lz / 1000])
 
+                
+                %- set limits of colorbar and invoke plot -----------------
                 set(cb2, 'Ticks', get(cb2, 'Limits'))
-                shading(ax2, 'interp')
                 drawnow
 
             end
