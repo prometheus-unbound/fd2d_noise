@@ -28,14 +28,15 @@ function plot_kernel(gradient, usr_par)
     %- open figure, set size, etc. ----------------------------------------
     fig = figure;
     set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5])
-    set(gca, 'FontSize', 12);
+    ax1 = gca;
+    set(ax1, 'FontSize', 12);
     hold on
 
-    xlabel('x [km]')
-    ylabel('z [km]')
-    set(gca, 'XTick', [0, 200, 400])
-    set(gca, 'YTick', [0, 200, 400])
-    title([usr_par.type, ' kernel'], 'FontSize', 14)
+    xlabel(ax1, 'x [km]')
+    ylabel(ax1, 'z [km]')
+    set(ax1, 'XTick', [0, 200, 400])
+    set(ax1, 'YTick', [0, 200, 400])
+    title(ax1, [usr_par.type, ' kernel'], 'FontSize', 14)
 
     handle = [];
     legend_string = [];
@@ -44,11 +45,11 @@ function plot_kernel(gradient, usr_par)
     %- plot gradient ------------------------------------------------------
     m = max(max(max(abs(gradient))));
     if (strcmp(usr_par.type, 'source'))
-        mesh(X, Z, gradient(:,:, 2)');
-        caxis([- 0.6 * m, 0.6 * m]);
+        mesh(ax1, X, Z, gradient(:,:, 2)');
+        caxis(ax1, [- 0.6 * m, 0.6 * m]);
     else
-        mesh(X, Z, gradient(:,:, 1)');
-        caxis([- 0.1 * m, 0.1 * m]);
+        mesh(ax1, X, Z, gradient(:,:, 1)');
+        caxis(ax1, [- 0.1 * m, 0.1 * m]);
     end
 
 
@@ -62,26 +63,29 @@ function plot_kernel(gradient, usr_par)
 
     %- plot absorbing boundaries ------------------------------------------
     level = [1.1 * m, 1.1 * m];
-    handle(end + 1,:) = plot3([width, Lx - width], [width, width], level, 'k--');
-    plot3([width, Lx - width], [Lz - width, Lz - width], level, 'k--')
-    plot3([width, width], [width, Lz - width], level, 'k--')
-    plot3([Lx - width, Lx - width], [width, Lz - width], level, 'k--')
+    handle(end + 1,:) = plot3(ax1, [width, Lx - width], [width, width], level, 'k--');
+    plot3(ax1, [width, Lx - width], [Lz - width, Lz - width], level, 'k--')
+    plot3(ax1, [width, width], [width, Lz - width], level, 'k--')
+    plot3(ax1, [Lx - width, Lx - width], [width, Lz - width], level, 'k--')
     legend_string{end + 1} = 'absorbing boundaries';
 
 
+    %- plot array ---------------------------------------------------------
+    handle(end + 1,:) = plot3(ax1, usr_par.network.array(:, 1) / 1000, usr_par.network.array(:, 2) / 1000, 1.1 * m + 0 * usr_par.network.array(:, 2), ...
+        'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
+    
+    
     %- legend -------------------------------------------------------------
-    handle(end + 1,:) = plot3(usr_par.network.array(:, 1) / 1000, usr_par.network.array(:, 2) / 1000, 1.1 * m + 0 * usr_par.network.array(:, 2), ...
-        'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8);
     legend_string{end + 1} = 'array';
-    legend(handle, legend_string)
+    legend(ax1, handle, legend_string)
 
 
     %- layout -------------------------------------------------------------
-    shading interp
-    grid on
-    box on
-    set(gca, 'LineWidth', 2)
-    axis square
+    shading(ax1, 'interp')
+    grid(ax1, 'on')
+    box(ax1, 'on')
+    set(ax1, 'LineWidth', 2)
+    axis(ax1, 'square')
 
     drawnow
 

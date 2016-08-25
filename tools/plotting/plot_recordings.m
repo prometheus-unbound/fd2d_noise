@@ -46,8 +46,9 @@ function [h] = plot_recordings(u, t, color, normalize)
 
 
     %- plot recordings ----------------------------------------------------
-    set(gca, 'FontSize', 12)
-    hold on
+    ax1 = gca;
+    set(ax1, 'FontSize', 12)
+    hold(ax1, 'on')
     k = 1;
     for i_ref = 1:size(u, 1)
 
@@ -61,25 +62,26 @@ function [h] = plot_recordings(u, t, color, normalize)
             end
 
             %- plot -------------------------------------------------------
-            h = plot(t, spacing * k + squeeze(u(i_ref, i_rec,:)) / m + offset, ...
+            h = plot(ax1, t, spacing * k + squeeze(u(i_ref, i_rec,:)) / m + offset, ...
                 'color', color, 'LineWidth', 1);
             k = k + 1;
+            
         end
 
     end
 
 
     %- labels and limits --------------------------------------------------
-    xlabel('time [s]');
+    xlabel(ax1, 'time [s]');
     if (normalize)
-        ylabel('normalized');
+        ylabel(ax1, 'normalized');
         % else
         %     ylabel('seismograms','FontSize',18);
     end
 
-    set(gca, 'YTick', []);
-    ylimits = get(gca, 'YLim');
-    set(gca, 'YLim', [ylimits(1) - 0.2, ylimits(2) + 0.2])
+    set(ax1, 'YTick', []);
+    ylimits = get(ax1, 'YLim');
+    set(ax1, 'YLim', [ylimits(1) - 0.2, ylimits(2) + 0.2])
 
 
 end

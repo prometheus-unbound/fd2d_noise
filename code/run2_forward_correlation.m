@@ -67,20 +67,21 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
 
         fig = figure;
         set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5])
-        hold on
+        ax1 = gca;
+        hold(ax1, 'on')
 
-        xlabel('x [km]')
-        ylabel('z [km]')
-        set(gca, 'XTick', [0, 200, 400])
-        set(gca, 'YTick', [0, 200, 400])
+        xlabel(ax1, 'x [km]')
+        ylabel(ax1, 'z [km]')
+        set(ax1, 'XTick', [0, 200, 400])
+        set(ax1, 'YTick', [0, 200, 400])
 
-        title('correlation wavefield', 'FontSize', 14)
+        title(ax1, 'correlation wavefield', 'FontSize', 14)
         cm = cbrewer('div', 'RdBu', 120);
         colormap(cm)
         cb = colorbar;
-        axis square
-        box on
-        set(gca, 'LineWidth', 2)
+        axis(ax1, 'square')
+        box(ax1, 'on')
+        set(ax1, 'LineWidth', 2)
 
         [width] = absorb_specs();
 
@@ -169,34 +170,40 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
 
             if (n > 0.1 * nt && n < 0.9 * nt && mod(n, plot_nth) == 0)
 
-                pcolor(X / 1000, Z / 1000, u')
-                shading interp
+                
+                %- plot wavefield -----------------------------------------
+                pcolor(ax1, X / 1000, Z / 1000, u')
+                shading(ax1, 'interp')
 
                 if (strcmp(source_type, 'homogeneous'))
-                    caxis([-0.08, 0.08]);
+                    caxis(ax1, [-0.08, 0.08]);
                 elseif (strcmp(source_type, 'point'))
-                    caxis([-0.003, 0.003]);
+                    caxis(ax1, [-0.003, 0.003]);
                 elseif (strcmp(source_type, 'gaussian'))
-                    caxis([-0.2, 0.2]);
+                    caxis(ax1, [-0.2, 0.2]);
                 else
                     m = max(max(abs(u)));
-                    caxis([- 0.8 * m, 0.8 * m]);
+                    caxis(ax1, [- 0.8 * m, 0.8 * m]);
                 end
 
                 clabels = get(cb, 'YTick');
                 set(cb, 'YTick', [clabels(1), clabels(ceil(length(clabels) / 2)), clabels(end)])
 
-                plot(ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ... 
-                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 8)
-                plot(rec(:, 1) / 1000, rec(:, 2) / 1000, ....
-                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8)
-
-                plot([width, Lx - width] / 1000, [width, width] / 1000, 'k--');
-                plot([width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
-                plot([width, width] / 1000, [width, Lz - width] / 1000, 'k--')
-                plot([Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
                 
-                set(gca, 'FontSize', 12, 'position', [0.17, 0.204, 0.599, 0.624]);
+                %- plot array ---------------------------------------------
+                plot(ax1, ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ... 
+                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
+                plot(ax1,rec(:, 1) / 1000, rec(:, 2) / 1000, ....
+                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
+                
+                
+                %- plot absorbing boundaries ------------------------------
+                plot(ax1, [width, Lx - width] / 1000, [width, width] / 1000, 'k--');
+                plot(ax1, [width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
+                plot(ax1, [width, width] / 1000, [width, Lz - width] / 1000, 'k--')
+                plot(ax1, [Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
+                
+                set(ax1, 'FontSize', 12, 'position', [0.17, 0.204, 0.599, 0.624]);
                 drawnow
 
             end

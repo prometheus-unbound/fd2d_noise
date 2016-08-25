@@ -59,65 +59,63 @@ function plot_models(structure, source, array, clim)
         end
 
         set(ax1, 'FontSize', 12);
-        hold on
+        hold(ax1, 'on')
 
 
         %- plot noise source ----------------------------------------------
-        mesh(X, Z, structure')
+        mesh(ax1, X, Z, structure')
 
 
         %- plot absorbing boundaries --------------------------------------
         level = [1.1 * max(max(structure)), 1.1 * max(max(structure))];
-        handle(end + 1,:) = plot3([width, Lx - width], [width, width], level, 'k--');
-        plot3([width, Lx - width], [Lz - width, Lz - width], level, 'k--')
-        plot3([width, width], [width, Lz - width], level, 'k--')
-        plot3([Lx - width, Lx - width], [width, Lz - width], level, 'k--')
+        handle(end + 1,:) = plot3(ax1, [width, Lx - width], [width, width], level, 'k--');
+        plot3(ax1, [width, Lx - width], [Lz - width, Lz - width], level, 'k--')
+        plot3(ax1, [width, width], [width, Lz - width], level, 'k--')
+        plot3(ax1, [Lx - width, Lx - width], [width, Lz - width], level, 'k--')
         legend_string{end + 1} = 'absorbing boundaries';
 
 
         %- plot array if given --------------------------------------------
         if (~isempty(array))
-            handle(end + 1,:) = plot3(array(:, 1), array(:, 2), level(1) + 0 * array(:, 2), ...
-                'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8);
+            handle(end + 1,:) = plot3(ax1, array(:, 1), array(:, 2), level(1) + 0 * array(:, 2), ...
+                'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
             legend_string{end + 1} = 'array';
         end
 
 
         %- include legend -------------------------------------------------
-        legend(handle, legend_string, 'position', [0.44, 0.06, 0.1, 0.05])
+        legend(ax1, handle, legend_string, 'position', [0.44, 0.06, 0.1, 0.05])
 
 
         %- color stuff ----------------------------------------------------
         colormap(ax1, cm)
         if (clim(1) ~= 0 || clim(2) ~= 0)
-            caxis([clim(1), clim(2)]);
+            caxis(ax1, [clim(1), clim(2)]);
         end
         cb = colorbar;
         ylabel(cb, '[m/s]')
         m = max(max(abs(structure - 4000)));
-        caxis([4000 - m - double(m < 1) * 50, 4000 + m + double(m < 1) * 50])
+        caxis(ax1, [4000 - m - double(m < 1) * 50, 4000 + m + double(m < 1) * 50])
         clabels = get(cb, 'YTick');
         set(cb, 'YTick', [clabels(1), clabels(ceil(length(clabels) / 2)), clabels(end)])
 
 
         %- labels ---------------------------------------------------------
-        xlabels = [0, 200, 400];
-        ylabels = [0, 200, 400];
-        set(ax1, 'XTick', xlabels);
-        set(ax1, 'YTick', ylabels);
-        xlim([0, Lx])
-        ylim([0, Lz])
-        xlabel('x [km]')
-        ylabel('z [km]')
-        title('structure', 'FontSize', 14)
+        set(ax1, 'XTick', [0, 200, 400]);
+        set(ax1, 'YTick', [0, 200, 400]);
+        xlim(ax1, [0, Lx])
+        ylim(ax1, [0, Lz])
+        xlabel(ax1, 'x [km]')
+        ylabel(ax1, 'z [km]')
+        title(ax1, 'structure', 'FontSize', 14)
 
 
         %- layout ---------------------------------------------------------
-        shading interp
-        grid on
-        box on
+        shading(ax1, 'interp')
+        grid(ax1, 'on')
+        box(ax1, 'on')
         set(ax1, 'LineWidth', 2)
-        axis square
+        axis(ax1, 'square')
 
 
     end
@@ -137,40 +135,40 @@ function plot_models(structure, source, array, clim)
         end
 
         set(ax2, 'FontSize', 12);
-        hold on
+        hold(ax2, 'on')
 
 
         %- plot noise source ----------------------------------------------
-        mesh(X, Z, source')
+        mesh(ax2, X, Z, source')
 
 
         %- plot absorbing boundaries --------------------------------------
         level = [1.1 * max(max(source)), 1.1 * max(max(source))];
-        handle(end + 1,:) = plot3([width, Lx - width], [width, width], level, 'k--');
-        plot3([width, Lx - width], [Lz - width, Lz - width], level, 'k--')
-        plot3([width, width], [width, Lz - width], level, 'k--')
-        plot3([Lx - width, Lx - width], [width, Lz - width], level, 'k--')
+        handle(end + 1,:) = plot3(ax2, [width, Lx - width], [width, width], level, 'k--');
+        plot3(ax2, [width, Lx - width], [Lz - width, Lz - width], level, 'k--')
+        plot3(ax2, [width, width], [width, Lz - width], level, 'k--')
+        plot3(ax2, [Lx - width, Lx - width], [width, Lz - width], level, 'k--')
         legend_string{end + 1} = 'absorbing boundaries';
 
 
         %- plot array if given --------------------------------------------
         if (~isempty(array))
-            handle(end + 1,:) = plot3(array(:, 1), array(:, 2), level(1) + 0 * array(:, 2), ...
-                'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8);
+            handle(end + 1,:) = plot3(ax2, array(:, 1), array(:, 2), level(1) + 0 * array(:, 2), ...
+                'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
             legend_string{end + 1} = 'array';
         end
 
 
         %- include legend -------------------------------------------------
         if (isempty(structure))
-            legend(handle, legend_string, 'position', [0.44, 0.06, 0.1, 0.05])
+            legend(ax2, handle, legend_string, 'position', [0.44, 0.06, 0.1, 0.05])
         end
 
 
         %- color stuff ----------------------------------------------------
         colormap(ax2, cm_source)
         if (clim(3) ~= 0 || clim(4) ~= 0)
-            caxis([clim(3), clim(4)]);
+            caxis(ax2, [clim(3), clim(4)]);
         end
         cb = colorbar;
         ylabel(cb, '[kg^2 m^{-2} s^{-2}]')
@@ -179,28 +177,26 @@ function plot_models(structure, source, array, clim)
 
 
         %- labels ---------------------------------------------------------
-        xlabels = [0, 200, 400];
-        ylabels = [0, 200, 400];
-        set(ax2, 'XTick', xlabels);
-        xlim([0, Lx])
-        ylim([0, Lz])
-        xlabel('x [km]')
+        set(ax2, 'XTick', [0, 200, 400]);
+        xlim(ax2, [0, Lx])
+        ylim(ax2, [0, Lz])
+        xlabel(ax2, 'x [km]')
         if (isempty(structure))
-            ylabel('z [km]')
-            set(ax2, 'YTick', ylabels);
+            ylabel(ax2, 'z [km]')
+            set(ax2, 'YTick', [0, 200, 400]);
         else
             set(ax2, 'YTick', []);
         end
 
-        title('source', 'FontSize', 14)
+        title(ax2, 'source', 'FontSize', 14)
 
 
         %- layout ---------------------------------------------------------
-        shading interp
-        grid on
-        box on
+        shading(ax2, 'interp')
+        grid(ax2, 'on')
+        box(ax2, 'on')
         set(ax2, 'LineWidth', 2)
-        axis square
+        axis(ax2, 'square')
 
 
     end

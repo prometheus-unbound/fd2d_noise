@@ -75,32 +75,32 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
         fig = figure;
         set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.6, 0.5])
 
+        %- prepare wavefield plot -----------------------------------------
         ax1 = subplot(1, 2, 1);
         hold on
-        set(ax1, 'FontSize', 12);
-        xlabel('x [km]')
-        ylabel('z [km]')
+        xlabel(ax1, 'x [km]')
+        ylabel(ax1, 'z [km]')
         set(ax1, 'XTick', [0, 200, 400])
         set(ax1, 'YTick', [0, 200, 400])
-        title('forward and adjoint wavefield', 'FontSize', 14)
+        title(ax1, 'forward and adjoint wavefield', 'FontSize', 14)
         cm = cbrewer('div', 'RdBu', 120);
         colormap(cm)
-        axis square
-        box on
-        set(gca, 'LineWidth', 2)
+        axis(ax1, 'square')
+        box(ax1, 'on')
+        set(ax1, 'LineWidth', 2, 'FontSize', 12)
 
-
+        
+        %- prepare kernel plot --------------------------------------------
         ax2 = subplot(1, 2, 2);
         hold on
-        set(ax2, 'FontSize', 12);
-        xlabel('x [km]')
+        xlabel(ax2, 'x [km]')
         set(ax2, 'XTick', [0, 200, 400])
         set(ax2, 'YTick', [])
-        title('kernel build-up', 'FontSize', 14)
-        colormap(cm)
-        axis square
-        box on
-        set(gca, 'LineWidth', 2)
+        title(ax2, 'kernel build-up', 'FontSize', 14)
+        colormap(ax2,cm)
+        axis(ax2,'square')
+        box(ax2,'on')
+        set(ax2, 'LineWidth', 2, 'FontSize', 12)
 
         cb1 = colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
             'Ticks', [], 'AxisLocation', 'in');
@@ -111,6 +111,7 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
         [width] = absorb_specs();
         max_u = 0;
         max_M_tn = 0;
+        % max_wavefield_fwd = 0;
 
     end
 
@@ -240,58 +241,74 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
             if (mod(n, plot_nth) == 0 || n == nt)
 
-                subplot(1, 2, 1)
-                cla
-
+                
+                %- plot wavefields ----------------------------------------
+                subplot(1, 2, 1)                                
                 max_u = max(max_u, max(max(abs(u + eps))));
                 max_M_tn = max(max_M_tn, max(max(abs(real(M_tn + eps)))));
+                % max_wavefield_fwd = max(0*max_wavefield_fwd, max(max(abs(wavefield_fwd(:,:,end-n+1) + eps))));
 
                 if (t(n) >= 0)
-                    pcolor(X / 1000, Z / 1000, u' / max_u + real(M_tn)' / max_M_tn);
-                elseif any(max(adjstf(:, 1:n), [], 2) > 0.05 * max(adjstf(:, 1:n_zero), [], 2))
-                    pcolor(X / 1000, Z / 1000, u' / max_u);
+                    pcolor(ax1, X / 1000, Z / 1000, u' / max_u + real(M_tn)' / max_M_tn);
+                elseif any(max(adjstf(:, 1:n), [], 2) > 0.07 * max(adjstf(:, 1:n_zero), [], 2))
+                    pcolor(ax1, X / 1000, Z / 1000, u' / max_u);
                 else
-                    pcolor(X / 1000, Z / 1000, 0 * u');
+                    pcolor(ax1, X / 1000, Z / 1000, 0 * u');
                 end
-                caxis([-0.2, 0.2])
 
-                plot(ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ...
-                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 8)
-                plot(rec(:, 1) / 1000, rec(:, 2) / 1000, ...
-                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8)
+                % pcolor(ax1, X / 1000, Z / 1000, u' / max_u + wavefield_fwd(:,:,end-n+1)' / max_wavefield_fwd);                
+                caxis(ax1, [-0.3, 0.3])
 
-                plot([width, Lx - width] / 1000, [width, width] / 1000, 'k--');
-                plot([width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
-                plot([width, width] / 1000, [width, Lz - width] / 1000, 'k--')
-                plot([Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
+                
+                %- plot array ---------------------------------------------
+                plot(ax1, ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ...
+                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
+                plot(ax1, rec(:, 1) / 1000, rec(:, 2) / 1000, ...
+                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
 
-                shading interp
+                
+                %- plot absorbing boundaries ------------------------------
+                plot(ax1, [width, Lx - width] / 1000, [width, width] / 1000, 'k--');
+                plot(ax1, [width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
+                plot(ax1, [width, width] / 1000, [width, Lz - width] / 1000, 'k--')
+                plot(ax1, [Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
+
+                shading(ax1, 'interp')
 
 
+                
+                %- plot kernel --------------------------------------------
                 subplot(1, 2, 2)
                 if (t(n) >= 0)
-                    pcolor(X / 1000, Z / 1000, K_source')
+                    pcolor(ax2, X / 1000, Z / 1000, K_source')
                     m = max(max(abs(K_source)));
-                    caxis([- 0.6 * m, 0.6 * m]);
+                    caxis(ax2, [- 0.6 * m, 0.6 * m]);
                 else
-                    pcolor(X / 1000, Z / 1000, 0 * K_source');
+                    pcolor(ax2, X / 1000, Z / 1000, 0 * K_source');
                 end
+                
+                % pcolor(ax2, X / 1000, Z / 1000, K_mu')
+                % m = max(max(abs(K_mu)));
+                % caxis(ax2, [- 0.6 * m, 0.6 * m]);
+                
+                
+                %- plot array ---------------------------------------------
+                plot(ax2, ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ...
+                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
+                plot(ax2, rec(:, 1) / 1000, rec(:, 2) / 1000, ...
+                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
 
-                plot(ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ...
-                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 8)
-                plot(rec(:, 1) / 1000, rec(:, 2) / 1000, ...
-                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 8)
-
-                plot([width, Lx - width] / 1000, [width, width] / 1000, 'k--');
-                plot([width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
-                plot([width, width] / 1000, [width, Lz - width] / 1000, 'k--')
-                plot([Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
-                xlim([0, Lx / 1000])
-                ylim([0, Lz / 1000])
+                
+                %- plot absorbing boundaries ------------------------------
+                plot(ax2, [width, Lx - width] / 1000, [width, width] / 1000, 'k--');
+                plot(ax2, [width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
+                plot(ax2, [width, width] / 1000, [width, Lz - width] / 1000, 'k--')
+                plot(ax2, [Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
+                xlim(ax2, [0, Lx / 1000])
+                ylim(ax2, [0, Lz / 1000])
 
                 set(cb2, 'Ticks', get(cb2, 'Limits'))
-
-                shading interp
+                shading(ax2, 'interp')
                 drawnow
 
             end

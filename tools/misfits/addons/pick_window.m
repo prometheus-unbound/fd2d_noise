@@ -23,27 +23,28 @@ function [left, right] = pick_window(u, u_0, t, measurement)
     %- open figure, set size, etc. ----------------------------------------
     fig = figure;
     set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.6, 0.5])
-    set(gca, 'FontSize', 14);
-    hold on
-    box on
+    ax1 = gca;
+    set(ax1, 'FontSize', 12);
+    hold(ax1, 'on')
+    box(ax1, 'on')
     legend_string = [];
 
 
     %- plot seismograms ---------------------------------------------------
-    plot(t, u, 'r')
+    plot(ax1, t, u, 'r')
     legend_string{end + 1} = 'synthetics';
     if( sum(u_0) ~= 0 )
-        plot(t, u_0, 'k')
+        plot(ax1, t, u_0, 'k')
         legend_string{end + 1} = 'data';
     end
 
 
     % legend, labels, title, limits ---------------------------------------
-    legend(legend_string)
-    xlabel('time [s]')
-    title('pick measurement window', 'FontSize', 16)
-    xlim([t(1), t(end)])
-    ylim([- 1.2 * max(max(abs(u)), max(abs(u_0))), 1.2 * max(max(abs(u)), max(abs(u_0)))])
+    legend(ax1, legend_string)
+    xlabel(ax1, 'time [s]')
+    title(ax1, 'pick measurement window', 'FontSize', 14)
+    xlim(ax1, [t(1), t(end)])
+    ylim(ax1, [- 1.2 * max(max(abs(u)), max(abs(u_0))), 1.2 * max(max(abs(u)), max(abs(u_0)))])
 
 
     %- check consistency of picks -----------------------------------------
@@ -60,23 +61,23 @@ function [left, right] = pick_window(u, u_0, t, measurement)
 
         if (strcmp(measurement, 'log_amplitude_ratio'))
             if (left * right < 0)
-                warning('for log_amplitude_ratio measurement, pick on either causal or acausal branch')
+                fprintf('\nfor log_amplitude_ratio measurement, pick on either causal or acausal branch\n')
                 continue
             end
         end
 
         if (left < t(1) || left > t(end))
-            warning('left pick is outside of bound')
+            fprintf('\nleft pick is outside of bound\n')
             continue
         end
 
         if (right < t(1) || right > t(end))
-            warning('right pick is outside of bound')
+            fprintf('\nright pick is outside of bound\n')
             continue
         end
 
         if (left >= right)
-            warning('left pick is not left')
+            fprintf('\nleft pick is not left\n')
             continue
         end
 

@@ -83,13 +83,14 @@ function [noise_source] = make_noise_source(make_plots)
     if (strcmp(make_plots, 'yes'))
 
         figure
-        set(gca, 'FontSize', 12)
-        hold on
-        grid on
-        plot(f_sample, noise_source.spectrum, 'r')
-        xlabel('frequency [Hz]');
-        xlim([f_sample(1), f_sample(end)])
-        title('spectrum for noise source', 'FontSize', 18)
+        ax1 = gca;
+        set(ax1, 'FontSize', 12)
+        hold(ax1, 'on')
+        grid(ax1, 'on')
+        plot(ax1, f_sample, noise_source.spectrum, 'r')
+        xlabel(ax1, 'frequency [Hz]');
+        xlim(ax1, [f_sample(1), f_sample(end)])
+        title(ax1, 'spectrum for noise source', 'FontSize', 14)
 
         if (exist([fd2d_path(), 'output', filesep, 'array_1_ref.mat'], 'file'))
             load([fd2d_path(), 'output', filesep, 'array_1_ref.mat']);

@@ -92,6 +92,7 @@ for i_ref = 1:n_ref
     end
     
     
+    % completed calculations for this reference station -------------------
     if(usr_par.verbose); fprintf('ref %i: done\n', i_ref); end
     
     
