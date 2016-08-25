@@ -84,7 +84,7 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
         set(ax1, 'YTick', [0, 200, 400])
         title(ax1, 'forward and adjoint wavefield', 'FontSize', 14)
         cm = cbrewer('div', 'RdBu', 120);
-        colormap(cm)
+        colormap(ax1,cm)
         axis(ax1, 'square')
         box(ax1, 'on')
         set(ax1, 'LineWidth', 2, 'FontSize', 12)
@@ -106,7 +106,7 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
             'Ticks', [], 'AxisLocation', 'in');
         ylabel(cb1, 'fields and kernels are normalized')
         cb2 = colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
-            'Ticks', [- 1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out');
+            'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out');
 
         [width] = absorb_specs();
         max_u = 0;
@@ -259,7 +259,7 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 % pcolor(ax1, X / 1000, Z / 1000, u' / max_u + wavefield_fwd(:,:,end-n+1)' / max_wavefield_fwd);                
                 
                 caxis(ax1, [-0.3, 0.3])
-                shading(ax1, 'interp')
+                shading interp
 
                 
                 %- plot array ---------------------------------------------
@@ -282,16 +282,16 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 if (t(n) >= 0)
                     pcolor(ax2, X / 1000, Z / 1000, K_source')
                     m = max(max(abs(K_source)));
-                    caxis(ax2, [- 0.6 * m, 0.6 * m]);
+                    caxis(ax2, [-0.6 * m, 0.6 * m]);
                 else
                     pcolor(ax2, X / 1000, Z / 1000, 0 * K_source');
                 end
                 
                 % pcolor(ax2, X / 1000, Z / 1000, K_mu')
                 % m = max(max(abs(K_mu)));
-                % caxis(ax2, [- 0.6 * m, 0.6 * m]);
+                % caxis(ax2, [-0.6 * m, 0.6 * m]);
                 
-                shading(ax2, 'interp')
+                shading interp
                 
                 
                 %- plot array ---------------------------------------------
