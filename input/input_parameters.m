@@ -38,10 +38,10 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
 
 
     %======================================================================
-    % parameter for kernel calculation
+    % parameter for structure kernel calculation
     %======================================================================
 
-    store_fwd_nth = 1;      % store forward wavefield every nth time step
+    store_fwd_nth = 4;      % store forward wavefield every nth time step
 
 
     %======================================================================
@@ -58,8 +58,8 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
     %======================================================================
 
     % source_type = 'homogeneous';
-    source_type = 'point';
-    % source_type = 'gaussian';
+    % source_type = 'point';
+    source_type = 'gaussian';
 
 
     %======================================================================

@@ -40,11 +40,11 @@ usr_par.verbose = false;
 % inversion parameters - steepest descent
 %==========================================================================
 
-options.init_step_length = 1024.0;
+options.init_step_length = 2^17;
 options.stepsize = 1.0;
 options.verbose = true;
 options.output_file = 'iterations_steepest_descent.tab';
-options.max_iterations = 100;
+options.max_iterations = 5;
 options.tolerance = 1e-2;
 
 
@@ -84,7 +84,10 @@ m0 = map_parameters_to_m(m_parameters, usr_par);
 
 
 %- run inversion ----------------------------------------------------------
+tic
 [flag, mfinal, usr_par] = optlib_steepest_descent(m0, options, usr_par);
+toc
+
 m_parameters_final = map_m_to_parameters( mfinal, usr_par );
 
 
