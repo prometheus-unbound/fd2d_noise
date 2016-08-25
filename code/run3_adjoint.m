@@ -102,11 +102,16 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
         box(ax2,'on')
         set(ax2, 'LineWidth', 2, 'FontSize', 12)
 
-        cb1 = colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
-            'Ticks', [], 'AxisLocation', 'in');
-        ylabel(cb1, 'fields and kernels are normalized')
-        cb2 = colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
-            'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out');
+        if( exist('OCTAVE_VERSION', 'builtin') ~= 0 )
+            cb1 = colorbar('Position', [0.50, 0.34, 0.02, 0.37]);
+            ylabel(cb1, 'fields and kernels are normalized')
+        else
+            cb1 = colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
+                'Ticks', [], 'AxisLocation', 'in');
+            ylabel(cb1, 'fields and kernels are normalized')
+            colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
+                'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out');
+        end
 
         [width] = absorb_specs();
         max_u = 0;
@@ -280,9 +285,10 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 %- plot kernel --------------------------------------------
                 subplot(1, 2, 2)
                 if (t(n) >= 0)
-                    pcolor(ax2, X / 1000, Z / 1000, K_source')
-                    m = max(max(abs(K_source)));
-                    caxis(ax2, [-0.6 * m, 0.6 * m]);
+                    pcolor(ax2, X / 1000, Z / 1000, K_source'/max(max(abs(K_source))))
+                    % m = max(max(abs(K_source)));
+                    % caxis(ax2, [-0.6 * m, 0.6 * m]);
+                    caxis(ax2, [-1, 1]);
                 else
                     pcolor(ax2, X / 1000, Z / 1000, 0 * K_source');
                 end
@@ -308,8 +314,7 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 plot(ax2, [Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
 
                 
-                %- set limits of colorbar and invoke plot -----------------
-                set(cb2, 'Ticks', get(cb2, 'Limits'))
+                %- invoke plot --------------------------------------------
                 drawnow
 
             end
