@@ -75,7 +75,7 @@ for i_ref = 1:n_ref
     end
     
     fprintf('ref %i: calculate correlations\n', i_ref)
-    [correlations(i_ref,:,:), C] = run2_forward_correlation(structure, noise_source, G_fft, src, rec, 1);
+    [correlations(i_ref,:,:)] = run2_forward_correlation(structure, noise_source, G_fft, src, rec, 0);
     
     fprintf('ref %i: done\n', i_ref)
     

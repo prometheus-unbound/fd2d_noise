@@ -12,6 +12,10 @@ addpath(genpath([pwd, filesep, 'output']))
 addpath(genpath([pwd, filesep, 'tools']))
 
 
+%- do not show warnings ---------------------------------------------------
+warning off
+
+
 %- for later runs, get path of fd2d_noise ---------------------------------
 % folders = strsplit(current_path, filesep);
 % id_project_folder = find(strncmp(folders, 'fd2d_noise', 10), 1, 'last');
@@ -29,7 +33,7 @@ addpath(genpath([pwd, filesep, 'tools']))
 
 
 %- cleanup ----------------------------------------------------------------
-clear current_path
+% clear current_path
 % clear folders; clear id_project_folder
 % clear fd2d_path; clear version_control
 return
