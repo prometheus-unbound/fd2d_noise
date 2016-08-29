@@ -238,8 +238,12 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         usr_par.network = [];
         usr_par.data = [];
         usr_par.config.n_basis_fct = n_basis_fct;
+        
         % usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
-%         usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
+        % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
+        usr_par.kernel.sigma.source = [1 1];
+        usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
+        
         [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
         m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
         

@@ -20,7 +20,8 @@ function [Hdm] = eigenvalues( dm )
     usr_par.network = load( '../output/interferometry/array_16_ref_hessian_small.mat' );
     usr_par.data = load( '../output/interferometry/data_16_ref_0_hessian_small.mat' );
     
-    usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
+    % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
+    usr_par.kernel.sigma.source = [1 1];
     
     usr_par.use_mex = 'yes';
     usr_par.type = 'source';

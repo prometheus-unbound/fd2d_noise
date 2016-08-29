@@ -77,24 +77,41 @@ function [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par)
 
     
     if( isfield(usr_par,'kernel') )
-        if( isfield( usr_par.kernel, 'imfilter') )
-            if( ~isfield( usr_par.kernel.imfilter, 'source' ) )
-                usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+        % if( isfield( usr_par.kernel, 'imfilter') )
+        %     if( ~isfield( usr_par.kernel.imfilter, 'source' ) )
+        %         usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+        %     end
+        %     if( ~isfield( usr_par.kernel.imfilter, 'structure' ) )
+        %         usr_par.kernel.imfilter.structure = fspecial('gaussian',[1 1], 1);
+        %     end            
+        % else 
+        %     usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+        %     usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
+        % end
+        
+        
+        if( isfield( usr_par.kernel, 'sigma') )
+            if( ~isfield( usr_par.kernel.sigma, 'source' ) )
+                usr_par.kernel.sigma.source = [1 1];
             end
-            if( ~isfield( usr_par.kernel.imfilter, 'structure' ) )
-                usr_par.kernel.imfilter.structure = fspecial('gaussian',[1 1], 1);
-            end            
-        else 
-            usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
-            usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
+            if( ~isfield( usr_par.kernel.sigma, 'structure' ) )
+                usr_par.kernel.sigma.structure = [1 1];
+            end
+        else
+            usr_par.kernel.sigma.source = [1 1];
+            usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
         end
+        
         
         if( ~isfield( usr_par.kernel, 'weighting') )
             usr_par.kernel.weighting = 0.5;
         end
     else
-        usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
-        usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
+        % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
+        % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
+        
+        usr_par.kernel.sigma.source = [1 1];
+        usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
         
         usr_par.kernel.weighting = 0.5;
     end

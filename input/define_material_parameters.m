@@ -198,13 +198,17 @@ if( strcmp(make_plots,'yes') )
     
     usr_par.network = []; usr_par.data = [];
     
-%     load('../models/random_0.1_norm.mat');
-%     m_parameters(:,:,end) = m_parameters(:,:,end) + 150.0e9 * signal; % .* pattern';
-    usr_par.kernel.imfilter.source = fspecial('gaussian', [1 1], 1);
-    usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
-%     usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
+    % load('../models/random_0.1_norm.mat');
+    % m_parameters(:,:,end) = m_parameters(:,:,end) + 150.0e9 * signal; % .* pattern';
+    
+    % usr_par.kernel.imfilter.source = fspecial('gaussian', [1 1], 1);
+    % usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
+    % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
     % usr_par.kernel.imfilter.source = fspecial('gaussian',[20 20], 10);
-    usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
+    % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;    
+    usr_par.kernel.sigma.source = [1 1];
+    usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
+    
     [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
     
     m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );

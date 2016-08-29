@@ -44,12 +44,15 @@ clear all
 
 usr_par.network = load('../output/interferometry/array_1_ref.mat');
 usr_par.data = load('../output/interferometry/data_1_ref_0.mat');
-usr_par.type = 'structure';
-usr_par.kernel.weighting = 0.0;
+usr_par.type = 'joint';
+usr_par.kernel.weighting = 0.5;
 
 usr_par.measurement.source = 'waveform_difference';
 usr_par.measurement.structure = 'waveform_difference';
         
+usr_par.kernel.sigma.source = [1e-3 1e-3];
+usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
+
 [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
 
 
@@ -223,7 +226,7 @@ usr_par.measurement.source = 'waveform_difference';
 % usr_par.measurement.source = 'amplitude_difference';
 usr_par.measurement.structure = 'waveform_difference';
 % usr_par.measurement.structure = 'log_amplitude_ratio';
-% usr_par.kernel.imfilter.source = fspecial('gaussian',[50 50], 50);
+
 usr_par.regularization.alpha = 0;
 usr_par.regularization.beta = 0;
 

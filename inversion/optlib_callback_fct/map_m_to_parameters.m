@@ -31,8 +31,16 @@ if( strcmp( usr_par.ring.switch, 'yes' ) )
     
 else
     
-    m_parameters(ix:end-ix+1, iz:end-iz+1, 1:end-1) = imfilter( m_parameters(ix:end-ix+1, iz:end-iz+1, 1:end-1) , usr_par.kernel.imfilter.source, 'circular' );
-    m_parameters(ix:end-ix+1, iz:end-iz+1, end) = imfilter( m_parameters(ix:end-ix+1, iz:end-iz+1, end) , usr_par.kernel.imfilter.structure, 'circular' );
+    % m_parameters(ix:end-ix+1, iz:end-iz+1, 1:end-1) = imfilter( m_parameters(ix:end-ix+1, iz:end-iz+1, 1:end-1) , usr_par.kernel.imfilter.source, 'circular' );
+    % m_parameters(ix:end-ix+1, iz:end-iz+1, end) = imfilter( m_parameters(ix:end-ix+1, iz:end-iz+1, end) , usr_par.kernel.imfilter.structure, 'circular' );
+    
+    [Lx, Lz] = input_parameters();
+    [~, ~, x, z] = define_computational_domain(Lx, Lz, usr_par.config.nx, usr_par.config.nz);
+    
+    for i = 1:size(m_parameters,3)-1
+        m_parameters(ix:end-ix+1, iz:end-iz+1, i) = gaussblur2d( m_parameters(ix:end-ix+1, iz:end-iz+1, i), x(ix:end-ix+1), z(iz:end-iz+1), usr_par.kernel.sigma.source );
+    end
+    m_parameters(ix:end-ix+1, iz:end-iz+1, end) = gaussblur2d( m_parameters(ix:end-ix+1, iz:end-iz+1, end), x(ix:end-ix+1), z(iz:end-iz+1), usr_par.kernel.sigma.structure );
     
 end
 

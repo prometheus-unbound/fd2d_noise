@@ -54,11 +54,15 @@ usr_par.kernel.weighting = 0.5;
 
 
 % design gaussian filter for smoothing of kernel (set second input variable to [1,1] to turn it off)
-usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
+% usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
-usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
+% usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
+
+usr_par.kernel.sigma.source = [1 1];
+usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
+
 
 
 % parameterize source distribution as ring

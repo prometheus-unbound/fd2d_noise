@@ -30,8 +30,11 @@ usr_par.model(it+1) = orderfields( model );
 
 
 %- save model -------------------------------------------------------------
-model.imfilter.source = usr_par.kernel.imfilter.source;
-model.imfilter.structure = usr_par.kernel.imfilter.structure;
+% model.imfilter.source = usr_par.kernel.imfilter.source;
+% model.imfilter.structure = usr_par.kernel.imfilter.structure;
+
+model.sigma.source = usr_par.kernel.sigma.source;
+model.sigma.structure = usr_par.kernel.sigma.structure;
 model.config.n_basis_fct = usr_par.config.n_basis_fct;
 model.config.nx = usr_par.config.nx;
 model.config.nz = usr_par.config.nz;

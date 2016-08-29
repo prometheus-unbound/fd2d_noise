@@ -34,23 +34,29 @@ else
     usr_par.ring.thickness = 2.0e5;
     usr_par.ring.taper_strength = 70e8;
         
-%     usr_par.ring.switch = 'no';
-%     usr_par.ring.x_center_ring = 1.0e6;
-%     usr_par.ring.z_center_ring = 1.0e6;
-%     usr_par.ring.radius = 6.9e5;
-%     usr_par.ring.thickness = 1.0e5;
-%     usr_par.ring.taper_strength = 10e8;
+    % usr_par.ring.switch = 'no';
+    % usr_par.ring.x_center_ring = 1.0e6;
+    % usr_par.ring.z_center_ring = 1.0e6;
+    % usr_par.ring.radius = 6.9e5;
+    % usr_par.ring.thickness = 1.0e5;
+    % usr_par.ring.taper_strength = 10e8;
 
     % usr_par.ring = model.ring;
    
-    if( isfield(model.imfilter, 'source') )
-        usr_par.kernel.imfilter.source = model.imfilter.source;
-        usr_par.kernel.imfilter.structure = model.imfilter.structure;
-        % usr_par.config.n_basis_fct = model.config.n_basis_fct;
-    else
-        usr_par.kernel.imfilter.source = model.imfilter;
-        usr_par.kernel.imfilter.structure = model.imfilter;
-        % usr_par.config.n_basis_fct = model.config.n_basis_fct;
+    
+    if( isfield(model, 'sigma') )
+        usr_par.kernel.sigma.source = model.sigma.source;
+        usr_par.kernel.sigma.structure = model.sigma.structure;
+    end
+    
+    if( isfield(model, 'imfilter') )
+        if( isfield(model.imfilter, 'source') )
+            usr_par.kernel.imfilter.source = model.imfilter.source;
+            usr_par.kernel.imfilter.structure = model.imfilter.structure;
+        else
+            usr_par.kernel.imfilter.source = model.imfilter;
+            usr_par.kernel.imfilter.structure = model.imfilter;
+        end
     end
     
     if( isfield(model, 'config') )

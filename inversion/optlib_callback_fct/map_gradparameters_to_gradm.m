@@ -34,8 +34,16 @@ if( strcmp( usr_par.ring.switch, 'yes' ) )
     
 else
     
-    temp(ix:end-ix+1, iz:end-iz+1, 1:end-1) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, 1:end-1), usr_par.kernel.imfilter.source, 'circular' );
-    temp(ix:end-ix+1, iz:end-iz+1, end) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, end), usr_par.kernel.imfilter.structure, 'circular' );
+    % temp(ix:end-ix+1, iz:end-iz+1, 1:end-1) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, 1:end-1), usr_par.kernel.imfilter.source, 'circular' );
+    % temp(ix:end-ix+1, iz:end-iz+1, end) = imfilter( grad_parameters(ix:end-ix+1, iz:end-iz+1, end), usr_par.kernel.imfilter.structure, 'circular' );
+    
+    [Lx, Lz] = input_parameters();
+    [~, ~, x, z] = define_computational_domain(Lx, Lz, usr_par.config.nx, usr_par.config.nz);
+    
+    for i = 1:size(temp,3)-1
+        temp(ix:end-ix+1, iz:end-iz+1, i) = gaussblur2d( grad_parameters(ix:end-ix+1, iz:end-iz+1, i), x(ix:end-ix+1), z(iz:end-iz+1), usr_par.kernel.sigma.source );
+    end
+    temp(ix:end-ix+1, iz:end-iz+1, end) = gaussblur2d( grad_parameters(ix:end-ix+1, iz:end-iz+1, end), x(ix:end-ix+1), z(iz:end-iz+1), usr_par.kernel.sigma.structure );
      
 end
 
