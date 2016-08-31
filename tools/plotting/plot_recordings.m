@@ -12,7 +12,6 @@ spacing = 2;
 a = 0;
 
 %- convert to velocity if wanted ------------------------------------------
-
 nt = length(t);
 
 if strcmp(veldis,'vel')
@@ -29,8 +28,13 @@ if strcmp(veldis,'vel')
 end
 
 
-%- plot recordings with ---------------------------------------------------
+%- filter displacement recordings -----------------------------------------
+% for i_rec = 1:size(u, 1)
+%     u(i_rec, :) = filter_correlations( u(i_rec, :), t, 0.02, 0.2, 1 );
+% end
+    
 
+%- plot recordings with ---------------------------------------------------
 set(gca,'FontSize',20)
 hold on
 

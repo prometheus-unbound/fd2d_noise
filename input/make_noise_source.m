@@ -241,7 +241,7 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         
         % usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
         % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
-        usr_par.kernel.sigma.source = [1 1];
+        usr_par.kernel.sigma.source = [5e4 5e4];
         usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
         
         [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
@@ -249,7 +249,7 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         
         % cm = cbrewer('div','RdBu',120,'PCHIP');
         % plot_models( m_parameters, n_basis_fct, array, [-0.2 1.1 3.8e3 4.2e3], 'no', 'no', cm );       
-        plot_models( m_parameters, n_basis_fct, array, [0 7 3.8e3 4.2e3], 'no', 'no' );       
+        plot_models( m_parameters, n_basis_fct, array, [0 0 3.8e3 4.2e3], 'no', 'no' );       
         
     end
     

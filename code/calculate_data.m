@@ -10,14 +10,14 @@ addpath(genpath('../'))
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usr_par.cluster = 'local';
+usr_par.cluster = 'monch';
 % 'local';
 % 'monch';
 % 'euler';
 % 'brutus';
 
 
-usr_par.use_mex = 'no';
+usr_par.use_mex = 'yes';
 % 'yes'
 % 'no'
 
@@ -33,56 +33,56 @@ usr_par.initial.mu_0 = 4.8e10;
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
 % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
-usr_par.kernel.sigma.source = [1 1];
+usr_par.kernel.sigma.source = [5e4 5e4];
 usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
 
 
 % define receiver array
-% nr_x = 4;
-% nr_z = 4;
-% array = zeros(nr_x*nr_z,2);
-% for i = 1:nr_x
-%     for j = 1:nr_z        
-%         
-%         % big - normal config
-%         array( (i-1)*nr_z + j, 1 ) = 0.9e6 + ( i-1 ) * 0.25e6;
-%         array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 ) * 0.25e6;
-% 
-%         
-%         % small - normal config
-%         % array( (i-1)*nr_z + j, 1 ) = 1.8e5 + ( i-1 ) * 0.5e5;
-%         % array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 ) * 0.5e5;
-% 
-%         % small - full coverage
-%         % array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
-%         % array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.8e5;
-% 
-%         % small - japan
-%         % array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
-%         % array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.4e5;
-%         
-%         % small - japan
-%         % array( nr_x*nr_z + (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
-%         % array( nr_x*nr_z + (i-1)*nr_z + j, 2 ) = 2.8e5 + ( j-1 ) * 0.4e5;
-% 
-%                 
-%         % big - line setup
-%         %array( (i-1)*nr_z + j, 1 ) = 0.5e6 + ( i-1 ) * 0.1e6;
-%         % array( (i-1)*nr_z + j, 2 ) = 1.0e6;
-%         
-%         % small - line setup
-%         % array( (i-1)*nr_z + j, 1 ) = 1.0e5 + ( i-1 ) * 0.1e5;
-%         % array( (i-1)*nr_z + j, 2 ) = 2.0e5;
-%         
-%     end
-% end
+nr_x = 4;
+nr_z = 4;
+array = zeros(nr_x*nr_z,2);
+for i = 1:nr_x
+    for j = 1:nr_z        
+        
+        % big - normal config
+        array( (i-1)*nr_z + j, 1 ) = 0.9e6 + ( i-1 ) * 0.25e6;
+        array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 ) * 0.25e6;
+
+        
+        % small - normal config
+        % array( (i-1)*nr_z + j, 1 ) = 1.8e5 + ( i-1 ) * 0.5e5;
+        % array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 ) * 0.5e5;
+
+        % small - full coverage
+        % array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
+        % array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.8e5;
+
+        % small - japan
+        % array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
+        % array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.4e5;
+        
+        % small - japan
+        % array( nr_x*nr_z + (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
+        % array( nr_x*nr_z + (i-1)*nr_z + j, 2 ) = 2.8e5 + ( j-1 ) * 0.4e5;
+
+                
+        % big - line setup
+        %array( (i-1)*nr_z + j, 1 ) = 0.5e6 + ( i-1 ) * 0.1e6;
+        % array( (i-1)*nr_z + j, 2 ) = 1.0e6;
+        
+        % small - line setup
+        % array( (i-1)*nr_z + j, 1 ) = 1.0e5 + ( i-1 ) * 0.1e5;
+        % array( (i-1)*nr_z + j, 2 ) = 2.0e5;
+        
+    end
+end
 
 
 % small test array, only two receivers close to each other
-array = zeros(2,2);
-array(1,1) = 2.5e4;
-array(2,1) = 3.5e4;
-array(:,2) = 3.0e4;
+% array = zeros(2,2);
+% array(1,1) = 2.5e4;
+% array(2,1) = 3.5e4;
+% array(:,2) = 3.0e4;
 
 % array = zeros(2,2);
 % array(1,1) = 1.25e5;
@@ -91,7 +91,7 @@ array(:,2) = 3.0e4;
 
 
 % select receivers that will be reference stations
-ref_stat = array(1,:);
+ref_stat = array; %(1,:);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,12 +115,12 @@ m_parameters(:,:,1:end-1) = make_noise_source( source_type, n_basis_fct );
 m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
 
 
-m_parameters(:,:,end) = m_parameters(:,:,end) + 1e9;
-if( n_basis_fct == 0 )
-    m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + rand(nx,nz);
-else
-    m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + rand(nx,nz,n_basis_fct);
-end
+% m_parameters(:,:,end) = m_parameters(:,:,end) + 1e9;
+% if( n_basis_fct == 0 )
+%     m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + rand(nx,nz);
+% else
+%     m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + rand(nx,nz,n_basis_fct);
+% end
 
 
 if(model_type==666)

@@ -10,7 +10,7 @@ if [ $brutus -gt 1 ] || [ $euler -gt 1 ]; then
 fi
 
 if [ $monch -gt 1 ]; then
-    module load matlab/r2015a
+    module load matlab/r2016a
 fi
 
 
@@ -51,7 +51,7 @@ cat <<EOF > eigenvalues.sh
 # Begin work section #
 ######################
 
-module load matlab/r2015a
+module load matlab/r2016a
 matlab -nodisplay -r start_eigenvalues
 
 EOF

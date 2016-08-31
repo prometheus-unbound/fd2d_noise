@@ -6,7 +6,7 @@ clear all
 [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, fw_nth] = input_parameters();
 
 
-path = '~/Desktop/model_21.mat';
+path = '~/Desktop/model_59.mat';
 % path2 = '~/Desktop/model_23.mat';
 
 

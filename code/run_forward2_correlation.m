@@ -84,13 +84,6 @@ for n = 1:nt
     end
 end
 
-ifft_coeff_2 = zeros(n_ftc,n_sample) + 1i*zeros(n_ftc,n_sample);
-for n = 1:nt
-    for k = 1:n_sample
-        ifft_coeff_2(n,k) = 1/sqrt(2*pi) * exp( 1i*w_sample(k)*t(n) ) * dw;
-    end
-end
-
 
 %- allocate dynamic fields ------------------------------------------------
 v = zeros(nx,nz);

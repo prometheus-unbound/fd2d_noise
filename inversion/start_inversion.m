@@ -60,7 +60,7 @@ usr_par.kernel.weighting = 0.5;
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
 % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
-usr_par.kernel.sigma.source = [1 1];
+usr_par.kernel.sigma.source = [5e4 5e4];
 usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
 
 
@@ -76,7 +76,7 @@ usr_par.ring.taper_strength = 70e8;
 
 % load array with reference stations and data
 usr_par.network = load('../output/interferometry/array_16_ref.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_0_h1g_iugg_smooth.mat');
+usr_par.data = load('../output/interferometry/data_16_ref_0_gaussian_smoothing_test.mat');
 
 
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')
@@ -102,9 +102,9 @@ usr_par.regularization.weighting = weighting( nx, nz );
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% FOR LBFGS
-options.tolerance = 1e-3;
-options.successive_change = 1e-16;
-options.successive_iterations = 400;
+options.tolerance = 5e-3;
+options.successive_change = 1e-3;
+options.successive_iterations = 5;
 options.max_iterations = 500;
 options.wolfe_try_to_increase_step_length = false;
 options.verbose = true;
