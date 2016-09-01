@@ -10,9 +10,7 @@ usr_par.type = 'source';
 
 usr_par.measurement.type = 'waveform_difference';
 % 'log_amplitude_ratio';
-% 'amplitude_difference';
 % 'waveform_difference';
-% 'cc_time_shift';
 
 
 usr_par.measurement.mode = 'manual';
@@ -27,7 +25,7 @@ usr_par.data_independent = 'yes';
 
 % provide name of array and of data file
 array_file = 'array_nref-1.mat';
-data_file = 'correlations_nref-1_model-1_source-gaussian.mat';
+data_file = 'correlations_nref-1_model-1_source-homogeneous.mat';
 
 
 usr_par.verbose = true;
@@ -41,6 +39,20 @@ usr_par.verbose = true;
 
 %- check path -------------------------------------------------------------
 fd2d_path = fd2d_path();
+
+
+%- data independent only works for waveform differences -------------------
+if( strcmp(usr_par.data_independent, 'yes') )
+    
+    if( ~strcmp(usr_par.measurement.type, 'waveform_difference') )
+        error('data independent measurements only work here for waveform differences')
+    end
+    
+    if( strcmp(usr_par.type, 'structure') )
+        error('data independent measurements only for source kernels')
+    end
+    
+end
 
 
 %- get configuration and set up time vector -------------------------------
