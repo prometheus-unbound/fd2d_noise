@@ -52,7 +52,7 @@ function [structure] = define_material_parameters(make_plots)
         end
 
 
-        %======================================================================
+        %==================================================================
         % define your own velocity model, e.g.
         %
         % elseif( model_type == 3 )
@@ -60,7 +60,7 @@ function [structure] = define_material_parameters(make_plots)
         %     structure.rho = 3000.0 * ones(nx, nz) + ...;
         %     structure.mu = 4.8e10 * ones(nx, nz) + ...;
         %
-        %======================================================================
+        %==================================================================
 
 
     end
