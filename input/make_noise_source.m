@@ -10,7 +10,7 @@
 %
 % output:
 %--------
-% noise_source: contains spectrum and distribution of psd
+% noise_source: contains spectrum and distribution of psd [kg^2 m^-2 s^-2]
 %
 %==========================================================================
 
@@ -23,21 +23,21 @@ function [noise_source] = make_noise_source(make_plots)
     %======================================================================
 
     % specify spectrum
-    f_peak = 1 / 9;
-    bandwidth = 0.04;
+    f_peak = 1 / 9;                     % in Hz
+    bandwidth = 0.04;                   % in Hz
     strength = 1;
 
     % specify point location, width and strength
-    point.x_source = 2.0e5;
-    point.z_source = 1.7e5;
-    point.source_width = 5e3;
-    point.magnitude = 5.0;
+    point.x_source = 2.0e5;             % in m
+    point.z_source = 1.7e5;             % in m
+    point.source_width = 5e3;           % in m
+    point.magnitude = 5.0;              % in kg^2 m^-2 s^-2
 
     % specify location, width and strength of Gaussian anomaly
-    gaussian.x_source = 1.0e5;
-    gaussian.z_source = 1.6e5;
-    gaussian.source_width = 3e4;
-    gaussian.magnitude = 15.0;
+    gaussian.x_source = 2.0e5;          % in m
+    gaussian.z_source = 2.0e5;          % in m
+    gaussian.source_width = 3e4;        % in m
+    gaussian.magnitude = 15.0;          % in kg^2 m^-2 s^-2
 
 
     %======================================================================

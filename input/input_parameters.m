@@ -43,7 +43,7 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
 
     model_type = 1;
     % 1 = homogeneous 
-    % 2 = two anomalies
+    % 2 = slow anomaly in the center of the domain
 
 
     %======================================================================

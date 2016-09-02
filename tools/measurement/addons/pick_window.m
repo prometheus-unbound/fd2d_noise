@@ -1,10 +1,10 @@
 
 %==========================================================================
-% [left,right] = pick_window( u, u_0, t, measurement )
+% [left,right] = pick_window( u, u_0, t, measurement, i )
 %==========================================================================
 
 
-function [left, right] = pick_window(u, u_0, t, measurement)
+function [left, right] = pick_window(u, u_0, t, measurement, i)
 
 
     %- convert to velocity ------------------------------------------------
@@ -42,7 +42,7 @@ function [left, right] = pick_window(u, u_0, t, measurement)
     % legend, labels, title, limits ---------------------------------------
     legend(ax1, legend_string)
     xlabel(ax1, 'time [s]')
-    title(ax1, 'pick measurement window', 'FontSize', 14)
+    title(ax1, ['pick measurement window - correlation ' num2str(i)], 'FontSize', 14)
     xlim(ax1, [t(1), t(end)])
     ylim(ax1, [- 1.2 * max(max(abs(u)), max(abs(u_0))), 1.2 * max(max(abs(u)), max(abs(u_0)))])
 
@@ -53,11 +53,10 @@ function [left, right] = pick_window(u, u_0, t, measurement)
         fprintf('\n')
         disp('pick left start of window:');
         [left, ~] = ginput(1);
-        fprintf('left pick: %5.2f\n', left)
-        fprintf('\n')
+        fprintf('left pick: %5.2f\n\n', left)
         disp('pick end of window:');
         [right, ~] = ginput(1);
-        fprintf('right pick: %5.2f\n', right)
+        fprintf('right pick: %5.2f\n\n', right)
 
         if (strcmp(measurement, 'log_amplitude_ratio'))
             if (left * right < 0)

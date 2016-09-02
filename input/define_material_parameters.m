@@ -69,8 +69,7 @@ function [structure] = define_material_parameters(make_plots)
     %- plot model ---------------------------------------------------------
     if (strcmp(make_plots, 'yes'))
 
-        array = [];
-        plot_models(sqrt(structure.mu ./ structure.rho), [], array, [0, 0, 0, 0]);
+        plot_models(sqrt(structure.mu ./ structure.rho), [], [], [0, 0, 0, 0]);
 
     end
 

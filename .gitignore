@@ -4,3 +4,4 @@ code/mex_functions/codegen
 *.mat
 *~
 *.mexmaci64
+.DS_Store

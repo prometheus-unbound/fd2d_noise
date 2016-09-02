@@ -48,7 +48,7 @@ function [misfit, adjstf] = make_adjoint_sources(u, u_0, t, measurement, src, re
         %- select time windows --------------------------------------------
         if( strcmp(mode, 'manual') )
 
-            [left, right] = pick_window(u(i_rec,:), u_0(i_rec,:), t, measurement);
+            [left, right] = pick_window(u(i_rec,:), u_0(i_rec,:), t, measurement, i_rec);
 
         else
 

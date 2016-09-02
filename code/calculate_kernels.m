@@ -13,19 +13,19 @@ usr_par.measurement.type = 'waveform_difference';
 % 'waveform_difference';
 
 
-usr_par.measurement.mode = 'manual';
+usr_par.measurement.mode = 'auto';
 % manual
 % auto
 
 
-usr_par.data_independent = 'yes';
+usr_par.data_independent = 'no';
 % yes
 % no
 
 
 % provide name of array and of data file
 array_file = 'array_nref-1.mat';
-data_file = 'correlations_nref-1_model-1_source-homogeneous.mat';
+data_file = 'correlations_nref-1_model-1_source-gaussian.mat';
 
 
 usr_par.verbose = true;

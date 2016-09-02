@@ -9,18 +9,30 @@
 % array(2,1) = 3.5e4;
 % array(:,2) = 3.0e4;
 
-% array for kernel computation
-array = zeros(2, 2);
-array(1, 1) = 1.4e5;
-array(2, 1) = 2.6e5;
-array(1:2, 2) = 2.0e5;
-
+% design array [m]
+% x-components: array(:,1)
+% z-components: array(:,2)
+% array = zeros(2, 2);
+% array(1, 1) = 1.4e5;
+% array(2, 1) = 2.6e5;
+% array(1:2, 2) = 2.0e5;
+% 
 % array(3:4, 1) = 2.0e5;
 % array(3, 2) = 1.4e5;
 % array(4, 2) = 2.6e5;
 
+nr_x = 4;
+nr_z = 4;
+array = zeros(nr_x*nr_z,2);
+for i = 1:nr_x
+    for j = 1:nr_z        
+        array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
+        array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.8e5;
+    end
+end
+
 % select receivers that will be reference stations
-ref_stat = array(1,:);
+ref_stat = array(6,:);
 
 
 %==========================================================================

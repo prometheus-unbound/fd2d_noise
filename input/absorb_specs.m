@@ -6,7 +6,7 @@
 %
 % output:
 %--------
-% width: width of the boundary layer in meters
+% width: width of the boundary layer [m]
 % absorb_left: absorb waves on the left boundary
 % absorb_right: absorb waves on the right boundary
 % absorb_top: absorb waves on the top boundary

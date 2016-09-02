@@ -6,7 +6,7 @@
 %
 % output:
 %--------
-% f_sample: frequency vector
+% f_sample: frequency vector [Hz]
 % n_sample: number of frequency samples
 % w_sample: frequency vector converted to angular frequency
 % dw: step in angular frequency
@@ -18,7 +18,7 @@
 function [f_sample, n_sample, w_sample, dw, freq_samp] = input_interferometry()
 
 
-    f_sample = 0.02:0.004:0.2;
+    f_sample = 0.02:0.004:0.2;      % in Hz
     freq_samp = 5;
 
 
