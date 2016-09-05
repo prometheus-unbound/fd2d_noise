@@ -72,18 +72,16 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
 
         xlabel(ax1, 'x [km]')
         ylabel(ax1, 'z [km]')
-        set(ax1, 'XTick', [0, 200, 400])
-        set(ax1, 'YTick', [0, 200, 400])
 
         title(ax1, 'correlation wavefield', 'FontSize', 14)
         cm = cbrewer('div', 'RdBu', 120);
         colormap(cm)
         cb = colorbar;
-        axis(ax1, 'square')
+        axis(ax1, 'image')
         box(ax1, 'on')
         set(ax1, 'LineWidth', 2)
 
-        [width] = absorb_specs();
+        [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_specs();
 
     end
 
@@ -198,10 +196,15 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 
                 
                 %- plot absorbing boundaries ------------------------------
-                plot(ax1, [width, Lx - width] / 1000, [width, width] / 1000, 'k--');
-                plot(ax1, [width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
-                plot(ax1, [width, width] / 1000, [width, Lz - width] / 1000, 'k--')
-                plot(ax1, [Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
+                if(absorb_bottom); plot(ax1, [absorb_left*width, Lx - absorb_right*width] / 1000, [width, width] / 1000, 'k--'); end
+                if(absorb_top); plot(ax1, [absorb_left*width, Lx - absorb_right*width] / 1000, [Lz - width, Lz - width] / 1000, 'k--'); end
+                if(absorb_left); plot(ax1, [width, width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
+                if(absorb_right); plot(ax1, [Lx - width, Lx - width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
+                
+                xlabels = get(ax1, 'XTick');
+                ylabels = get(ax1, 'YTick');
+                set(ax1, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
+                set(ax1, 'YTick', [ylabels(1), ylabels(ceil(length(ylabels) / 2)), ylabels(end)])
                 
                 set(ax1, 'FontSize', 12, 'position', [0.17, 0.204, 0.599, 0.624]);
                 drawnow

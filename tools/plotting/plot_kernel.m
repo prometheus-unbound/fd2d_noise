@@ -16,7 +16,7 @@ function plot_kernel(gradient, usr_par)
     %- configuration ------------------------------------------------------
     [Lx, Lz, nx, nz] = input_parameters();
     [X, Z] = define_computational_domain(Lx, Lz, nx, nz);
-    [width] = absorb_specs();
+    [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_specs();
 
 
     %- convert to km ------------------------------------------------------
@@ -34,8 +34,6 @@ function plot_kernel(gradient, usr_par)
 
     xlabel(ax1, 'x [km]')
     ylabel(ax1, 'z [km]')
-    set(ax1, 'XTick', [0, 200, 400])
-    set(ax1, 'YTick', [0, 200, 400])
     title(ax1, [usr_par.type, ' kernel'], 'FontSize', 14)
 
     handle = [];
@@ -63,11 +61,14 @@ function plot_kernel(gradient, usr_par)
 
     %- plot absorbing boundaries ------------------------------------------
     level = [1.1 * m, 1.1 * m];
-    handle(end + 1,:) = plot3(ax1, [width, Lx - width], [width, width], level, 'k--');
-    plot3(ax1, [width, Lx - width], [Lz - width, Lz - width], level, 'k--')
-    plot3(ax1, [width, width], [width, Lz - width], level, 'k--')
-    plot3(ax1, [Lx - width, Lx - width], [width, Lz - width], level, 'k--')
-    legend_string{end + 1} = 'absorbing boundaries';
+    if(absorb_bottom); handle(1,:) = plot3(ax1, [absorb_left*width, Lx - absorb_right*width], [width, width], level, 'k--'); end
+    if(absorb_top); handle(1,:) = plot3(ax1, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], level, 'k--'); end
+    if(absorb_left); handle(1,:) = plot3(ax1, [width, width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
+    if(absorb_right); handle(1,:) = plot3(ax1, [Lx - width, Lx - width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
+    
+    if( absorb_left || absorb_right || absorb_top || absorb_bottom );
+        legend_string{end + 1} = 'absorbing boundaries';
+    end
 
 
     %- plot array ---------------------------------------------------------
@@ -81,11 +82,15 @@ function plot_kernel(gradient, usr_par)
 
 
     %- layout -------------------------------------------------------------
+    xlabels = get(ax1, 'XTick');
+    ylabels = get(ax1, 'YTick');
+    set(ax1, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
+    set(ax1, 'YTick', [ylabels(1), ylabels(ceil(length(ylabels) / 2)), ylabels(end)])
     shading(ax1, 'interp')
     grid(ax1, 'on')
     box(ax1, 'on')
     set(ax1, 'LineWidth', 2)
-    axis(ax1, 'square')
+    axis(ax1, 'image')
 
     drawnow
 

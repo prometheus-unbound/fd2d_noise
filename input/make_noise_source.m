@@ -34,8 +34,8 @@ function [noise_source] = make_noise_source(make_plots)
     point.magnitude = 5.0;              % in kg^2 m^-2 s^-2
 
     % specify location, width and strength of Gaussian anomaly
-    gaussian.x_source = 2.0e5;          % in m
-    gaussian.z_source = 2.0e5;          % in m
+    gaussian.x_source = 1.0e5;          % in m
+    gaussian.z_source = 1.6e5;          % in m
     gaussian.source_width = 3e4;        % in m
     gaussian.magnitude = 15.0;          % in kg^2 m^-2 s^-2
 

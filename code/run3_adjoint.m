@@ -80,11 +80,9 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
         hold on
         xlabel(ax1, 'x [km]')
         ylabel(ax1, 'z [km]')
-        set(ax1, 'XTick', [0, 200, 400])
-        set(ax1, 'YTick', [0, 200, 400])
         cm = cbrewer('div', 'RdBu', 120);
         colormap(ax1,cm)
-        axis(ax1, 'square')
+        axis(ax1, 'image')
         box(ax1, 'on')
         set(ax1, 'LineWidth', 2, 'FontSize', 12)
 
@@ -92,12 +90,11 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
         %- prepare kernel plot --------------------------------------------
         ax2 = subplot(1, 2, 2);
         hold on
-        xlabel(ax2, 'x [km]')
-        set(ax2, 'XTick', [0, 200, 400])
+        xlabel(ax2, 'x [km]')        
         set(ax2, 'YTick', [])
         
         colormap(ax2,cm)
-        axis(ax2,'square')
+        axis(ax2,'image')
         box(ax2,'on')
         set(ax2, 'LineWidth', 2, 'FontSize', 12)
 
@@ -121,7 +118,7 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
         
         %- get absorbing boundary width and initialize max-variables ------
-        [width] = absorb_specs();
+        [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_specs();
         max_u = 0;
         max_M_tn = 0;
         % max_wavefield_fwd = 0;
@@ -283,10 +280,17 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
                 
                 %- plot absorbing boundaries ------------------------------
-                plot(ax1, [width, Lx - width] / 1000, [width, width] / 1000, 'k--');
-                plot(ax1, [width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
-                plot(ax1, [width, width] / 1000, [width, Lz - width] / 1000, 'k--')
-                plot(ax1, [Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
+                if(absorb_bottom); plot(ax1, [absorb_left*width, Lx - absorb_right*width] / 1000, [width, width] / 1000, 'k--'); end
+                if(absorb_top); plot(ax1, [absorb_left*width, Lx - absorb_right*width] / 1000, [Lz - width, Lz - width] / 1000, 'k--'); end
+                if(absorb_left); plot(ax1, [width, width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
+                if(absorb_right); plot(ax1, [Lx - width, Lx - width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
+                
+                
+                %- set labels ---------------------------------------------
+                xlabels = get(ax1, 'XTick');
+                ylabels = get(ax1, 'YTick');
+                set(ax1, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
+                set(ax1, 'YTick', [ylabels(1), ylabels(ceil(length(ylabels) / 2)), ylabels(end)])
 
 
                 
@@ -316,10 +320,15 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
                 
                 %- plot absorbing boundaries ------------------------------
-                plot(ax2, [width, Lx - width] / 1000, [width, width] / 1000, 'k--');
-                plot(ax2, [width, Lx - width] / 1000, [Lz - width, Lz - width] / 1000, 'k--')
-                plot(ax2, [width, width] / 1000, [width, Lz - width] / 1000, 'k--')
-                plot(ax2, [Lx - width, Lx - width] / 1000, [width, Lz - width] / 1000, 'k--')
+                if(absorb_bottom); plot(ax2, [absorb_left*width, Lx - absorb_right*width] / 1000, [width, width] / 1000, 'k--'); end
+                if(absorb_top); plot(ax2, [absorb_left*width, Lx - absorb_right*width] / 1000, [Lz - width, Lz - width] / 1000, 'k--'); end
+                if(absorb_left); plot(ax2, [width, width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
+                if(absorb_right); plot(ax2, [Lx - width, Lx - width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
+                
+                
+                %- set labels ---------------------------------------------
+                xlabels = get(ax2, 'XTick');
+                set(ax2, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
 
                 
                 %- invoke plot --------------------------------------------

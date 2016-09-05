@@ -23,12 +23,21 @@ function [misfit, adjstf] = cc_time_shift(u, u_0, win, t)
 
 
     %- compute time shift -------------------------------------------------
-    [cc, t_cc] = cross_correlation_td(win .* u, win .* u_0, t);
-    [~, i_max] = max(cc);
-    T = t_cc(i_max);
-    if (abs(T) > 3.5)
-        T = 0;
-    end
+    % if sum(u_0==0) == length(t)
+    %     
+    %     T = 1.0;
+    %     
+    % else
+        
+        [cc, t_cc] = cross_correlation_td(win .* u, win .* u_0, t);
+        [~, i_max] = max(cc);
+        T = t_cc(i_max);
+        
+        if (abs(T) > 3.5)
+            T = 0;
+        end
+        
+    % end
 
 
     %- compute misfit -----------------------------------------------------

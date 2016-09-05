@@ -17,7 +17,7 @@ function plot_models(structure, source, array, clim)
     %- configuration ------------------------------------------------------
     [Lx, Lz, nx, nz] = input_parameters();
     [X, Z] = define_computational_domain(Lx, Lz, nx, nz);
-    [width] = absorb_specs();
+    [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_specs();
 
 
     %- convert to km ------------------------------------------------------
@@ -40,8 +40,6 @@ function plot_models(structure, source, array, clim)
         set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.6, 0.5])
         orient landscape
     end
-    handle = [];
-    legend_string = [];
 
 
     %======================================================================
@@ -50,7 +48,9 @@ function plot_models(structure, source, array, clim)
 
     if (~isempty(structure))
 
-
+        handle = [];
+        legend_string = [];
+        
         if (~isempty(source))
             ax1 = subplot(1, 2, 1);
         else
@@ -68,11 +68,14 @@ function plot_models(structure, source, array, clim)
 
         %- plot absorbing boundaries --------------------------------------
         level = [1.1 * max(max(structure)), 1.1 * max(max(structure))];
-        handle(end + 1,:) = plot3(ax1, [width, Lx - width], [width, width], level, 'k--');
-        plot3(ax1, [width, Lx - width], [Lz - width, Lz - width], level, 'k--')
-        plot3(ax1, [width, width], [width, Lz - width], level, 'k--')
-        plot3(ax1, [Lx - width, Lx - width], [width, Lz - width], level, 'k--')
-        legend_string{end + 1} = 'absorbing boundaries';
+        if(absorb_bottom); handle(1,:) = plot3(ax1, [absorb_left*width, Lx - absorb_right*width], [width, width], level, 'k--'); end
+        if(absorb_top); handle(1,:) = plot3(ax1, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], level, 'k--'); end
+        if(absorb_left); handle(1,:) = plot3(ax1, [width, width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
+        if(absorb_right); handle(1,:) = plot3(ax1, [Lx - width, Lx - width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
+        
+        if( absorb_left || absorb_right || absorb_top || absorb_bottom );
+            legend_string{end + 1} = 'absorbing boundaries';
+        end
 
 
         %- plot array if given --------------------------------------------
@@ -101,8 +104,10 @@ function plot_models(structure, source, array, clim)
 
 
         %- labels ---------------------------------------------------------
-        set(ax1, 'XTick', [0, 200, 400]);
-        set(ax1, 'YTick', [0, 200, 400]);
+        xlabels = get(ax1, 'XTick');
+        ylabels = get(ax1, 'YTick');
+        set(ax1, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
+        set(ax1, 'YTick', [ylabels(1), ylabels(ceil(length(ylabels) / 2)), ylabels(end)])
         xlim(ax1, [0, Lx])
         ylim(ax1, [0, Lz])
         xlabel(ax1, 'x [km]')
@@ -115,7 +120,7 @@ function plot_models(structure, source, array, clim)
         grid(ax1, 'on')
         box(ax1, 'on')
         set(ax1, 'LineWidth', 2)
-        axis(ax1, 'square')
+        axis(ax1, 'image')
 
 
     end
@@ -124,9 +129,12 @@ function plot_models(structure, source, array, clim)
     %======================================================================
     % concerning source
     %======================================================================
-
+    
     if (~isempty(source))
-
+        
+        handle = [];
+        legend_string = [];
+        
         if (~isempty(structure))
             ax2 = subplot(1, 2, 2);
         else
@@ -144,11 +152,14 @@ function plot_models(structure, source, array, clim)
 
         %- plot absorbing boundaries --------------------------------------
         level = [1.1 * max(max(source)), 1.1 * max(max(source))];
-        handle(end + 1,:) = plot3(ax2, [width, Lx - width], [width, width], level, 'k--');
-        plot3(ax2, [width, Lx - width], [Lz - width, Lz - width], level, 'k--')
-        plot3(ax2, [width, width], [width, Lz - width], level, 'k--')
-        plot3(ax2, [Lx - width, Lx - width], [width, Lz - width], level, 'k--')
-        legend_string{end + 1} = 'absorbing boundaries';
+        if(absorb_bottom); handle(1,:) = plot3(ax2, [absorb_left*width, Lx - absorb_right*width], [width, width], level, 'k--'); end
+        if(absorb_top); handle(1,:) = plot3(ax2, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], level, 'k--'); end
+        if(absorb_left); handle(1,:) = plot3(ax2, [width, width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
+        if(absorb_right); handle(1,:) = plot3(ax2, [Lx - width, Lx - width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
+        
+        if( absorb_left || absorb_right || absorb_top || absorb_bottom );
+            legend_string{end + 1} = 'absorbing boundaries';
+        end
 
 
         %- plot array if given --------------------------------------------
@@ -177,13 +188,16 @@ function plot_models(structure, source, array, clim)
 
 
         %- labels ---------------------------------------------------------
-        set(ax2, 'XTick', [0, 200, 400]);
+        xlabels = get(ax2, 'XTick');
+        set(ax2, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
+                        
         xlim(ax2, [0, Lx])
         ylim(ax2, [0, Lz])
         xlabel(ax2, 'x [km]')
         if (isempty(structure))
             ylabel(ax2, 'z [km]')
-            set(ax2, 'YTick', [0, 200, 400]);
+            ylabels = get(ax2, 'YTick');
+            set(ax2, 'YTick', [ylabels(1), ylabels(ceil(length(ylabels) / 2)), ylabels(end)])
         else
             set(ax2, 'YTick', []);
         end
@@ -196,7 +210,7 @@ function plot_models(structure, source, array, clim)
         grid(ax2, 'on')
         box(ax2, 'on')
         set(ax2, 'LineWidth', 2)
-        axis(ax2, 'square')
+        axis(ax2, 'image')
 
 
     end

@@ -3,7 +3,7 @@
 % user input
 %==========================================================================
 
-usr_par.type = 'source';
+usr_par.type = 'structure';
 % 'source'
 % 'structure'
 
@@ -25,7 +25,7 @@ usr_par.data_independent = 'no';
 
 % provide name of array and of data file
 array_file = 'array_nref-1.mat';
-data_file = 'correlations_nref-1_model-1_source-gaussian.mat';
+data_file = 'correlations_nref-1_model-2_source-gaussian.mat';
 
 
 usr_par.verbose = true;

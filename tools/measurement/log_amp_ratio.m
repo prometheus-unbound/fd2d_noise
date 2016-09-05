@@ -55,7 +55,11 @@ function [misfit, adjstf] = log_amp_ratio(u, u_0, win_caus, t)
     de_caus = 2 * win_caus .^ 2 .* u * dt;
     de_acaus = 2 * win_acaus .^ 2 .* u * dt;
 
-    adjstf = (A - A0) * (de_caus / e_caus - de_acaus / e_acaus);
+    % if ( sum(u_0==0) == length(t) )
+    %     adjstf = de_caus/e_caus - de_acaus/e_acaus;
+    % else
+        adjstf = (A - A0) * (de_caus / e_caus - de_acaus / e_acaus);
+    % end
 
 
     %- time reverse adjoint source time function --------------------------
