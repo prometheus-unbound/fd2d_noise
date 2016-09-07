@@ -3,7 +3,7 @@
 % user input
 %==========================================================================
 
-usr_par.type = 'structure';
+usr_par.type = 'source';
 % 'source'
 % 'structure'
 
@@ -13,19 +13,19 @@ usr_par.measurement.type = 'waveform_difference';
 % 'waveform_difference';
 
 
-usr_par.measurement.mode = 'auto';
+usr_par.measurement.mode = 'manual';
 % manual
 % auto
 
 
-usr_par.data_independent = 'no';
+usr_par.data_independent = 'yes';
 % yes
 % no
 
 
 % provide name of array and of data file
 array_file = 'array_nref-1.mat';
-data_file = 'correlations_nref-1_model-2_source-gaussian.mat';
+data_file = 'correlations_nref-1_model-1_source-gaussian.mat';
 
 
 usr_par.verbose = true;
@@ -38,7 +38,7 @@ usr_par.verbose = true;
 %==========================================================================
 
 %- check path -------------------------------------------------------------
-fd2d_path = fd2d_path();
+fd2d_path();
 
 
 %- data independent only works for waveform differences -------------------

@@ -50,17 +50,17 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
     % source type
     %======================================================================
 
-    % source_type = 'homogeneous';
+    source_type = 'homogeneous';
     % source_type = 'point';
-    source_type = 'gaussian';
+    % source_type = 'gaussian';
 
 
     %======================================================================
     % plotting parameters
     %======================================================================
 
-    make_plots = 'yes';     % 'yes' or 'no'
-    plot_nth = 100;         % plot every nth time step
+    make_plots = 'yes';      % 'yes' or 'no'
+    plot_nth = 100;          % plot every nth time step
     
     
     %======================================================================

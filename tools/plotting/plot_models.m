@@ -29,7 +29,8 @@ function plot_models(structure, source, array, clim)
 
     %- colormaps ----------------------------------------------------------
     cm = cbrewer('div', 'RdBu', 120);
-    cm_source = cm(50:120,:);
+    % cm_source = cm(50:120,:);
+    cm_source = cbrewer('seq', 'Blues', 120);
 
 
     %- open figure, set size, etc. ----------------------------------------
@@ -180,6 +181,8 @@ function plot_models(structure, source, array, clim)
         colormap(ax2, cm_source)
         if (clim(3) ~= 0 || clim(4) ~= 0)
             caxis(ax2, [clim(3), clim(4)]);
+        % else
+        %     caxis(ax2, [0, max(max(source))]);
         end
         cb = colorbar;
         ylabel(cb, '[kg^2 m^{-2} s^{-2}]')

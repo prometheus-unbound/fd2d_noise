@@ -106,10 +106,10 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
             title(ax2, 'kernel build-up', 'FontSize', 14)
             
             cb1 = colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
-                'Ticks', [], 'AxisLocation', 'in');
-            ylabel(cb1, 'fields and kernels are normalized')
+                'Ticks', [], 'AxisLocation', 'in', 'FontSize', 12);
+            ylabel(cb1, 'fields and kernels are normalized', 'FontSize', 12)
             colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
-                'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out');
+                'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out', 'FontSize', 14);
             
         else
             title(ax1, 'forward and adjoint wavefield (normalized)', 'FontSize', 14)
@@ -122,6 +122,12 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
         max_u = 0;
         max_M_tn = 0;
         % max_wavefield_fwd = 0;
+
+        
+        %- make movie -----------------------------------------------------
+        % writerObj = VideoWriter('~/Desktop/test','MPEG-4');
+        % writerObj.FrameRate = 6;
+        % open(writerObj);
 
     end
 
@@ -247,7 +253,7 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
 
         %- plot correlation wavefield -------------------------------------
-        if (strcmp(make_plots, 'yes') && isempty(wavefield_fwd))
+        if (strcmp(make_plots, 'yes') && isempty(wavefield_fwd)) % && n > 250)
 
             if (mod(n, plot_nth) == 0 || n == nt)
 
@@ -333,6 +339,12 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
                 
                 %- invoke plot --------------------------------------------
                 drawnow
+                
+                
+                %- make movie ---------------------------------------------
+                % M = getframe(fig);
+                % writeVideo(writerObj,M);
+                
 
             end
 
@@ -340,6 +352,11 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
 
     end
+    
+    
+    % if (strcmp(make_plots, 'yes'))
+    %     close(writerObj);
+    % end
 
 
     %- concatenate kernels ------------------------------------------------

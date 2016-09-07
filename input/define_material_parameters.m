@@ -22,6 +22,10 @@ function [structure] = define_material_parameters(make_plots)
     if (nargin < 1)
         make_plots = 'yes';
     end
+    
+    
+    %- check path ---------------------------------------------------------
+    fd2d_path();
 
 
     %- get basic configuration --------------------------------------------

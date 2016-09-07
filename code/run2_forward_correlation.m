@@ -82,6 +82,11 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
         set(ax1, 'LineWidth', 2)
 
         [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_specs();
+        
+        %- make movie -----------------------------------------------------
+        % writerObj = VideoWriter('~/Desktop/test','MPEG-4');
+        % writerObj.FrameRate = 6;
+        % open(writerObj);
 
     end
 
@@ -121,7 +126,6 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
 
 
         %- add source of the correlation field ----------------------------
-        % if( mod(n,freq_samp) == 0 && t(n) <= 0.0 )
         if (mod(n, freq_samp) == 0)
 
             %- transform on the fly to the time domain
@@ -184,9 +188,6 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                     caxis(ax1, [- 0.8 * m, 0.8 * m]);
                 end
 
-                clabels = get(cb, 'YTick');
-                set(cb, 'YTick', [clabels(1), clabels(ceil(length(clabels) / 2)), clabels(end)])
-
                 
                 %- plot array ---------------------------------------------
                 plot(ax1, ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ... 
@@ -201,13 +202,26 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 if(absorb_left); plot(ax1, [width, width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
                 if(absorb_right); plot(ax1, [Lx - width, Lx - width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
                 
+                
+                %- set labels ---------------------------------------------
+                clabels = get(cb, 'YTick');
+                set(cb, 'YTick', [clabels(1), clabels(ceil(length(clabels) / 2)), clabels(end)])
+                
                 xlabels = get(ax1, 'XTick');
                 ylabels = get(ax1, 'YTick');
                 set(ax1, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
                 set(ax1, 'YTick', [ylabels(1), ylabels(ceil(length(ylabels) / 2)), ylabels(end)])
                 
+                
+                % set FontSize and invoke plot ----------------------------
                 set(ax1, 'FontSize', 12, 'position', [0.17, 0.204, 0.599, 0.624]);
                 drawnow
+                
+                
+                %- make movie ---------------------------------------------
+                % M = getframe(fig);
+                % writeVideo(writerObj,M);
+                
 
             end
 
@@ -216,8 +230,9 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
 
     end
 
-
+    
     if (strcmp(make_plots, 'yes'))
+        % close(writerObj);
         close(fig)
     end
 

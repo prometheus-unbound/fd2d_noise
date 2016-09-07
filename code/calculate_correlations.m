@@ -16,7 +16,7 @@ array = zeros(2, 2);
 array(1, 1) = 1.4e5;
 array(2, 1) = 2.6e5;
 array(1:2, 2) = 2.0e5;
-% 
+
 % array(3:4, 1) = 2.0e5;
 % array(3, 2) = 1.4e5;
 % array(4, 2) = 2.6e5;
@@ -33,6 +33,7 @@ array(1:2, 2) = 2.0e5;
 
 % select receivers that will be reference stations
 ref_stat = array(1,:);
+% ref_stat = array([6 7 10 11],:);
 
 
 %==========================================================================
@@ -40,7 +41,7 @@ ref_stat = array(1,:);
 %==========================================================================
 
 %- check path -------------------------------------------------------------
-fd2d_path = fd2d_path();
+fd2d_path();
 
 
 %- get configuration and set up time vector -------------------------------

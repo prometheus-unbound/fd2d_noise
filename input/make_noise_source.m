@@ -22,11 +22,6 @@ function [noise_source] = make_noise_source(make_plots)
     % user input
     %======================================================================
 
-    % specify spectrum
-    f_peak = 1 / 9;                     % in Hz
-    bandwidth = 0.04;                   % in Hz
-    strength = 1;
-
     % specify point location, width and strength
     point.x_source = 2.0e5;             % in m
     point.z_source = 1.7e5;             % in m
@@ -35,7 +30,9 @@ function [noise_source] = make_noise_source(make_plots)
 
     % specify location, width and strength of Gaussian anomaly
     gaussian.x_source = 1.0e5;          % in m
-    gaussian.z_source = 1.6e5;          % in m
+    gaussian.z_source = 1.7e5;          % in m
+    % gaussian.x_source = 2.0e5;          % in m
+    % gaussian.z_source = 2.0e5;          % in m
     gaussian.source_width = 3e4;        % in m
     gaussian.magnitude = 15.0;          % in kg^2 m^-2 s^-2
 
@@ -44,10 +41,20 @@ function [noise_source] = make_noise_source(make_plots)
     % set up noise source as specified by user
     %======================================================================
 
+    %- specify spectrum - change input_interferometry accordingly ---------
+    f_peak = 1 / 9;                     % in Hz
+    bandwidth = 0.04;                   % in Hz
+    strength = 1;
+    
+    
     %- define make_plots if not specified ---------------------------------
     if (nargin < 1)
         make_plots = 'yes';
     end
+    
+    
+    %- check path ---------------------------------------------------------
+    fd2d_path();
 
 
     %- get basic configuration --------------------------------------------
