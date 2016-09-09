@@ -14,16 +14,6 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
     % basic simulation parameters
     %======================================================================
 
-    % tiny setup for gradient validation
-    % Lx = 6.0e4;             % model extension in x-direction [m]
-    % Lz = 6.0e4;             % model extension in y-direction [m]
-    % nx = 50;                % grid points in x-direction
-    % nz = 50;                % grid points in z-direction
-    
-    % dt = 0.09;              % time step [s]
-    % nt = 50;                % number of time steps
-
-
     % setup for kernel calculation
     Lx = 4.0e5;             % model extension in x-direction [m]
     Lz = 4.0e5;             % model extension in y-direction [m]

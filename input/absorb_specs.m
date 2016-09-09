@@ -16,9 +16,7 @@
 
 
 function [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_specs()
-
-    
-    % width = 5000;               % in meters         
+     
     width = 50000;              % in meters
 
     absorb_left = 1;            % 0 or 1

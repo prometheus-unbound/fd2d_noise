@@ -3,37 +3,16 @@
 % user input
 %==========================================================================
 
-% small test array for gradient validation
-% array = zeros(2,2);
-% array(1,1) = 2.5e4;
-% array(2,1) = 3.5e4;
-% array(:,2) = 3.0e4;
-
 % design array [m]
 % x-components: array(:,1)
 % z-components: array(:,2)
 array = zeros(2, 2);
 array(1, 1) = 1.4e5;
 array(2, 1) = 2.6e5;
-array(1:2, 2) = 2.0e5;
-
-% array(3:4, 1) = 2.0e5;
-% array(3, 2) = 1.4e5;
-% array(4, 2) = 2.6e5;
-
-% nr_x = 4;
-% nr_z = 4;
-% array = zeros(nr_x*nr_z,2);
-% for i = 1:nr_x
-%     for j = 1:nr_z        
-%         array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
-%         array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.8e5;
-%     end
-% end
+array(:, 2) = 2.0e5;
 
 % select receivers that will be reference stations
 ref_stat = array(1,:);
-% ref_stat = array([6 7 10 11],:);
 
 
 %==========================================================================
@@ -53,11 +32,6 @@ nt = length(t);
 %- get source and material ------------------------------------------------
 noise_source = make_noise_source('no');
 structure = define_material_parameters('no');
-
-
-%- for gradient test ------------------------------------------------------
-% noise_source.distribution = noise_source.distribution + rand(nx,nz);
-% structure.mu = structure.mu + 1e9;
 
 
 %- plot model with array configuration ------------------------------------
@@ -110,25 +84,5 @@ save(filename('correlations', n_ref), 'correlations', 't')
     
 % end
 
-
-% if( strcmp(make_plots,'yes') )
-% 
-%     fig = figure;
-%     set(fig,'units','normalized','position',[0.1 0.3 0.6 0.5])
-%     list = dir([fd2d_path 'output' filesep 'correlations_nref*']);
-%     handle = [];
-%     legend_string = [];
-%     colors = hsv(size(list,1));
-%     for i = 1:size(list,1)
-% 
-%         tmp = load( list(i).name );
-%         handle(end + 1,:) = plot_recordings(tmp.correlations, t, colors(i,:), false);
-%         legend_string{end+1} = list(i).name;
-% 
-%     end
-% 
-%     legend(handle,legend_string,'Interpreter','none','Location','best')
-% 
-% end
 
 

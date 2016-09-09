@@ -85,11 +85,7 @@ structure = define_material_parameters('no');
 
 
 %- loop over reference stations -------------------------------------------
-if (~exist(filename('correlations', n_ref), 'file'))
-    correlations = zeros(n_ref, n_rec, nt);
-else
-    load(filename('correlations', n_ref), 'correlations');
-end
+correlations = zeros(n_ref, n_rec, nt);
 
 misfit = 0;
 gradient = zeros(nx, nz, 2);
@@ -123,14 +119,8 @@ for i_ref = 1:n_ref
     
     % calculate correlation -----------------------------------------------
     if (strcmp(usr_par.type, 'source'))
-        
-        if (~exist(filename('correlations', n_ref), 'file'))
-            if(usr_par.verbose); fprintf('ref %i: calculate correlations\n', i_ref); end
-            correlations(i_ref,:,:) = run2_forward_correlation(structure, noise_source, G_fft, src, rec, 0);
-        else
-            if(usr_par.verbose); fprintf('ref %i: use pre-computed correlations\n', i_ref); end
-        end
-        
+        if(usr_par.verbose); fprintf('ref %i: calculate correlations\n', i_ref); end
+        correlations(i_ref,:,:) = run2_forward_correlation(structure, noise_source, G_fft, src, rec, 0);
     else
         if(usr_par.verbose); fprintf('ref %i: calculate correlations\n', i_ref); end
         [correlations(i_ref,:,:), C] = run2_forward_correlation(structure, noise_source, G_fft, src, rec, 1);
@@ -175,11 +165,8 @@ end
 toc
 
 
-%- save correlations ------------------------------------------------------
+%- print total misfit -----------------------------------------------------
 if(usr_par.verbose); fprintf('misfit:   %15.10f\n', misfit); end
-if (~exist(filename('correlations', n_ref), 'file'))
-    save(filename('correlations', n_ref), 'correlations', 't')
-end
 
 
 %- plot kernel ------------------------------------------------------------
