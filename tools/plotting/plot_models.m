@@ -155,7 +155,7 @@ function plot_models(structure, source, array, clim)
 
 
         %- plot absorbing boundaries --------------------------------------
-        level = [1.1 * max(max(source)), 1.1 * max(max(source))];
+        level = [10 * max(max(source)), 10 * max(max(source))];
         if(absorb_bottom); handle(1,:) = plot3(ax2, [absorb_left*width, Lx - absorb_right*width], [width, width], level, 'k--'); end
         if(absorb_top); handle(1,:) = plot3(ax2, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], level, 'k--'); end
         if(absorb_left); handle(1,:) = plot3(ax2, [width, width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
@@ -196,9 +196,6 @@ function plot_models(structure, source, array, clim)
         %- labels ---------------------------------------------------------
         xlabels = get(ax2, 'XTick');
         set(ax2, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
-                        
-        xlim(ax2, [0, Lx])
-        ylim(ax2, [0, Lz])
         xlabel(ax2, 'x [km]')
         if (isempty(structure))
             ylabel(ax2, 'z [km]')
@@ -212,6 +209,8 @@ function plot_models(structure, source, array, clim)
 
 
         %- layout ---------------------------------------------------------
+        xlim(ax2, [0, Lx])
+        ylim(ax2, [0, Lz])
         shading(ax2, 'interp')
         grid(ax2, 'on')
         box(ax2, 'on')
