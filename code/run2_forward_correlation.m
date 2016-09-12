@@ -210,12 +210,12 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 
                 
                 %- set labels ---------------------------------------------
-                if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
-                    set(cb, 'YTick', [-m m], 'TickLabels', {'-', '+'})
-                else
+                % if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
+                %     set(cb, 'YTick', [-m m], 'TickLabels', {'-', '+'})
+                % else
                     clabels = get(cb, 'YTick');
                     set(cb, 'YTick', [clabels(1), clabels(ceil(length(clabels) / 2)), clabels(end)])
-                end
+                % end
                 
                 xlabels = get(ax1, 'XTick');
                 ylabels = get(ax1, 'YTick');
