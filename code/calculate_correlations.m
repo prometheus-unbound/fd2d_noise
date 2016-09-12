@@ -88,6 +88,7 @@ save(filename('correlations', n_ref), 'correlations', 't')
 
 
 %- uncomment this part if you want to plot all correlation-files in output/
+
 % if( strcmp(make_plots,'yes') )
 % 
 %     fig = figure;

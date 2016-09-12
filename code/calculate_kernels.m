@@ -15,7 +15,7 @@ usr_par.measurement.type = 'waveform_difference';
 % 'waveform_difference';
  
 
-usr_par.measurement.mode = 'manual';
+usr_par.measurement.mode = 'auto';
 % manual
 % auto
 
