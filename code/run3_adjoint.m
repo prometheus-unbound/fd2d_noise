@@ -89,6 +89,8 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
             axis(ax1, 'image')
             box(ax1, 'on')
             set(ax1, 'LineWidth', 2, 'FontSize', font_size)
+            xlim(ax1, [0, Lx / 1000])
+            ylim(ax1, [0, Lz / 1000])
             
             
             %- prepare adjoint wavefield plot -----------------------------
@@ -100,17 +102,21 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
             axis(ax2,'image')
             box(ax2,'on')
             set(ax2, 'LineWidth', 2, 'FontSize', font_size)
+            xlim(ax2, [0, Lx / 1000])
+            ylim(ax2, [0, Lz / 1000])
             
             
             %- prepare kernel plot ----------------------------------------
             ax3 = subplot(2, 2, 3:4);
             hold on
             xlabel(ax3, 'x [km]')
-            set(ax3, 'YTick', [])
+            ylabel(ax1, 'z [km]')
             colormap(ax3,cm)
             axis(ax3,'image')
             box(ax3,'on')
             set(ax3, 'LineWidth', 2, 'FontSize', font_size)
+            xlim(ax3, [0, Lx / 1000])
+            ylim(ax3, [0, Lz / 1000])
             
             
             %- colorbar and title different for octave --------------------
@@ -118,11 +124,11 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
             title(ax2, 'adjoint wavefield', 'FontSize', title_size)
             title(ax3, 'kernel build-up', 'FontSize', title_size)
             
-            cb1 = colorbar('Position', [0.73, 0.11, 0.02, 0.34], ...
-                'Ticks', [], 'AxisLocation', 'in', 'FontSize', 12);
-            ylabel(cb1, 'fields and kernels are normalized', 'FontSize', font_size)
-            colorbar('Position', [0.73, 0.11, 0.02, 0.34], ...
-                'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out', 'FontSize', font_size);
+            % cb1 = colorbar('Position', [0.73, 0.11, 0.02, 0.34], ...
+            %     'Ticks', [], 'AxisLocation', 'in', 'FontSize', 12);
+            % ylabel(cb1, 'fields and kernels are normalized', 'FontSize', font_size)
+            % colorbar('Position', [0.73, 0.11, 0.02, 0.34], ...
+            %     'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out', 'FontSize', font_size);
             
             
             %- get absorbing boundary width and initialize max-variables ------

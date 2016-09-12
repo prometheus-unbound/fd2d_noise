@@ -66,11 +66,11 @@ function plot_kernel(gradient, usr_par)
 
 
     %- plot absorbing boundaries ------------------------------------------
-    level = [1.1 * m, 1.1 * m];
-    if(absorb_bottom); handle(1,:) = plot3(ax1, [absorb_left*width, Lx - absorb_right*width], [width, width], level, 'k--'); end
-    if(absorb_top); handle(1,:) = plot3(ax1, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], level, 'k--'); end
-    if(absorb_left); handle(1,:) = plot3(ax1, [width, width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
-    if(absorb_right); handle(1,:) = plot3(ax1, [Lx - width, Lx - width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
+    % level = [1.1 * m, 1.1 * m];
+    if(absorb_bottom); handle(1,:) = plot(ax1, [absorb_left*width, Lx - absorb_right*width], [width, width], 'k--'); end
+    if(absorb_top); handle(1,:) = plot(ax1, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], 'k--'); end
+    if(absorb_left); handle(1,:) = plot(ax1, [width, width], [absorb_bottom*width, Lz - absorb_top*width], 'k--'); end
+    if(absorb_right); handle(1,:) = plot(ax1, [Lx - width, Lx - width], [absorb_bottom*width, Lz - absorb_top*width], 'k--'); end
     
     if( absorb_left || absorb_right || absorb_top || absorb_bottom );
         legend_string{end + 1} = 'absorbing boundaries';
@@ -78,7 +78,7 @@ function plot_kernel(gradient, usr_par)
 
 
     %- plot array ---------------------------------------------------------
-    handle(end + 1,:) = plot3(ax1, usr_par.network.array(:, 1) / 1000, usr_par.network.array(:, 2) / 1000, 1.1 * m + 0 * usr_par.network.array(:, 2), ...
+    handle(end + 1,:) = plot(ax1, usr_par.network.array(:, 1) / 1000, usr_par.network.array(:, 2) / 1000, ... % 1.1 * m + 0 * usr_par.network.array(:, 2), ...
         'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
     
     

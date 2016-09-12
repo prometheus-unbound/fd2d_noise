@@ -72,9 +72,12 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
         marker_size = 6;
         ax1 = gca;
         hold(ax1, 'on')
+        set(ax1, 'FontSize', font_size, 'position', [0.17, 0.204, 0.599, 0.624]);
 
         xlabel(ax1, 'x [km]')
         ylabel(ax1, 'z [km]')
+        xlim(ax1, [0, Lx / 1000])
+        ylim(ax1, [0, Lz / 1000])
 
         title(ax1, 'correlation wavefield', 'FontSize', title_size)
         cm = cbrewer('div', 'RdBu', 120);
@@ -207,12 +210,12 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 
                 
                 %- set labels ---------------------------------------------
-                if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
-                    set(cb, 'YTick', [-m m], 'TickLabels', {'-', '+'})
-                else
+                % if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
+                %     set(cb, 'YTick', [-m m], 'TickLabels', {'-', '+'})
+                % else
                     clabels = get(cb, 'YTick');
                     set(cb, 'YTick', [clabels(1), clabels(ceil(length(clabels) / 2)), clabels(end)])
-                end
+                % end
                 
                 xlabels = get(ax1, 'XTick');
                 ylabels = get(ax1, 'YTick');
@@ -222,8 +225,7 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 ylim(ax1, [0, Lz / 1000])
                 
                 
-                % set FontSize and invoke plot ----------------------------
-                set(ax1, 'FontSize', font_size, 'position', [0.17, 0.204, 0.599, 0.624]);
+                % invoke plot ---------------------------------------------
                 drawnow
                 
                 

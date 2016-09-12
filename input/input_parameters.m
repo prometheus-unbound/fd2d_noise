@@ -59,7 +59,7 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
     % plotting parameters
     %======================================================================
 
-    make_plots = 'no';      % 'yes' or 'no'
+    make_plots = 'yes';      % 'yes' or 'no'
     plot_nth = 100;          % plot every nth time step
     
     
