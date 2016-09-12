@@ -133,7 +133,7 @@ for i_ref = 1:n_ref
         
         % if you know what you do, you can uncomment the if-else statement
         % if (~exist(filename('correlations', n_ref), 'file'))
-        %     if(usr_par.verbose); fprintf('ref %i: calculate correlations\n', i_ref); end
+            if(usr_par.verbose); fprintf('ref %i: calculate correlations\n', i_ref); end
             correlations(i_ref,:,:) = run2_forward_correlation(structure, noise_source, G_fft, src, rec, 0);
         % else
         %     if(usr_par.verbose); fprintf('ref %i: use pre-computed correlations\n', i_ref); end

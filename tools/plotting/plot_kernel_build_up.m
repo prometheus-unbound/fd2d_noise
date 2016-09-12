@@ -76,8 +76,8 @@ if(absorb_right); plot(ax2, [Lx - width, Lx - width] / 1000, [absorb_bottom*widt
 %- set labels ---------------------------------------------
 xlabels = get(ax2, 'XTick');
 set(ax2, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
-xlim(ax1, [0, Lx / 1000])
-ylim(ax1, [0, Lz / 1000])
+xlim(ax2, [0, Lx / 1000])
+ylim(ax2, [0, Lz / 1000])
 
 
 
@@ -111,7 +111,9 @@ if(absorb_right); plot(ax3, [Lx - width, Lx - width] / 1000, [absorb_bottom*widt
 
 %- set labels ---------------------------------------------
 xlabels = get(ax3, 'XTick');
+ylabels = get(ax3, 'YTick');
 set(ax3, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
-xlim(ax1, [0, Lx / 1000])
-ylim(ax1, [0, Lz / 1000])
+set(ax3, 'YTick', [ylabels(1), ylabels(ceil(length(ylabels) / 2)), ylabels(end)])
+xlim(ax3, [0, Lx / 1000])
+ylim(ax3, [0, Lz / 1000])
 

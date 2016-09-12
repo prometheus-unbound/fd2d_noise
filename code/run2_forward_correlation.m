@@ -70,16 +70,19 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
         title_size = 14;
         font_size = 12;
         marker_size = 6;
+        
         ax1 = gca;
         hold(ax1, 'on')
-
+        title(ax1, 'correlation wavefield', 'FontSize', title_size)
         xlabel(ax1, 'x [km]')
         ylabel(ax1, 'z [km]')
+        xlim(ax1, [0, Lx / 1000])
+        ylim(ax1, [0, Lz / 1000])
 
-        title(ax1, 'correlation wavefield', 'FontSize', title_size)
         cm = cbrewer('div', 'RdBu', 120);
         colormap(cm)
         cb = colorbar;
+        
         axis(ax1, 'image')
         box(ax1, 'on')
         set(ax1, 'LineWidth', 2)
