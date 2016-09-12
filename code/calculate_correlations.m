@@ -17,10 +17,6 @@ array(1, 1) = 1.4e5;
 array(2, 1) = 2.6e5;
 array(1:2, 2) = 2.0e5;
 
-% array(3:4, 1) = 2.0e5;
-% array(3, 2) = 1.4e5;
-% array(4, 2) = 2.6e5;
-
 % nr_x = 4;
 % nr_z = 4;
 % array = zeros(nr_x*nr_z,2);
@@ -102,15 +98,14 @@ save(filename('correlations', n_ref), 'correlations', 't')
 
 
 %- plot data --------------------------------------------------------------
-% if (strcmp(make_plots, 'yes'))
-    
+% if( strcmp(make_plots,'yes') )
     fig = figure;
-    set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.6, 0.5])
-    plot_recordings(correlations, t, 'k', true);
-    
+    set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.6, 0.5], 'Color', [1 1 1])
+    plot_recordings(correlations, t, 'k', true, array, ref_stat);
 % end
 
 
+%- uncomment this part if you want to plot all correlation-files in output/
 % if( strcmp(make_plots,'yes') )
 % 
 %     fig = figure;
@@ -122,7 +117,7 @@ save(filename('correlations', n_ref), 'correlations', 't')
 %     for i = 1:size(list,1)
 % 
 %         tmp = load( list(i).name );
-%         handle(end + 1,:) = plot_recordings(tmp.correlations, t, colors(i,:), false);
+%         handle(end + 1,:) = plot_recordings(tmp.correlations, t, colors(i,:), true);
 %         legend_string{end+1} = list(i).name;
 % 
 %     end

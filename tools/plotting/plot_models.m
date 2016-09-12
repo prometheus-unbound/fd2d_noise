@@ -29,16 +29,19 @@ function plot_models(structure, source, array, clim)
 
     %- colormaps ----------------------------------------------------------
     cm = cbrewer('div', 'RdBu', 120);
-    % cm_source = cm(50:120,:);
-    cm_source = cbrewer('seq', 'Blues', 120);
+    if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
+        cm_source = cbrewer('seq', 'Blues', 120);
+    else
+        cm_source = cm;
+    end
 
 
     %- open figure, set size, etc. ----------------------------------------
     fig = figure;
     if (isempty(structure) || isempty(source))
-        set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5])
+        set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5], 'Color', [1 1 1])
     else
-        set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.6, 0.5])
+        set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.6, 0.5], 'Color', [1 1 1])
         orient landscape
     end
 
@@ -205,7 +208,7 @@ function plot_models(structure, source, array, clim)
             set(ax2, 'YTick', []);
         end
 
-        title(ax2, 'source', 'FontSize', 14)
+        title(ax2, 'source distribution', 'FontSize', 14)
 
 
         %- layout ---------------------------------------------------------

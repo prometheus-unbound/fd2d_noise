@@ -70,65 +70,75 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
 
     %- prepare figure for kernel building process -------------------------
-    if (strcmp(make_plots, 'yes') && isempty(wavefield_fwd))
-
-        fig = figure;
-        set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.6, 0.5])
-
-        %- prepare wavefield plot -----------------------------------------
-        ax1 = subplot(1, 2, 1);
-        hold on
-        xlabel(ax1, 'x [km]')
-        ylabel(ax1, 'z [km]')
-        cm = cbrewer('div', 'RdBu', 120);
-        colormap(ax1,cm)
-        axis(ax1, 'image')
-        box(ax1, 'on')
-        set(ax1, 'LineWidth', 2, 'FontSize', 12)
-
-        
-        %- prepare kernel plot --------------------------------------------
-        ax2 = subplot(1, 2, 2);
-        hold on
-        xlabel(ax2, 'x [km]')        
-        set(ax2, 'YTick', [])
-        
-        colormap(ax2,cm)
-        axis(ax2,'image')
-        box(ax2,'on')
-        set(ax2, 'LineWidth', 2, 'FontSize', 12)
-
-        
-        %- colorbar and title different for octave ------------------------
-        if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
+    if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
+        if (strcmp(make_plots, 'yes') && isempty(wavefield_fwd))
             
-            title(ax1, 'forward and adjoint wavefield', 'FontSize', 14)
-            title(ax2, 'kernel build-up', 'FontSize', 14)
+            fig = figure;
+            set(fig, 'units', 'normalized', 'position', [0.13 0.11 0.60 0.75], 'Color', [1 1 1])
+            cm = cbrewer('div', 'RdBu', 120);
+            title_size = 14;
+            font_size = 12;
+            marker_size = 6;
             
-            cb1 = colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
+            %- prepare forward wavefield plot -----------------------------
+            ax1 = subplot(2, 2, 1);
+            hold on
+            xlabel(ax1, 'x [km]')
+            ylabel(ax1, 'z [km]')
+            colormap(ax1,cm)
+            axis(ax1, 'image')
+            box(ax1, 'on')
+            set(ax1, 'LineWidth', 2, 'FontSize', font_size)
+            
+            
+            %- prepare adjoint wavefield plot -----------------------------
+            ax2 = subplot(2, 2, 2);
+            hold on
+            xlabel(ax2, 'x [km]')
+            set(ax2, 'YTick', [])
+            colormap(ax2,cm)
+            axis(ax2,'image')
+            box(ax2,'on')
+            set(ax2, 'LineWidth', 2, 'FontSize', font_size)
+            
+            
+            %- prepare kernel plot ----------------------------------------
+            ax3 = subplot(2, 2, 3:4);
+            hold on
+            xlabel(ax3, 'x [km]')
+            set(ax3, 'YTick', [])
+            colormap(ax3,cm)
+            axis(ax3,'image')
+            box(ax3,'on')
+            set(ax3, 'LineWidth', 2, 'FontSize', font_size)
+            
+            
+            %- colorbar and title different for octave --------------------
+            title(ax1, 'forward wavefield', 'FontSize', title_size)
+            title(ax2, 'adjoint wavefield', 'FontSize', title_size)
+            title(ax3, 'kernel build-up', 'FontSize', title_size)
+            
+            cb1 = colorbar('Position', [0.73, 0.11, 0.02, 0.34], ...
                 'Ticks', [], 'AxisLocation', 'in', 'FontSize', 12);
-            ylabel(cb1, 'fields and kernels are normalized', 'FontSize', 12)
-            colorbar('Position', [0.50, 0.34, 0.02, 0.37], ...
-                'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out', 'FontSize', 14);
+            ylabel(cb1, 'fields and kernels are normalized', 'FontSize', font_size)
+            colorbar('Position', [0.73, 0.11, 0.02, 0.34], ...
+                'Ticks', [-1, 1], 'TickLabels', {'-', '+'}, 'AxisLocation', 'out', 'FontSize', font_size);
             
-        else
-            title(ax1, 'forward and adjoint wavefield (normalized)', 'FontSize', 14)
-            title(ax2, 'kernel build-up (normalized)', 'FontSize', 14)
+            
+            %- get absorbing boundary width and initialize max-variables ------
+            [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_specs();
+            max_u = 0;
+            max_M_tn = 0;
+            max_interaction = 0;
+            
+            
+            %- make movie -----------------------------------------------------
+            % writerObj = VideoWriter('~/Desktop/test','MPEG-4');
+            % writerObj.FrameRate = 6;
+            % open(writerObj);
+            
         end
-
         
-        %- get absorbing boundary width and initialize max-variables ------
-        [width, absorb_left, absorb_right, absorb_top, absorb_bottom] = absorb_specs();
-        max_u = 0;
-        max_M_tn = 0;
-        % max_wavefield_fwd = 0;
-
-        
-        %- make movie -----------------------------------------------------
-        % writerObj = VideoWriter('~/Desktop/test','MPEG-4');
-        % writerObj.FrameRate = 6;
-        % open(writerObj);
-
     end
 
 
@@ -253,101 +263,22 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
 
 
         %- plot correlation wavefield -------------------------------------
-        if (strcmp(make_plots, 'yes') && isempty(wavefield_fwd)) % && n > 250)
-
-            if (mod(n, plot_nth) == 0 || n == nt)
-
+        if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
+            if (strcmp(make_plots, 'yes') && isempty(wavefield_fwd) ) % && n > 250)
                 
-                %- plot wavefields ----------------------------------------
-                subplot(1, 2, 1)                                
-                max_u = max(max_u, max(max(abs(u + eps))));
-                max_M_tn = max(max_M_tn, max(max(abs(real(M_tn + eps)))));
-                % max_wavefield_fwd = max(0*max_wavefield_fwd, max(max(abs(wavefield_fwd(:,:,end-n+1) + eps))));
-
-                if (t(n) >= 0)
-                    pcolor(ax1, X / 1000, Z / 1000, u' / max_u + real(M_tn)' / max_M_tn);
-                elseif any(max(adjstf(:, 1:n), [], 2) > 0.07 * max(adjstf(:, 1:n_zero), [], 2))
-                    pcolor(ax1, X / 1000, Z / 1000, u' / max_u);
-                else
-                    pcolor(ax1, X / 1000, Z / 1000, 0 * u');
-                end
-
-                % pcolor(ax1, X / 1000, Z / 1000, u' / max_u + wavefield_fwd(:,:,end-n+1)' / max_wavefield_fwd);                
-                
-                caxis(ax1, [-0.3, 0.3])
-                shading interp
-
-                
-                %- plot array ---------------------------------------------
-                plot(ax1, ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ...
-                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
-                plot(ax1, rec(:, 1) / 1000, rec(:, 2) / 1000, ...
-                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
-
-                
-                %- plot absorbing boundaries ------------------------------
-                if(absorb_bottom); plot(ax1, [absorb_left*width, Lx - absorb_right*width] / 1000, [width, width] / 1000, 'k--'); end
-                if(absorb_top); plot(ax1, [absorb_left*width, Lx - absorb_right*width] / 1000, [Lz - width, Lz - width] / 1000, 'k--'); end
-                if(absorb_left); plot(ax1, [width, width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
-                if(absorb_right); plot(ax1, [Lx - width, Lx - width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
-                
-                
-                %- set labels ---------------------------------------------
-                xlabels = get(ax1, 'XTick');
-                ylabels = get(ax1, 'YTick');
-                set(ax1, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
-                set(ax1, 'YTick', [ylabels(1), ylabels(ceil(length(ylabels) / 2)), ylabels(end)])
-
-
-                
-                %- plot kernel --------------------------------------------
-                subplot(1, 2, 2)
-                if (t(n) >= 0)
-                    pcolor(ax2, X / 1000, Z / 1000, K_source'/max(max(abs(K_source))))
-                    % m = max(max(abs(K_source)));
-                    % caxis(ax2, [-0.6 * m, 0.6 * m]);
-                    caxis(ax2, [-1, 1]);
-                else
-                    pcolor(ax2, X / 1000, Z / 1000, 0 * K_source');
+                if (mod(n, plot_nth) == 0 || n == nt)
+                    
+                    %- kept plooting outside of function ----------------------
+                    plot_kernel_build_up
+                    drawnow
+                    
+                    %- make movie ---------------------------------------------
+                    % M = getframe(fig);
+                    % writeVideo(writerObj,M);
+                     
                 end
                 
-                % pcolor(ax2, X / 1000, Z / 1000, K_mu')
-                % m = max(max(abs(K_mu)));
-                % caxis(ax2, [-0.6 * m, 0.6 * m]);
-                
-                shading interp
-                
-                
-                %- plot array ---------------------------------------------
-                plot(ax2, ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ...
-                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
-                plot(ax2, rec(:, 1) / 1000, rec(:, 2) / 1000, ...
-                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
-
-                
-                %- plot absorbing boundaries ------------------------------
-                if(absorb_bottom); plot(ax2, [absorb_left*width, Lx - absorb_right*width] / 1000, [width, width] / 1000, 'k--'); end
-                if(absorb_top); plot(ax2, [absorb_left*width, Lx - absorb_right*width] / 1000, [Lz - width, Lz - width] / 1000, 'k--'); end
-                if(absorb_left); plot(ax2, [width, width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
-                if(absorb_right); plot(ax2, [Lx - width, Lx - width] / 1000, [absorb_bottom*width, Lz - absorb_top*width] / 1000, 'k--'); end
-                
-                
-                %- set labels ---------------------------------------------
-                xlabels = get(ax2, 'XTick');
-                set(ax2, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
-
-                
-                %- invoke plot --------------------------------------------
-                drawnow
-                
-                
-                %- make movie ---------------------------------------------
-                % M = getframe(fig);
-                % writeVideo(writerObj,M);
-                
-
             end
-
         end
 
 

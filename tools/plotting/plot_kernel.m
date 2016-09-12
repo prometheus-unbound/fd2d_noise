@@ -27,7 +27,7 @@ function plot_kernel(gradient, usr_par)
 
     %- open figure, set size, etc. ----------------------------------------
     fig = figure;
-    set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5])
+    set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5], 'Color', [1 1 1])
     ax1 = gca;
     set(ax1, 'FontSize', 12);
     hold on
@@ -47,7 +47,7 @@ function plot_kernel(gradient, usr_par)
         caxis(ax1, [- 0.6 * m, 0.6 * m]);
     else
         mesh(ax1, X, Z, gradient(:,:, 1)');
-        caxis(ax1, [- 0.1 * m, 0.1 * m]);
+        caxis(ax1, [-0.1 * m, 0.1 * m]);
     end
 
 
@@ -57,6 +57,12 @@ function plot_kernel(gradient, usr_par)
     cb = colorbar;
     clabels = get(cb, 'YTick');
     set(cb, 'YTick', [clabels(1), clabels(ceil(length(clabels) / 2)), clabels(end)])
+    
+    if (strcmp(usr_par.type, 'source'))
+        ylabel(cb, '[kg^{-2} m^{2} s^{2}]')
+    else
+        ylabel(cb, '[N^{-1} m^{2}]')
+    end
 
 
     %- plot absorbing boundaries ------------------------------------------

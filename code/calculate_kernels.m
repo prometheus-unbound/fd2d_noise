@@ -1,4 +1,6 @@
 
+close all
+
 %==========================================================================
 % user input
 %==========================================================================
@@ -11,9 +13,9 @@ usr_par.type = 'source';
 usr_par.measurement.type = 'waveform_difference';
 % 'log_amplitude_ratio';
 % 'waveform_difference';
+ 
 
-
-usr_par.measurement.mode = 'manual';
+usr_par.measurement.mode = 'auto';
 % manual
 % auto
 
@@ -26,6 +28,11 @@ usr_par.data_independent = 'yes';
 % provide name of array and of data file
 array_file = 'array_nref-1.mat';
 data_file = 'correlations_nref-1_model-1_source-gaussian.mat';
+
+% for TASK 3
+% data_file = 'correlations_nref-1_model-2_source-homogeneous.mat';
+% data_file = 'correlations_nref-1_model-2_source-point.mat';
+% data_file = 'correlations_nref-1_model-2_source-gaussian.mat';
 
 
 usr_par.verbose = true;
@@ -124,6 +131,7 @@ for i_ref = 1:n_ref
     % calculate correlation -----------------------------------------------
     if (strcmp(usr_par.type, 'source'))
         
+        % if you know what you do, you can uncomment the if-else statement
         if (~exist(filename('correlations', n_ref), 'file'))
             if(usr_par.verbose); fprintf('ref %i: calculate correlations\n', i_ref); end
             correlations(i_ref,:,:) = run2_forward_correlation(structure, noise_source, G_fft, src, rec, 0);

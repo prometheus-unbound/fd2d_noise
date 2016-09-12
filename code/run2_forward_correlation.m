@@ -66,14 +66,17 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
     if (strcmp(make_plots, 'yes'))
 
         fig = figure;
-        set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5])
+        set(fig, 'units', 'normalized', 'position', [0.1, 0.3, 0.3, 0.5], 'Color', [1 1 1])
+        title_size = 14;
+        font_size = 12;
+        marker_size = 6;
         ax1 = gca;
         hold(ax1, 'on')
 
         xlabel(ax1, 'x [km]')
         ylabel(ax1, 'z [km]')
 
-        title(ax1, 'correlation wavefield', 'FontSize', 14)
+        title(ax1, 'correlation wavefield', 'FontSize', title_size)
         cm = cbrewer('div', 'RdBu', 120);
         colormap(cm)
         cb = colorbar;
@@ -178,22 +181,22 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 shading(ax1, 'interp')
 
                 if (strcmp(source_type, 'homogeneous'))
-                    caxis(ax1, [-0.08, 0.08]);
+                    m = 0.08;
                 elseif (strcmp(source_type, 'point'))
-                    caxis(ax1, [-0.003, 0.003]);
+                    m = 0.003;                    
                 elseif (strcmp(source_type, 'gaussian'))
-                    caxis(ax1, [-0.2, 0.2]);
+                    m = 0.15;
                 else
-                    m = max(max(abs(u)));
-                    caxis(ax1, [- 0.8 * m, 0.8 * m]);
+                    m = 0.8*max(max(abs(u)));
                 end
+                caxis(ax1, [-m, m]);
 
                 
                 %- plot array ---------------------------------------------
                 plot(ax1, ref_station(:, 1) / 1000, ref_station(:, 2) / 1000, ... 
-                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
+                    'kx', 'MarkerFaceColor', 'k', 'MarkerSize', marker_size)
                 plot(ax1,rec(:, 1) / 1000, rec(:, 2) / 1000, ....
-                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6)
+                    'kd', 'MarkerFaceColor', 'k', 'MarkerSize', marker_size)
                 
                 
                 %- plot absorbing boundaries ------------------------------
@@ -204,17 +207,23 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 
                 
                 %- set labels ---------------------------------------------
-                clabels = get(cb, 'YTick');
-                set(cb, 'YTick', [clabels(1), clabels(ceil(length(clabels) / 2)), clabels(end)])
+                if( exist('OCTAVE_VERSION', 'builtin' ) == 0 )
+                    set(cb, 'YTick', [-m m], 'TickLabels', {'-', '+'})
+                else
+                    clabels = get(cb, 'YTick');
+                    set(cb, 'YTick', [clabels(1), clabels(ceil(length(clabels) / 2)), clabels(end)])
+                end
                 
                 xlabels = get(ax1, 'XTick');
                 ylabels = get(ax1, 'YTick');
                 set(ax1, 'XTick', [xlabels(1), xlabels(ceil(length(xlabels) / 2)), xlabels(end)])
                 set(ax1, 'YTick', [ylabels(1), ylabels(ceil(length(ylabels) / 2)), ylabels(end)])
+                xlim(ax1, [0, Lx / 1000])
+                ylim(ax1, [0, Lz / 1000])
                 
                 
                 % set FontSize and invoke plot ----------------------------
-                set(ax1, 'FontSize', 12, 'position', [0.17, 0.204, 0.599, 0.624]);
+                set(ax1, 'FontSize', font_size, 'position', [0.17, 0.204, 0.599, 0.624]);
                 drawnow
                 
                 

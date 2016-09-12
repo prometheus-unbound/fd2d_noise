@@ -42,50 +42,75 @@ function [left, right] = pick_window(u, u_0, t, measurement, i)
     % legend, labels, title, limits ---------------------------------------
     legend(ax1, legend_string)
     xlabel(ax1, 'time [s]')
-    title(ax1, ['pick measurement window - correlation ' num2str(i)], 'FontSize', 14)
+    title(ax1, ['correlation ' num2str(i) ':   pick LEFT start of measurement window'], 'FontSize', 14)
     xlim(ax1, [t(1), t(end)])
     ylim(ax1, [- 1.2 * max(max(abs(u)), max(abs(u_0))), 1.2 * max(max(abs(u)), max(abs(u_0)))])
 
 
     %- check consistency of picks -----------------------------------------
+    error = false;
+    error_msg = [];
     while true
 
         fprintf('\n')
         disp('pick left start of window:');
-        [left, ~] = ginput(1);
+        [left, dummy1] = ginput(1);
+        h(1,:) = text(left,dummy1, sprintf('left pick:\n%5.2f s', left), 'FontSize',14);
         fprintf('left pick: %5.2f\n\n', left)
+        
+        title(ax1, ['correlation ' num2str(i) ':   pick END of measurement window'], 'FontSize', 14)
         disp('pick end of window:');
-        [right, ~] = ginput(1);
+        [right, dummy2] = ginput(1);
+        h(2,:) = text(right,dummy2, sprintf('right pick:\n%5.2f s', right),'FontSize',14);
         fprintf('right pick: %5.2f\n\n', right)
 
         if (strcmp(measurement, 'log_amplitude_ratio'))
             if (left * right < 0)
-                fprintf('\nfor log_amplitude_ratio measurement, pick on either causal or acausal branch\n')
-                continue
+                error = true;
+                error_msg{end + 1} = 'for log_amplitude_ratio measurement, pick on either causal or acausal branch\n';
             end
         end
 
         if (left < t(1) || left > t(end))
-            fprintf('\nleft pick is outside of bound\n')
-            continue
+            error = true;
+            error_msg{end + 1} = 'left pick is outside of bound\n';
         end
 
         if (right < t(1) || right > t(end))
-            fprintf('\nright pick is outside of bound\n')
-            continue
+            error = true;
+            error_msg{end + 1} = 'right pick is outside of bound\n';
         end
 
         if (left >= right)
-            fprintf('\nleft pick is not left\n')
-            continue
+            error = true;
+            error_msg{end + 1} = 'left pick is not left\n';
         end
 
-        break
+        
+        if( error )
+            
+            fprintf(['\n' error_msg{:}])
+            
+            dummy1 = get(gca,'XLim');
+            dummy2 = get(gca,'YLim');
+            h(3,:) = text( dummy1(1) + 0.05*abs(diff(dummy1)), dummy2(2) - 0.1*abs(diff(dummy2)), ...
+                sprintf([error_msg{:}]), 'FontSize', 18, 'Color', 'r', 'Interpreter', 'none');
+            
+            pause(2.5)
+            delete(h)
+            error = false;
+            error_msg = [];
+            continue
+            
+        else
+            break
+        end
 
     end
 
 
     %- close figure -------------------------------------------------------
+    pause(1)
     close(fig)
 
 

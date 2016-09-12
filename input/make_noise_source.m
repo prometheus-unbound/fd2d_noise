@@ -31,8 +31,6 @@ function [noise_source] = make_noise_source(make_plots)
     % specify location, width and strength of Gaussian anomaly
     gaussian.x_source = 1.0e5;          % in m
     gaussian.z_source = 1.7e5;          % in m
-    % gaussian.x_source = 2.0e5;          % in m
-    % gaussian.z_source = 2.0e5;          % in m
     gaussian.source_width = 3e4;        % in m
     gaussian.magnitude = 15.0;          % in kg^2 m^-2 s^-2
 
@@ -89,7 +87,8 @@ function [noise_source] = make_noise_source(make_plots)
     %- plot noise source configuration ------------------------------------
     if (strcmp(make_plots, 'yes'))
 
-        figure
+        fig = figure;
+        set(fig, 'Color', [1 1 1])
         ax1 = gca;
         set(ax1, 'FontSize', 12)
         hold(ax1, 'on')
@@ -97,6 +96,8 @@ function [noise_source] = make_noise_source(make_plots)
         plot(ax1, f_sample, noise_source.spectrum, 'r')
         xlabel(ax1, 'frequency [Hz]');
         xlim(ax1, [f_sample(1), f_sample(end)])
+        set(ax1,'XTick', [0 0.1 0.2])
+        set(ax1,'YTick', [0 0.5 1])
         title(ax1, 'spectrum for noise source', 'FontSize', 14)
 
         if (exist([fd2d_path(), 'output', filesep, 'array_1_ref.mat'], 'file'))
