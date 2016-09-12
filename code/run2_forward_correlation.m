@@ -73,7 +73,6 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
         
         ax1 = gca;
         hold(ax1, 'on')
-        title(ax1, 'correlation wavefield', 'FontSize', title_size)
         xlabel(ax1, 'x [km]')
         ylabel(ax1, 'z [km]')
         xlim(ax1, [0, Lx / 1000])
@@ -83,6 +82,8 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
         colormap(cm)
         cb = colorbar;
         
+        set(ax1, 'FontSize', font_size, 'position', [0.17, 0.204, 0.599, 0.624]);
+        title(ax1, 'correlation wavefield', 'FontSize', title_size)
         axis(ax1, 'image')
         box(ax1, 'on')
         set(ax1, 'LineWidth', 2)
@@ -225,8 +226,7 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 ylim(ax1, [0, Lz / 1000])
                 
                 
-                % set FontSize and invoke plot ----------------------------
-                set(ax1, 'FontSize', font_size, 'position', [0.17, 0.204, 0.599, 0.624]);
+                % invoke plot ---------------------------------------------
                 drawnow
                 
                 

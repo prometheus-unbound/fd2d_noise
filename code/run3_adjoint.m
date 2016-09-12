@@ -110,7 +110,7 @@ function [K, u_adj_fft] = run3_adjoint(structure, noise_source, G_fft, ref_stati
             ax3 = subplot(2, 2, 3:4);
             hold on
             xlabel(ax3, 'x [km]')
-            set(ax3, 'YTick', [])
+            ylabel(ax3, 'z [km]')
             colormap(ax3,cm)
             axis(ax3,'image')
             box(ax3,'on')

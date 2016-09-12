@@ -67,15 +67,15 @@ function plot_models(structure, source, array, clim)
 
 
         %- plot noise source ----------------------------------------------
-        mesh(ax1, X, Z, structure')
+        pcolor(ax1, X, Z, structure')
 
 
         %- plot absorbing boundaries --------------------------------------
-        level = [1.1 * max(max(structure)), 1.1 * max(max(structure))];
-        if(absorb_bottom); handle(1,:) = plot3(ax1, [absorb_left*width, Lx - absorb_right*width], [width, width], level, 'k--'); end
-        if(absorb_top); handle(1,:) = plot3(ax1, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], level, 'k--'); end
-        if(absorb_left); handle(1,:) = plot3(ax1, [width, width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
-        if(absorb_right); handle(1,:) = plot3(ax1, [Lx - width, Lx - width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
+        % level = [100 * max(max(structure)), 100 * max(max(structure))];
+        if(absorb_bottom); handle(1,:) = plot(ax1, [absorb_left*width, Lx - absorb_right*width], [width, width], 'k--'); end
+        if(absorb_top); handle(1,:) = plot(ax1, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], 'k--'); end
+        if(absorb_left); handle(1,:) = plot(ax1, [width, width], [absorb_bottom*width, Lz - absorb_top*width], 'k--'); end
+        if(absorb_right); handle(1,:) = plot(ax1, [Lx - width, Lx - width], [absorb_bottom*width, Lz - absorb_top*width], 'k--'); end
         
         if( absorb_left || absorb_right || absorb_top || absorb_bottom );
             legend_string{end + 1} = 'absorbing boundaries';
@@ -84,7 +84,7 @@ function plot_models(structure, source, array, clim)
 
         %- plot array if given --------------------------------------------
         if (~isempty(array))
-            handle(end + 1,:) = plot3(ax1, array(:, 1), array(:, 2), level(1) + 0 * array(:, 2), ...
+            handle(end + 1,:) = plot(ax1, array(:, 1), array(:, 2), ... % level(1) + 0 * array(:, 2), ...
                 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
             legend_string{end + 1} = 'array';
         end
@@ -151,15 +151,15 @@ function plot_models(structure, source, array, clim)
 
 
         %- plot noise source ----------------------------------------------
-        mesh(ax2, X, Z, source')
+        pcolor(ax2, X, Z, source')
 
 
         %- plot absorbing boundaries --------------------------------------
-        level = [10 * max(max(source)), 10 * max(max(source))];
-        if(absorb_bottom); handle(1,:) = plot3(ax2, [absorb_left*width, Lx - absorb_right*width], [width, width], level, 'k--'); end
-        if(absorb_top); handle(1,:) = plot3(ax2, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], level, 'k--'); end
-        if(absorb_left); handle(1,:) = plot3(ax2, [width, width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
-        if(absorb_right); handle(1,:) = plot3(ax2, [Lx - width, Lx - width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
+        % level = [100 * max(max(source)), 100 * max(max(source))];
+        if(absorb_bottom); handle(1,:) = plot(ax2, [absorb_left*width, Lx - absorb_right*width], [width, width], 'k--'); end
+        if(absorb_top); handle(1,:) = plot(ax2, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], 'k--'); end
+        if(absorb_left); handle(1,:) = plot(ax2, [width, width], [absorb_bottom*width, Lz - absorb_top*width], 'k--'); end
+        if(absorb_right); handle(1,:) = plot(ax2, [Lx - width, Lx - width], [absorb_bottom*width, Lz - absorb_top*width], 'k--'); end
         
         if( absorb_left || absorb_right || absorb_top || absorb_bottom );
             legend_string{end + 1} = 'absorbing boundaries';
@@ -168,7 +168,7 @@ function plot_models(structure, source, array, clim)
 
         %- plot array if given --------------------------------------------
         if (~isempty(array))
-            handle(end + 1,:) = plot3(ax2, array(:, 1), array(:, 2), level(1) + 0 * array(:, 2), ...
+            handle(end + 1,:) = plot(ax2, array(:, 1), array(:, 2), ... % level(1) + 0 * array(:, 2), ...
                 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
             legend_string{end + 1} = 'array';
         end
