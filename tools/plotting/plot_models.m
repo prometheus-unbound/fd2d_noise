@@ -155,7 +155,7 @@ function plot_models(structure, source, array, clim)
 
 
         %- plot absorbing boundaries --------------------------------------
-        level = [1.1 * max(max(source)), 1.1 * max(max(source))];
+        level = [10 * max(max(source)), 10 * max(max(source))];
         if(absorb_bottom); handle(1,:) = plot3(ax2, [absorb_left*width, Lx - absorb_right*width], [width, width], level, 'k--'); end
         if(absorb_top); handle(1,:) = plot3(ax2, [absorb_left*width, Lx - absorb_right*width], [Lz - width, Lz - width], level, 'k--'); end
         if(absorb_left); handle(1,:) = plot3(ax2, [width, width], [absorb_bottom*width, Lz - absorb_top*width], level, 'k--'); end
