@@ -6,16 +6,15 @@
 % design array [m]
 % x-components: array(:,1)
 % z-components: array(:,2)
-array = zeros(2, 2);
+array = zeros(6, 2);
 array(1, 1) = 1.4e5;
 array(2, 1) = 2.6e5;
 array(1:2, 2) = 2.0e5;
 
-
 % select receivers that will be reference stations
 ref_stat = array(1,:);
 
-% for selection, e.g.
+% for selection with more stations, e.g.
 % ref_stat = array([6 7 10 11],:);
 
 
@@ -87,7 +86,7 @@ save(filename('correlations', n_ref), 'correlations', 't')
 % end
 
 
-%- uncomment this part if you want to plot all correlation-files in output/
+%- uncomment the following part if you want to plot all correlation-files in output/
 
 % if( strcmp(make_plots,'yes') )
 % 
