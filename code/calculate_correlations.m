@@ -6,7 +6,7 @@
 % design array [m]
 % x-components: array(:,1)
 % z-components: array(:,2)
-array = zeros(6, 2);
+array = zeros(2, 2);
 array(1, 1) = 1.4e5;
 array(2, 1) = 2.6e5;
 array(1:2, 2) = 2.0e5;

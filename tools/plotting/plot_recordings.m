@@ -86,6 +86,9 @@ function [h] = plot_recordings(u, t, color, normalize, array, ref_stat)
             %- normalization ----------------------------------------------
             if (normalize == true)
                 m = max(max(abs( u(dist(k,2), dist(k,3), : ) )));
+                if( m == 0 )
+                    m = 1;
+                end
             else
                 m = 1;
             end
@@ -108,10 +111,10 @@ function [h] = plot_recordings(u, t, color, normalize, array, ref_stat)
         %     ylabel('seismograms','FontSize',18);
     end
 
-    set(ax1, 'YTick', []);
     ylimits = get(ax1, 'YLim');
     % set(ax1, 'YLim', [ylimits(1) - 0.2, ylimits(2) + 0.2])
     set(ax1, 'YLim', [ylimits(1) - 0.2, 0.2 + spacing * (k-1) + max(abs(squeeze(u(end, end,:))))/m] )
+    set(ax1, 'YTick', []);
 
 
 end
