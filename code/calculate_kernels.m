@@ -15,7 +15,7 @@ usr_par.measurement.type = 'waveform_difference';
 % 'waveform_difference';
  
 
-usr_par.measurement.mode = 'auto';
+usr_par.measurement.mode = 'manual';
 % manual
 % auto
 
@@ -132,12 +132,12 @@ for i_ref = 1:n_ref
     if (strcmp(usr_par.type, 'source'))
         
         % if you know what you do, you can uncomment the if-else statement
-        % if (~exist(filename('correlations', n_ref), 'file'))
+        if (~exist(filename('correlations', n_ref), 'file'))
             if(usr_par.verbose); fprintf('ref %i: calculate correlations\n', i_ref); end
             correlations(i_ref,:,:) = run2_forward_correlation(structure, noise_source, G_fft, src, rec, 0);
-        % else
-        %     if(usr_par.verbose); fprintf('ref %i: use pre-computed correlations\n', i_ref); end
-        % end
+        else
+            if(usr_par.verbose); fprintf('ref %i: use pre-computed correlations\n', i_ref); end
+        end
         
     else
         if(usr_par.verbose); fprintf('ref %i: calculate correlations\n', i_ref); end
