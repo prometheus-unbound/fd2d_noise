@@ -51,8 +51,8 @@ function [G_fft, G_out] = run1_forward_green(structure, ref_station, mode)
     assert(size(ref_station, 1) == 1, ...
         'not possible to compute Green functions for more reference stations in one run of run1_forward_green.m')
     src_id = zeros(1, 2);
-    src_id(1, 1) = find( min( abs(x - ref_station(1, 1)) ) == abs(x - ref_station(1, 1)), 1 );
-    src_id(1, 2) = find( min( abs(z - ref_station(1, 2)) ) == abs(z - ref_station(1, 2)), 1 );
+    src_id(1, 1) = min( find( min( abs(x - ref_station(1, 1)) ) == abs(x - ref_station(1, 1)) ));
+    src_id(1, 2) = min( find( min( abs(z - ref_station(1, 2)) ) == abs(z - ref_station(1, 2)) ));
 
 
     %- initialise absorbing boundary taper a la Cerjan --------------------

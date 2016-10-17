@@ -19,7 +19,8 @@ ARGS{1}{2}.distribution = coder.typeof(0, [inf, inf]);
 ARGS{1}{2} = coder.typeof(ARGS{1}{2});
 ARGS{1}{3} = coder.typeof(1i, [inf, inf, inf]);
 ARGS{1}{4} = coder.typeof(0, [inf, inf]);
-ARGS{1}{5} = coder.typeof(0);
+ARGS{1}{5} = coder.typeof(0, [inf, inf]);
+ARGS{1}{6} = coder.typeof(0);
 
 %% Invoke MATLAB Coder.
 if (~exist('exit_code', 'var'))
@@ -28,7 +29,7 @@ end
 
 if (exit_code == 0)
     try
-        codegen - config cfg run2_forward_correlation - args ARGS{1}
+        codegen -config cfg run2_forward_correlation -args ARGS{1}
         exit_code = 0;
     catch
         exit_code = 1;

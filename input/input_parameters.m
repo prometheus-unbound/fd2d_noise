@@ -27,12 +27,12 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
     % setup for kernel calculation
     Lx = 4.0e5;             % model extension in x-direction [m]
     Lz = 4.0e5;             % model extension in y-direction [m]
-    nx = 300;               % grid points in x-direction
-    nz = 300;               % grid points in z-direction
+    nx = 110;               % grid points in x-direction
+    nz = 110;               % grid points in z-direction
 
-    dt = 0.09;              % time step [s]
-    nt = 800;               % number of time steps
-
+    dt = 0.26;              % time step [s]
+    nt = 280;               % number of time steps
+    
 
     order = 4;              % finite-difference order (2 or 4)
 
@@ -59,8 +59,8 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, store_fwd_nth,
     % plotting parameters
     %======================================================================
 
-    make_plots = 'yes';      % 'yes' or 'no'
-    plot_nth = 100;          % plot every nth time step
+    make_plots = 'no';      % 'yes' or 'no'
+    plot_nth = 5;          % plot every nth time step
     
     
     %======================================================================

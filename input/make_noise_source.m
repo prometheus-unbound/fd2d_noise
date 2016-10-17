@@ -32,7 +32,7 @@ function [noise_source] = make_noise_source(make_plots)
     gaussian.x_source = 1.0e5;          % in m
     gaussian.z_source = 1.7e5;          % in m
     gaussian.source_width = 3e4;        % in m
-    gaussian.magnitude = 15.0;          % in kg^2 m^-2 s^-2
+    gaussian.magnitude = 7.0;          % in kg^2 m^-2 s^-2
 
 
     %======================================================================
@@ -41,7 +41,7 @@ function [noise_source] = make_noise_source(make_plots)
 
     %- specify spectrum - change input_interferometry accordingly ---------
     f_peak = 1 / 9;                     % in Hz
-    bandwidth = 0.04;                   % in Hz
+    bandwidth = 0.033;                   % in Hz
     strength = 1;
     
     

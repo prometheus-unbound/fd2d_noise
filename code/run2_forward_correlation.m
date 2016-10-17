@@ -53,8 +53,8 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
     rec_id = zeros(n_receivers, 2);
 
     for i = 1:n_receivers
-        rec_id(i, 1) = find( min( abs(x - rec(i, 1)) ) == abs(x - rec(i, 1)), 1 );
-        rec_id(i, 2) = find( min( abs(z - rec(i, 2)) ) == abs(z - rec(i, 2)), 1 );
+        rec_id(i, 1) = min( find( min( abs(x - rec(i, 1)) ) == abs(x - rec(i, 1)) ));
+        rec_id(i, 2) = min( find( min( abs(z - rec(i, 2)) ) == abs(z - rec(i, 2)) ));
     end
 
 
@@ -132,7 +132,7 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
 
 
         %- add source of the correlation field ----------------------------
-        if (mod(n, freq_samp) == 0)
+        if (mod(n, freq_samp) == 0 && t(n) < 0.2*t(end) )
 
             %- transform on the fly to the time domain
             S = zeros(nx, nz) + 1i * zeros(nx, nz);
@@ -183,15 +183,15 @@ function [seismograms, C_out] = run2_forward_correlation(structure, noise_source
                 pcolor(ax1, X / 1000, Z / 1000, u')
                 shading(ax1, 'interp')
 
-                if (strcmp(source_type, 'homogeneous'))
-                    m = 0.08;
-                elseif (strcmp(source_type, 'point'))
-                    m = 0.003;                    
-                elseif (strcmp(source_type, 'gaussian'))
-                    m = 0.15;
-                else
+%                 if (strcmp(source_type, 'homogeneous'))
+%                     m = 0.08;
+%                 elseif (strcmp(source_type, 'point'))
+%                     m = 0.003;                    
+%                 elseif (strcmp(source_type, 'gaussian'))
+%                     m = 0.15;
+%                 else
                     m = 0.8*max(max(abs(u)));
-                end
+%                 end
                 caxis(ax1, [-m, m]);
 
                 

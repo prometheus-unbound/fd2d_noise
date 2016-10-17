@@ -18,7 +18,7 @@
 function [f_sample, n_sample, w_sample, dw, freq_samp] = input_interferometry()
 
 
-    f_sample = 0.02:0.004:0.2;      % in Hz
+    f_sample = 0.04:0.002:0.18;      % in Hz
     freq_samp = 5;
 
 

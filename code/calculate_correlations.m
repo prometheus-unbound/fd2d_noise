@@ -17,6 +17,7 @@ array(1, 1) = 1.4e5;
 array(2, 1) = 2.6e5;
 array(1:2, 2) = 2.0e5;
 
+
 % nr_x = 4;
 % nr_z = 4;
 % array = zeros(nr_x*nr_z,2);
@@ -27,8 +28,18 @@ array(1:2, 2) = 2.0e5;
 %     end
 % end
 
+% nr_x = 4;
+% nr_z = 4;
+% array = zeros(nr_x*nr_z,2);
+% for i = 1:nr_x
+%     for j = 1:nr_z        
+%         array( (i-1)*nr_z + j, 1 ) = 1.8e5 + ( i-1 ) * 0.5e5;
+%         array( (i-1)*nr_z + j, 2 ) = 1.25e5 + ( j-1 ) * 0.5e5;
+%     end
+% end
+
 % select receivers that will be reference stations
-ref_stat = array(1,:);
+ref_stat = array; %(1,:);
 % ref_stat = array([6 7 10 11],:);
 
 
@@ -62,6 +73,7 @@ if (strcmp(make_plots, 'yes'))
         noise_source.distribution, array, [0, 0, 0, 0]);
 end
 
+% return
 
 %- loop over reference stations -------------------------------------------
 n_ref = size(ref_stat, 1);
@@ -69,14 +81,14 @@ n_rec = size(array, 1) - 1;
 correlations = zeros(n_ref, n_rec, nt);
 
 tic
-for i_ref = 1:n_ref
+parfor i_ref = 1:n_ref
     
     src = ref_stat(i_ref,:);
     rec = array(~ismember(array, src, 'rows'),:);
     
     if (~exist(filename('G_fft', i_ref), 'file'))
         fprintf('ref %i: calculate Green function\n', i_ref)
-        G_fft = run1_forward_green(structure, src, 0);
+        G_fft = run1_forward_green_mex(structure, src, 0);
         parsave(filename('G_fft', i_ref), G_fft)
     else
         fprintf('ref %i: load pre-computed Green function\n', i_ref)
@@ -84,7 +96,9 @@ for i_ref = 1:n_ref
     end
     
     fprintf('ref %i: calculate correlations\n', i_ref)
-    [correlations(i_ref,:,:)] = run2_forward_correlation(structure, noise_source, G_fft, src, rec, 0);
+%     tic
+    [correlations(i_ref,:,:)] = run2_forward_correlation_mex(structure, noise_source, G_fft, src, rec, 0);
+%     toc
     
     fprintf('ref %i: done\n', i_ref)
     

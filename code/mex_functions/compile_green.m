@@ -18,7 +18,7 @@ ARGS{1}{3} = coder.typeof(0);
 
 %% Invoke MATLAB Coder.
 try
-    codegen - config cfg run1_forward_green - args ARGS{1}
+    codegen -config cfg run1_forward_green -args ARGS{1}
     exit_code = 0;
 catch
     exit_code = 1;
