@@ -175,16 +175,16 @@ if( strcmp(make_plots,'yes') )
     [Lx,Lz,nx,nz,~,~,~,~,source_type,n_basis_fct] = input_parameters();   
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
-%     load ../output/interferometry/array_16_ref.mat
-%     min_x = min(array(:,1));
-%     min_z = min(array(:,2));
-%     max_x = max(array(:,1));
-%     max_z = max(array(:,2));
-%     
-%     buffer = 1e5;
-%     pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
+    load ../output/interferometry/array_16_ref.mat
+    min_x = min(array(:,1));
+    min_z = min(array(:,2));
+    max_x = max(array(:,1));
+    max_z = max(array(:,2));
     
-    array = [];
+    buffer = 1e5;
+    pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
+    
+    % array = [];
     
     if( n_basis_fct == 0 )
         m_parameters = zeros( nx, nz, 2);
@@ -198,15 +198,15 @@ if( strcmp(make_plots,'yes') )
     
     usr_par.network = []; usr_par.data = [];
     
-    % load('../models/random_0.1_norm.mat');
-    % m_parameters(:,:,end) = m_parameters(:,:,end) + 150.0e9 * signal; % .* pattern';
+    load('../models/random_0.07_norm.mat');
+    m_parameters(:,:,end) = m_parameters(:,:,end) + 0.8e10 * signal;% .* pattern';
     
     % usr_par.kernel.imfilter.source = fspecial('gaussian', [1 1], 1);
     % usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
     % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
     % usr_par.kernel.imfilter.source = fspecial('gaussian',[20 20], 10);
     % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;    
-    usr_par.kernel.sigma.source = [1 1];
+    usr_par.kernel.sigma.source = [1e-3 1e-3];
     usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
     
     [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
@@ -214,7 +214,8 @@ if( strcmp(make_plots,'yes') )
     m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
     m_parameters(:,:,end) = sqrt( m_parameters(:,:,end) ./ rho );
     
-    plot_models( m_parameters, n_basis_fct, array, [0 7 0 0] );
+    plot_models( m_parameters, n_basis_fct, array, [0 0 3700 4300] );
+%     plot_models( m_parameters, n_basis_fct, array, [0 0 0 0] );
     
 end
 

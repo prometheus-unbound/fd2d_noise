@@ -52,6 +52,7 @@ function [misfit, adstf] = log_amp_ratio( u, u_0, du, win_caus, t, deriv_order )
         
         % compute misfit --------------------------------------------------
         misfit = 0.5 * ( A - A0 )^2;
+        % misfit = A;
         
         % compute adjoint source time function ----------------------------
         de_caus = 2 * win_caus.^2 .* u * dt;

@@ -73,7 +73,7 @@ for i = 1:n_ref
     
     % perturbation of correlation following from dmu
     if( ~isempty( find( dmu, 1 ) ) )
-        [c_pert1, dC] = run_forward2_correlation_mex( mu, rho, dG_fft, spectrum, source_dist_ref, rec, 1, dmu, C );
+        [c_pert1, dC] = run_forward2_correlation_mex( mu, rho, dG_fft, spectrum, source_dist_ref, rec, 1, dmu, single(C) );
         if( strcmp( usr_par.verbose, 'yes') ) fprintf( '%i: dcorrelation dmu -- done\n', i ); end
     else
         c_pert1 = 0.0;
@@ -112,7 +112,7 @@ for i = 1:n_ref
     %% YELLOW -- u_dagger
     % dmu dmu - ds dmu - dmu ds
     if( ~strcmp( usr_par.type, 'source' ) )
-        [K_1, uT, u_dag] = run_noise_adjoint_mex( mu, rho, dC, complex(adstf_1st_1), rec, [], spectrum, [], dG_fft, 13, [], single([]) );
+        [K_1, uT, u_dag] = run_noise_adjoint_mex( mu, rho, single(dC), complex(adstf_1st_1), rec, [], spectrum, [], dG_fft, 13, [], single([]) );
     else
         u_dag = 0.0;
     end
@@ -128,7 +128,7 @@ for i = 1:n_ref
     %% GRAY -- p
     % dmu dmu
     if( ~strcmp( usr_par.type, 'source' ) && ~isempty( find( dmu, 1 ) ) )
-        [K_2, ~, p] = run_noise_adjoint_mex( mu, rho, dG, uT, rec, [], spectrum, source_dist_ref, [], 11, [], single([]) );
+        [K_2, ~, p] = run_noise_adjoint_mex( mu, rho, single(dG), complex(uT), rec, [], spectrum, source_dist_ref, complex([]), 11, [], single([]) );
     else
         p = 0.0;
     end
@@ -140,7 +140,7 @@ for i = 1:n_ref
     %% GRAY -- p
     % ds dmu
     if( strcmp( usr_par.type, 'joint' ) && ~isempty( find( source_dist_pert, 1 ) ) )
-        [K_2_add, ~, p_add] = run_noise_adjoint_mex( mu, rho, G, uT, rec, [], spectrum, source_dist_pert, [], 11, [], single([]) );
+        [K_2_add, ~, p_add] = run_noise_adjoint_mex( mu, rho, single(G), complex(uT), rec, [], spectrum, source_dist_pert, complex([]), 11, [], single([]) );
         K_2 = K_2 + K_2_add;
         p = p + p_add;
         p_add = [];
@@ -152,7 +152,7 @@ for i = 1:n_ref
     
     %% BLACK -- k
     % dmu dmu - ds dmu - dmu ds - ds ds
-    [K_3, kT] = run_noise_adjoint_mex( mu, rho, C, complex(adstf_2nd), rec, [], spectrum, [], G_fft, 12, dmu, u_dag );
+    [K_3, kT] = run_noise_adjoint_mex( mu, rho, single(C), complex(adstf_2nd), rec, [], spectrum, [], G_fft, 12, dmu, single(u_dag) );
     
     if( strcmp( usr_par.type, 'source' ) )
         K_3(:,:,end) = 0 * K_3(:,:,end);
@@ -167,7 +167,7 @@ for i = 1:n_ref
     %% RED -- w und l
     % dmu dmu - ds dmu
     if( ~strcmp( usr_par.type, 'source') )
-        K_4 = run_noise_adjoint_mex( mu, rho, G, kT, rec, [], spectrum, source_dist_ref, [], 10, dmu, p );
+        K_4 = run_noise_adjoint_mex( mu, rho, single(G), complex(kT), rec, [], spectrum, source_dist_ref, complex([]), 10, dmu, single(p) );
     end
     
     if( strcmp( usr_par.verbose, 'yes') ) fprintf( '%i: RED -- done\n', i ); end

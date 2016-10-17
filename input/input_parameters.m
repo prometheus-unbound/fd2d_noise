@@ -50,17 +50,17 @@ order = 4;              % finite-difference order (2 or 4)
 %==========================================================================
 
 % store every nth time step of forward field
-fw_nth = 1;
+fw_nth = 4;
 
 
 %==========================================================================
 % model type
 %==========================================================================
 
-model_type = 1;
+% model_type = 1;
 % model_type = 200;
 % model_type = 666;
-% model_type = 888;
+model_type = 888;
 % model_type = 999;
 
 
@@ -79,8 +79,8 @@ model_type = 1;
 % source type
 %==========================================================================
 
-source_type = 'homogeneous';
-% source_type = 'gaussian';
+% source_type = 'homogeneous';
+source_type = 'gaussian';
 
 % number of frequency bands
 n_basis_fct = 0;  

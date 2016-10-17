@@ -33,7 +33,7 @@ usr_par.initial.mu_0 = 4.8e10;
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
 % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
-usr_par.kernel.sigma.source = [5e4 5e4];
+usr_par.kernel.sigma.source = [1e-3 1e-3];
 usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
 
 
@@ -67,7 +67,7 @@ for i = 1:nr_x
 
                 
         % big - line setup
-        %array( (i-1)*nr_z + j, 1 ) = 0.5e6 + ( i-1 ) * 0.1e6;
+        % array( (i-1)*nr_z + j, 1 ) = 0.5e6 + ( i-1 ) * 0.1e6;
         % array( (i-1)*nr_z + j, 2 ) = 1.0e6;
         
         % small - line setup
@@ -125,14 +125,14 @@ m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
 
 if(model_type==666)
     
-    A = imread('../models/random_10_in_lt_array.png');
+    A = imread('../models/random_7_in_lt_array.png');
     m_parameters(:,:,end) = m_parameters(:,:,end) + 5.0e9 * flipud( abs((double(A(:,:,1))-255)/max(max(abs(double(A(:,:,1))-255)))) )';
     m_parameters(:,:,end) = m_parameters(:,:,end) - 5.0e9 * flipud( abs((double(A(:,:,2))-255)/max(max(abs(double(A(:,:,2))-255)))) )';
         
 elseif(model_type==888)   
     
-    load('../models/random_0.1_norm.mat');
-    m_parameters(:,:,end) = m_parameters(:,:,end) + 150.0e9 * signal;
+    load('../models/random_0.07_norm.mat');
+    m_parameters(:,:,end) = m_parameters(:,:,end) + 0.8e10 * signal;
     
 end
 
@@ -157,7 +157,7 @@ end
 
 % plot configuration
 % if( strcmp(make_plots,'yes') )
-%     
+    
 %     figure
 %     hold on
 %     plot( array(:,1), array(:,2), 'o' )
@@ -177,17 +177,11 @@ end
 %     
 %     return
 %     
-%     figure
-%     hold on
-%     mesh( X, Z, sqrt(mu./rho)' )
-%     plot3( array(:,1), array(:,2), 5000 + 0*array(:,2), 'o' )
-%     xlim([0 Lx])
-%     ylim([0 Lz])
-%     axis square
-%     colorbar
-%     grid on
-%     
+%     m_parameters2 = m_parameters;
+%     m_parameters2(:,:,end) = sqrt( m_parameters(:,:,end) ./ rho );
+%     plot_models( m_parameters2, n_basis_fct, array, [0 7 3600 4400] );
 %     return
+%     
 % end
 
 

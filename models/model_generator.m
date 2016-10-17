@@ -10,9 +10,9 @@ clc
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 
 
-corr_length = 0.09;
+corr_length = 0.04;
 k_max = 2 * pi * dx / (corr_length * Lx);
-pert = 1e10 / (corr_length * Lx)^2;
+pert = 4e10 / (corr_length * Lx)^2;
 
 
 %% TESTING
@@ -85,6 +85,9 @@ plot3([width,Lx-width],[Lz-width,Lz-width],level,'k--')
 plot3([width,width],[width,Lz-width],level,'k--')
 plot3([Lx-width,Lx-width],[width,Lz-width],level,'k--')
 
+caxis([-max(max(abs(signal))) max(max(abs(signal)))])
+cm = cbrewer('div','RdBu',120,'PCHIP');
+colormap(cm);
 view([0 90])
 axis square
 colorbar

@@ -6,8 +6,10 @@ clear all
 [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, fw_nth] = input_parameters();
 
 
-path = '~/Desktop/model_59.mat';
-% path2 = '~/Desktop/model_23.mat';
+path = '~/Desktop/model_68.mat';
+% path = 'initial_models/structure_random_0.10_cc_equal_homogeneous_regu_1em2_smooth_5e4.mat';
+% path = 'initial_models/structure_random_0.07_cc_equal_homogeneous_regu_1em2_smooth_5e4.mat';
+% path2 = '~/Desktop/model_79.mat';
 
 
 difftrue = 'no';
@@ -180,25 +182,18 @@ if( isempty( find( m_parameters(:,:,end) < 0, 1 )) )
     m_parameters(:,:,end) = sqrt( m_parameters(:,:,end)./rho );
 end
 
+% m_parameters(:,:,1) = m_parameters(:,:,1) .* ~double(m_parameters(:,:,1) <= 0);
 
 %% actual plotting commadn
 if( exist('clim','var') )
     plot_models( m_parameters, array, [clim(1) clim(2) clim(3) clim(4)] );
 else
     
-%     if( exist('path2', 'var') )
-%         cm = cbrewer('div','RdBu',120,'PCHIP');
-%         plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no', cm );
-%     else
-% 
-%     cm_source_orig = cbrewer('div','RdBu',120,'PCHIP');
-%     cm_source = cm_source_orig(33:120,:);
-%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 3 3.6e3 4.4e3], 'no', 'no', cm_source );
-% 
-%     plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 3.8e3 4.2e3], 'no', 'no' );
-    plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 6 0 0], 'no', 'no' );
-% 
-%     end
+    if( ~exist('path2', 'var') )
+        plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 3700 4300], 'no', 'no' );
+    else
+        plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no' );
+    end
 
 end
 
@@ -220,28 +215,27 @@ end
 % plot correlations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-return
-fprintf('\nResidual nach Inversion:\n')
-% data = load('~/Desktop/runs/2016_start/data_random_norm/data_16_ref_0_1h1g_random_0.07_norm.mat');
-data = load('~/Desktop/runs/2016_start/data_more_sources/data_16_ref_0_h2g_homog.mat');
-misfit_1 = compare_influences( model.correlation, data.c_data, data.t, array, ref_stat, 'no' );
+% return
+% fprintf('\nResidual nach Inversion:\n')
+% data = load('../output/interferometry/data_16_ref_0_gaussian_random_0.07_0.8e10_nosmooth.mat');
+% misfit_1 = compare_influences( model.correlation, data.c_data, data.t, array, ref_stat, 'no' );
+
+% return
+% fprintf('\nEffekt - Struktur:\n')
+% data2 = ;
+% misfit_2 = compare_influences( data2.c_data, data.c_data, data.t, array, ref_stat, 'no' );
+
+% fprintf('\nEffekt - Struktur und Quelle:\n')
+% data3 = ;
+% misfit_3 = compare_influences( data3.c_data, data.c_data, data.t, array, ref_stat, 'no' );
 
 return
-fprintf('\nEffekt - Struktur:\n')
-data2 = load('~/Desktop/runs/2016_start/data_random_norm/data_16_ref_0_1h1g_homog.mat');
-misfit_2 = compare_influences( data2.c_data, data.c_data, data.t, array, ref_stat, 'no' );
-
-fprintf('\nEffekt - Struktur und Quelle:\n')
-data3 = load('~/Desktop/runs/2016_start/data_random_norm/data_16_ref_0_1h_homog.mat');
-misfit_3 = compare_influences( data3.c_data, data.c_data, data.t, array, ref_stat, 'no' );
-
-return
-% initial = load('~/Desktop/runs/inversion_basis_fct/data/data_16_ref_0_uniform1_homogeneous.mat');
-
+initial = load('~/Desktop/runs/paper/data/data_16_ref_0_equal_homogeneous.mat');
 
 figure
-plot_recordings(data.c_data,t,'vel','k',true);
-% plot_recordings(initial.c_data,t,'vel','r',true);
-plot_recordings(model.correlation,t,'vel','b',true);
+data = load('../output/interferometry/data_16_ref_0_gaussian_random_0.07_0.8e10_nosmooth.mat');
+plot_recordings( data.c_data, data.t, 'vel', 'k', true );
+plot_recordings( initial.c_data, data.t, 'vel', 'r', true );
+plot_recordings( model.correlation, data.t, 'vel', 'b', true );
 
 

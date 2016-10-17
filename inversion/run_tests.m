@@ -40,83 +40,83 @@ clear all
 
 
 %% check gradient
-[Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
-
-usr_par.network = load('../output/interferometry/array_1_ref.mat');
-usr_par.data = load('../output/interferometry/data_1_ref_0.mat');
-usr_par.type = 'joint';
-usr_par.kernel.weighting = 0.5;
-
-usr_par.measurement.source = 'waveform_difference';
-usr_par.measurement.structure = 'waveform_difference';
-        
-usr_par.kernel.sigma.source = [1e-3 1e-3];
-usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
-
-[usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
-
-
-% set up initial model
-if( n_basis_fct == 0)
-    m_parameters = zeros(nx, nz, 2);
-    m_parameters(:,:,1) = make_noise_source(source_type, n_basis_fct);
-else
-    m_parameters = zeros(nx, nz, n_basis_fct+1);
-    m_parameters(:,:,1:n_basis_fct) = make_noise_source(source_type, n_basis_fct);
-end
-m_parameters(:,:,end) = define_material_parameters(nx,nz,model_type);
-
-
-% convert to optimization variable
-m = map_parameters_to_m(m_parameters,usr_par);
-
-
-% initial model for regularization
-usr_par.m0 = m;
-
-
-% set up test vector
-dm = rand( numel(m), 1 );
-
-
-%%% TEST %%%
-% x_source_r = 3.0e4;
-% z_source_r = 3.0e4;
-% radius = 2.0e4;
-% thickness = 5e3;
-% [Lx, Lz, nx, nz] = input_parameters();
-% [X, Z] = define_computational_domain(Lx,Lz,nx,nz);
+% [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
 % 
-% R = ( (X-x_source_r).^2 + (Z-z_source_r).^2 ).^(1/2);
+% usr_par.network = load('../output/interferometry/array_2_ref_testing.mat');
+% usr_par.data = load('../output/interferometry/data_2_ref_0_testing.mat');
+% usr_par.type = 'joint';
+% usr_par.kernel.weighting = 0.5;
 % 
-% mesh( double(R > (radius-thickness/2) & R < (radius+thickness/2) ) )
-% return 
+% usr_par.measurement.source = 'waveform_difference';
+% usr_par.measurement.structure = 'waveform_difference';
+%         
+% usr_par.kernel.sigma.source = [1e-3 1e-3];
+% usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
 % 
-% dm(:,:,1) = dm(:,:,1) .* double(R > (radius-thickness/2) & R < (radius+thickness/2) );
-%%% TEST END %%%
-
-
-% make sure that test vector is consistent with setup
-if( strcmp( usr_par.type, 'source' ) && ~isempty(find( dm(end-nx*nz+1:end, 1), 1 )) )
-    fprintf('\nchanged dm accordingly!\n')
-    dm( end - nx*nz + 1 : end, 1 ) = 0 * dm( end - nx*nz + 1 : end, 1 );
-elseif( strcmp( usr_par.type, 'structure' ) && ~isempty(find( dm(1:end-nx*nz, 1), 1 )) )
-    fprintf('\nchanged dm accordingly!\n')
-    dm( 1:end-nx*nz, 1 ) = 0 * dm( 1:end-nx*nz, 1 );
-end
-
-
-[absbound] = reshape( init_absbound() , [], 1 );
-for i = 1:size(dm)/(nx*nz)
-   dm( ((i-1)*nx*nz+1):i*nx*nz, 1 ) = double( absbound == 1 ) .* dm( ((i-1)*nx*nz+1):i*nx*nz, 1 ); 
-end
-
-
-[dcheck, dcheck_struct] = optlib_check_derivative( m, reshape(dm,[],1), -10, 0, 1, usr_par );
-
-return
-keyboard
-clear all
+% [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
+% 
+% 
+% % set up initial model
+% if( n_basis_fct == 0)
+%     m_parameters = zeros(nx, nz, 2);
+%     m_parameters(:,:,1) = make_noise_source(source_type, n_basis_fct);
+% else
+%     m_parameters = zeros(nx, nz, n_basis_fct+1);
+%     m_parameters(:,:,1:n_basis_fct) = make_noise_source(source_type, n_basis_fct);
+% end
+% m_parameters(:,:,end) = define_material_parameters(nx,nz,model_type);
+% 
+% 
+% % convert to optimization variable
+% m = map_parameters_to_m(m_parameters,usr_par);
+% 
+% 
+% % initial model for regularization
+% usr_par.m0 = m;
+% 
+% 
+% % set up test vector
+% dm = rand( numel(m), 1 );
+% 
+% 
+% %%% TEST %%%
+% % x_source_r = 3.0e4;
+% % z_source_r = 3.0e4;
+% % radius = 2.0e4;
+% % thickness = 5e3;
+% % [Lx, Lz, nx, nz] = input_parameters();
+% % [X, Z] = define_computational_domain(Lx,Lz,nx,nz);
+% % 
+% % R = ( (X-x_source_r).^2 + (Z-z_source_r).^2 ).^(1/2);
+% % 
+% % mesh( double(R > (radius-thickness/2) & R < (radius+thickness/2) ) )
+% % return 
+% % 
+% % dm(:,:,1) = dm(:,:,1) .* double(R > (radius-thickness/2) & R < (radius+thickness/2) );
+% %%% TEST END %%%
+% 
+% 
+% % make sure that test vector is consistent with setup
+% if( strcmp( usr_par.type, 'source' ) && ~isempty(find( dm(end-nx*nz+1:end, 1), 1 )) )
+%     fprintf('\nchanged dm accordingly!\n')
+%     dm( end - nx*nz + 1 : end, 1 ) = 0 * dm( end - nx*nz + 1 : end, 1 );
+% elseif( strcmp( usr_par.type, 'structure' ) && ~isempty(find( dm(1:end-nx*nz, 1), 1 )) )
+%     fprintf('\nchanged dm accordingly!\n')
+%     dm( 1:end-nx*nz, 1 ) = 0 * dm( 1:end-nx*nz, 1 );
+% end
+% 
+% 
+% [absbound] = reshape( init_absbound() , [], 1 );
+% for i = 1:size(dm)/(nx*nz)
+%    dm( ((i-1)*nx*nz+1):i*nx*nz, 1 ) = double( absbound == 1 ) .* dm( ((i-1)*nx*nz+1):i*nx*nz, 1 ); 
+% end
+% 
+% 
+% [dcheck, dcheck_struct] = optlib_check_derivative( m, reshape(dm,[],1), -10, 0, 1, usr_par );
+% 
+% return
+% keyboard
+% clear all
 
 
 
@@ -211,14 +211,14 @@ clear all
 [Lx,Lz,nx,nz,dt,nt,order,model_type,source_type,n_basis_fct] = input_parameters();
 [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
 
-usr_par.network = load('../output/interferometry/array_1_ref_testing_small.mat');
-usr_par.data = load('../output/interferometry/data_1_ref_0_testing_small.mat');
+usr_par.network = load('../output/interferometry/array_2_ref_testing.mat');
+usr_par.data = load('../output/interferometry/data_2_ref_0_testing.mat');
 
 % usr_par.network = load('../output/interferometry/array_1_ref.mat');
 % usr_par.data = load('../output/interferometry/data_1_ref_0.mat');
 
 usr_par.use_mex = 'no';
-usr_par.type = 'source';
+usr_par.type = 'joint';
 
 usr_par.kernel.weighting = 0.5;
 usr_par.measurement.source = 'waveform_difference';

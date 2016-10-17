@@ -43,6 +43,10 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     
     
     %% open figure, set size, etc.
+    font_size = 11;
+    title_size = 13;
+    maker_size = 3;
+    
     if(strcmp(video,'no') )
         fig1 = figure;
     else
@@ -57,14 +61,14 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
         ax1 = subplot(1,2,1);
     end
     cla
-    set(ax1,'FontSize',18);
+    set(ax1,'FontSize',font_size);
     hold on
     
     
     %% plot array if given
     if( ~isempty(array) )
-        plot3( array(:,1)/1000, array(:,2)/1000, 7+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
-        legend('array')
+        plot3( array(:,1)/1000, array(:,2)/1000, 7+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', maker_size )
+%         legend('array')
     end
     
     
@@ -125,6 +129,7 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     cb = colorbar;
     ylabel(cb,'[kg^2 m^{-2} s^{-2}]')
     colormap(ax1,cm_source)
+%     set(cb,'YTick',[0.9,1])
             
     if( clim(1)~=0 || clim(2)~=0 )
         caxis([clim(1) clim(2)]);
@@ -157,6 +162,7 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     
 %     return
     
+
     %% structure plot
     if(strcmp(video,'yes'))
         ax2 = subplot(2,2,2);
@@ -164,18 +170,30 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
         ax2 = subplot(1,2,2);
     end
     cla
-%     set(ax2,'FontSize',28);
-    set(ax2,'FontSize',18);
+    set(ax2,'FontSize',font_size);
     hold on
     
     % plot array if given
     if( ~isempty(array) )
-        plot3( array(:,1)/1000, array(:,2)/1000, 6e3+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', 5 )
-        legend('array')
+        plot3( array(:,1)/1000, array(:,2)/1000, 6e3+0*array(:,2), 'kd', 'MarkerFaceColor', 'k', 'MarkerSize', maker_size )
+%         legend('array')
     end
     
-    mesh(X, Z, m_parameter(:,:,end)' )
-    contour3(X, Z, m_parameter(:,:,end)', [3900 3950 3975 4025 4050 4100] ,'LineColor', 'k', 'LineWidth', 2 )
+    
+    
+    load ../output/interferometry/array_16_ref.mat
+    min_x = min(array(:,1))/1e3;
+    min_z = min(array(:,2))/1e3;
+    max_x = max(array(:,1))/1e3;
+    max_z = max(array(:,2))/1e3;
+    
+    buffer = 1e2;
+    pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
+    
+    
+    
+    mesh(X, Z, m_parameter(:,:,end)'); % .* pattern + double(4000 * ~pattern) )
+    
     cb = colorbar;
     ylabel(cb,'[m/s]')
     colormap(ax2,cm_structure);
@@ -187,8 +205,8 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
         caxis([3.6 4.4]*1e3)
         set(cb,'YTick',[3.6 4.0 4.4]*1e3,'FontSize',28)
     else
-%         caxis([3.87 4.13]*1e3)
-%         set(cb,'YTick',[3.9 4.0 4.1]*1e3)
+        % caxis([3.87 4.13]*1e3)
+        % set(cb,'YTick',[3.9 4.0 4.1]*1e3)
     end
     
     xlabels = [0 1000 2000];
@@ -198,34 +216,22 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     % set(gca, 'XTick', []);
     set(gca, 'YTick', []);
     xlabel('x [km]')
-%     ylabel('z [km]')
+    % ylabel('z [km]')
     xlim([0 Lx])
     ylim([0 Lz])
         
-    plot3([width,Lx-width],[width,width],[4.1e3,4.1e3],'k--')
-    plot3([width,Lx-width],[Lz-width,Lz-width],[4.1e3,4.1e3],'k--')
-    plot3([width,width],[width,Lz-width],[4.1e3,4.1e3],'k--')
-    plot3([Lx-width,Lx-width],[width,Lz-width],[4.1e3,4.1e3],'k--')
     
-%     title('inverted, with equal noise dist.','FontSize',34)
-%     title('inverted, with inverted source','FontSize',34)
-%     title('joint inversion','FontSize',34)
-%     title('true structure','FontSize',34)
-
-%     title('true structure','FontSize',34)
-%     title('traveltime inversion','FontSize',34)
-%     title('FWI, with inverted source','FontSize',34)
-
-%     min_x = min(array(:,1))/1e3;
-%     min_z = min(array(:,2))/1e3;
-%     max_x = max(array(:,1))/1e3;
-%     max_z = max(array(:,2))/1e3;
-%     buffer = 60;
+    plot3([width,Lx-width],[width,width],[4.5e3,4.5e3],'k--')
+    plot3([width,Lx-width],[Lz-width,Lz-width],[4.5e3,4.5e3],'k--')
+    plot3([width,width],[width,Lz-width],[4.5e3,4.5e3],'k--')
+    plot3([Lx-width,Lx-width],[width,Lz-width],[4.5e3,4.5e3],'k--')
     
-%     plot3([min_x-buffer,max_x+buffer],[min_z-buffer,min_z-buffer],[5.5e10,5.5e10],'k--','LineWidth',3)
-%     plot3([min_x-buffer,max_x+buffer],[max_z+buffer,max_z+buffer],[5.5e10,5.5e10],'k--','LineWidth',4)
-%     plot3([min_x-buffer,min_x-buffer],[min_z-buffer,max_z+buffer],[5.5e10,5.5e10],'k--','LineWidth',4)
-%     plot3([max_x+buffer,max_x+buffer],[min_z-buffer,max_z+buffer],[5.5e10,5.5e10],'k--','LineWidth',4)    
+   
+%     plot3([min_x-buffer,max_x+buffer],[min_z-buffer,min_z-buffer],[4.5e3,4.5e3],'k--','LineWidth', 3)
+%     plot3([min_x-buffer,max_x+buffer],[max_z+buffer,max_z+buffer],[4.5e3,4.5e3],'k--','LineWidth', 3)
+%     plot3([min_x-buffer,min_x-buffer],[min_z-buffer,max_z+buffer],[4.5e3,4.5e3],'k--','LineWidth', 3)
+%     plot3([max_x+buffer,max_x+buffer],[min_z-buffer,max_z+buffer],[4.5e3,4.5e3],'k--','LineWidth', 3)    
+
     
     shading interp   
     grid on

@@ -10,7 +10,7 @@ if [ $brutus -gt 1 ] || [ $euler -gt 1 ]; then
 fi
 
 if [ $monch -gt 1 ]; then
-    module load matlab/r2016a
+    module load matlab/r2015a
 fi
 
 
@@ -37,20 +37,20 @@ if [ $monch -gt 1 ]; then
 cat <<EOF > hessian.sh
 #!/bin/bash -l								
 
-#SBATCH --partition=fichtner_compute
+#SBATCH --partition=other_hugemem
 #SBATCH --job-name=hessian
 #SBATCH --output=logs/matlab_%j.out
 #SBATCH --error=logs/matlab_%j.err
 #SBATCH --time=01-00:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem=32768
+#SBATCH --mem=65536
 
 
 ######################
 # Begin work section #
 ######################
 
-module load matlab/r2016a
+module load matlab/r2015a
 matlab -nodisplay -r calculate_hessian
 
 EOF

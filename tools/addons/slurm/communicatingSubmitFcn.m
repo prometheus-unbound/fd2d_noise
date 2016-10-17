@@ -89,7 +89,7 @@ additionalSubmitArgs = sprintf('--partition=fichtner_compute_wk --time=07-00:00:
 % additionalSubmitArgs = sprintf('--partition=fichtner_compute --time=00-05:00:00 --nodes=2 --ntasks-per-node=8 --mem-per-cpu=4096 --ntasks=%d', props.NumberOfTasks);
 % additionalSubmitArgs = sprintf('--partition=fichtner_compute --time=01-00:00:00 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=32768 --ntasks=%d', props.NumberOfTasks);
 % additionalSubmitArgs = sprintf('--partition=other_largemem --time=00-05:00:00 --nodes=2 --ntasks-per-node=8 --mem-per-cpu=8192 --ntasks=%d', props.NumberOfTasks);
-% additionalSubmitArgs = sprintf('--partition=other_hugemem --time=00-01:00:00 --nodes=1 --ntasks-per-node=16 --mem-per-cpu=16384 --ntasks=%d', props.NumberOfTasks);
+% additionalSubmitArgs = sprintf('--partition=other_hugemem --time=01-00:00:00 --nodes=2 --ntasks-per-node=8 --mem-per-cpu=32768 --ntasks=%d', props.NumberOfTasks);
 dctSchedulerMessage(5, '%s: Generating command for task %i', currFilename, ii);
 commandToRun = getSubmitString(jobName, quotedLogFile, quotedScriptName, ...
     additionalSubmitArgs);

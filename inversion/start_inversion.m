@@ -17,7 +17,7 @@ usr_par.cluster = 'monch';
 % 'brutus';
 
 
-usr_par.type = 'source';
+usr_par.type = 'joint';
 % 'source'
 % 'structure'
 % 'joint'
@@ -35,10 +35,10 @@ usr_par.initial.mu_0 = 4.8e10;
 
 
 % if wanted, load initial perturbations for source and/or structure
-% initial_model = load('initial_models/model_56.mat');
-% usr_par.initial.source_dist = initial_model.model.m( 1 : end - nx*nz, 1 );
-% initial_model = load('initial_models/structure_cc_random_0.1_norm.mat');
-% usr_par.initial.structure = initial_model.model.m( end - nx*nz + 1 : end, 1 );
+initial_model = load('initial_models/structure_source_random_0.07_cc_1em2_ampdiff_1em3.mat');
+usr_par.initial.source_dist = initial_model.model.m( 1 : end - nx*nz, 1 );
+% initial_model = load('initial_models/structure_source_random_0.10_cc_1em2_ampdiff_1em5.mat');
+usr_par.initial.structure = initial_model.model.m( end - nx*nz + 1 : end, 1 );
 
 
 usr_par.measurement.source = 'amplitude_difference';
@@ -76,7 +76,7 @@ usr_par.ring.taper_strength = 70e8;
 
 % load array with reference stations and data
 usr_par.network = load('../output/interferometry/array_16_ref.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_0_gaussian_smoothing_test.mat');
+usr_par.data = load('../output/interferometry/data_16_ref_0_gaussian_random_0.07_0.8e10_nosmooth.mat');
 
 
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')
@@ -91,8 +91,8 @@ usr_par.filter.f_max = 1/7 + 0.01;
 
 % regularization j_total = dj/dm + alpha * ||m_source-m0_source||^2 + beta * ||m_structure-m0_structure||^2 
 % (i.e. set alpha or beta to zero to turn it off)
-usr_par.regularization.alpha = 1e-6;
-usr_par.regularization.beta = 0;
+usr_par.regularization.alpha = 1e-5;
+usr_par.regularization.beta = 1e-2;
 usr_par.regularization.weighting = weighting( nx, nz );
 
 
@@ -102,7 +102,7 @@ usr_par.regularization.weighting = weighting( nx, nz );
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% FOR LBFGS
-options.tolerance = 5e-3;
+options.tolerance = 1e-3;
 options.successive_change = 1e-3;
 options.successive_iterations = 5;
 options.max_iterations = 500;
@@ -158,12 +158,6 @@ elseif( strcmp( usr_par.type, 'structure') )
 end
 
 
-% start matlabpool
-if( ~strcmp( usr_par.cluster, 'local') )
-    parobj = start_cluster( usr_par.cluster, '', size(usr_par.network.ref_stat,1));
-end
-
-
 % set necessary fields that might not have been set
 [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
 
@@ -200,6 +194,12 @@ end
 
 % uncomment next line if the specified initial model is the real initial model and not just a restart of the inversion
 % usr_par.m0 = m0;
+
+
+% start matlabpool
+if( ~strcmp( usr_par.cluster, 'local') )
+    parobj = start_cluster( usr_par.cluster, '', size(usr_par.network.ref_stat,1));
+end
 
 
 % run inversion

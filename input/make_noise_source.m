@@ -59,8 +59,8 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
             % standard
             x_sourcem = [0.6e6, 0.5e6, 1.3e6];
             z_sourcem = [0.8e6, 1.5e6, 1.6e6];
-            sourcearea_width = [2.0e5, 1.5e5, 1.8e5];
-            magnitude = [6.0, 5.0, 3.0];
+            sourcearea_width = [1.5e5, 1.5e5, 1.8e5];
+            magnitude = [6.5, 5.0, 3.0];
             
             % x_sourcem = [0.4e6];
             % z_sourcem = [1.0e6];

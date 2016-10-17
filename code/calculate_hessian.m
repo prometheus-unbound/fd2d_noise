@@ -34,7 +34,14 @@ usr_par.initial.ref_structure = 1;
 usr_par.initial.mu_0 = 4.8e10;
 
 
-usr_par.measurement.source = 'waveform_difference';
+% if wanted, load initial perturbations for source and/or structure
+% initial_model = load('initial_models/source_random_0.10_loga_equal_homogeneous_regu_1em4_smooth_5e4.mat');
+% usr_par.initial.source_dist = initial_model.model.m( 1 : end - nx*nz, 1 );
+% initial_model = load('initial_models/structure_random_0.10_cc_equal_homogeneous_regu_1em2_smooth_5e4.mat');
+% usr_par.initial.structure = initial_model.model.m( end - nx*nz + 1 : end, 1 );
+
+
+usr_par.measurement.source = 'log_amplitude_ratio';
 usr_par.measurement.structure = 'waveform_difference';
 % 'log_amplitude_ratio';
 % 'amplitude_difference';
@@ -53,13 +60,16 @@ usr_par.kernel.weighting = 0.5;
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
 % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
-usr_par.kernel.sigma.source = [1 1];
+usr_par.kernel.sigma.source = [1e-3 1e-3];
 usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
 
 
 % load array with reference stations and data
-usr_par.network = load('../output/interferometry/array_1_ref_hessian_big.mat');
-usr_par.data = load('../output/interferometry/data_1_ref_0_hessian_big.mat');
+% usr_par.network = load('../output/interferometry/array_16_ref.mat');
+% usr_par.data = load('../output/interferometry/data_16_ref_0_gaussian_random_0.10_0.8e10_nosmooth.mat');
+
+usr_par.network = load('../output/interferometry/array_2_ref_testing.mat');
+usr_par.data = load('../output/interferometry/data_2_ref_0_testing.mat');
 
 
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')
@@ -73,15 +83,37 @@ usr_par.regularization.beta = 0;
 usr_par.regularization.weighting = weighting( nx, nz );
 
 
+usr_par.verbose = 'yes';
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % running the inversion
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% start matlabpool
-% if( ~strcmp( usr_par.cluster, 'local') )
-%     parobj = start_cluster( usr_par.cluster, '', size(usr_par.network.ref_stat,1));
-% end
+if( strcmp( usr_par.type, 'source') )
+    
+    if( usr_par.kernel.weighting ~= 0.0 )
+        
+        usr_par.kernel.weighting = 0.0;
+        usr_par.regularization.beta = 0.0;
+        
+        fprintf('\nset usr_par.kernel.weighting to 0.0')
+        fprintf('\nset usr_par.regularization.beta to 0.0\n')
+        
+    end
+    
+elseif( strcmp( usr_par.type, 'structure') )
+    
+    if( usr_par.kernel.weighting ~= 1.0 )
+        
+        usr_par.kernel.weighting = 1.0;
+        usr_par.regularization.alpha = 0.0;
+    
+        fprintf('\nset usr_par.kernel.weighting to 1.0')
+        fprintf('\nset usr_par.regularization.alpha to 0.0\n')
+    end
+    
+end
 
 
 % set necessary fields that might not have been set
@@ -103,20 +135,30 @@ m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
 m0 = map_parameters_to_m( m_parameters, usr_par );
 
 
+if( isfield( usr_par, 'initial') )
+    if( isfield( usr_par.initial, 'source_dist') )
+        m0( 1 : end - nx*nz, 1 ) = usr_par.initial.source_dist;
+    end
+    
+    if( isfield( usr_par.initial, 'structure') )
+        m0( end - nx*nz + 1 : end, 1 ) = usr_par.initial.structure;
+    end
+end
+
+
 % initial model for regularization
 usr_par.m0 = m0;
 
 
 % set up test vector
 dm = 0 * m_parameters;
-% dm( 295:305, 295:305, 1 ) = 0.1;
-% dm( 130:140, 295:305, 1 ) = 0.1;
-dm( 130:140, 325:335, 1 ) = 0.1;
+% dm( 382:386, 293:297, 2 ) = 0.1;
+dm( 25:30, 25:30, 2 ) = 0.1;
 
 
 if( strcmp( usr_par.cluster, 'local' ) )
     
-    figure%(555)
+    figure
     [Lx,Lz] = input_parameters();
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     [width] = absorb_specs();
@@ -131,7 +173,7 @@ if( strcmp( usr_par.cluster, 'local' ) )
     plot3([Lx-width,Lx-width],[width,Lz-width],[offset,offset],'k--')
     axis square
     
-    return
+%     return
     
 end
 
@@ -144,6 +186,17 @@ for i = 1:size(dm)/(nx*nz)
 end
 
 
+% tmp = reshape(dm,600,600,2);
+% mesh( X, Z, tmp(:,:,2)' )
+% return
+
+
+% start matlabpool
+if( ~strcmp( usr_par.cluster, 'local') )
+    parobj = start_cluster( usr_par.cluster, '', size(usr_par.network.ref_stat,1));
+end
+
+
 % calculate Hessian vector product
 tic
 Hdm = eval_hessian_vector_product( m0, dm, optlib_generate_random_string(8), usr_par );
@@ -153,7 +206,7 @@ toc
 % plot Hessian vector product
 if( strcmp( usr_par.cluster, 'local' ) )
     
-    fig666 = figure(666);
+    fig666 = figure;%(666);
     set(fig666,'units','normalized','position',[.1 .5 0.5 0.4])
     
     [Lx,Lz] = input_parameters();
@@ -167,7 +220,7 @@ if( strcmp( usr_par.cluster, 'local' ) )
     cm = cbrewer('div','RdBu',120,'PCHIP');
     colormap(cm);
     caxis([ -max(max(abs( uiui(:,:,1) )))  max(max(abs( uiui(:,:,1) )))]);
-    axis image
+%     axis image
     colorbar
     view(angle)
     
@@ -176,7 +229,7 @@ if( strcmp( usr_par.cluster, 'local' ) )
     cm = cbrewer('div','RdBu',120,'PCHIP');
     colormap(cm);
     caxis([ -max(max(abs( uiui(:,:,end) )))  max(max(abs( uiui(:,:,end) )))]);
-    axis image
+%     axis image
     colorbar
     view(angle)
     
@@ -190,7 +243,7 @@ save( '../output/hessian.mat', 'Hdm', 'usr_par', 'dm', '-v7.3' )
 
 
 % close matlabpool
-% if( ~strcmp( usr_par.cluster, 'local' ) )
-%     delete(parobj)
-% end
+if( ~strcmp( usr_par.cluster, 'local' ) )
+    delete(parobj)
+end
 
