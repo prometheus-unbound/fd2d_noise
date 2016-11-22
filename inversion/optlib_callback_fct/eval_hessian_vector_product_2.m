@@ -1,5 +1,5 @@
 
-function [Hm] = eval_hessian_vector_product( m, dm, ModRandString, usr_par )
+function [H_m] = eval_hessian_vector_product_2( m, dm_parameters, ModRandString, usr_par )
  
 
 %- get configuration
@@ -16,23 +16,22 @@ mu = m_parameters(:,:,end);
 source_dist_ref = m_parameters(:,:,1:end-1);
 [~, spectrum] = make_noise_source( source_type, n_basis_fct );
 
-if( numel(m_parameters) ~= numel(dm) )
+if( numel(m_parameters) ~= numel(dm_parameters) )
 
-    dm_generic = 0 * m;
+    dm_generic = 0 * m_parameters;
     
     if( strcmp( usr_par.type, 'source' ) )
-        dm_generic( 1:end-nx*nz, 1 ) = dm;
+        dm_generic(:,:,1:end-1) = dm_parameters;
     elseif( strcmp( usr_par.type, 'structure' ) )
-        dm_generic( end-nx*nz+1:end, 1 ) = dm;
+        dm_generic(:,:,end) = dm_parameters;
     end
     
 else
-    dm_generic = dm;
+    dm_generic = dm_parameters;
 end
 
-dm_parameters = map_m_to_parameters( m + dm_generic, usr_par);
-source_dist_pert = dm_parameters(:,:,1:end-1) - source_dist_ref;
-dmu = dm_parameters(:,:,end) - mu;
+source_dist_pert = dm_generic(:,:,1:end-1);
+dmu = dm_generic(:,:,end);
 
 
 %- loop over reference stations
@@ -185,16 +184,20 @@ end
 
 
 %- map H_parameters to H_m
-Hm = map_Hparameters_to_Hm( H_parameters, usr_par );
+H_m = map_Hparameters_to_Hm( H_parameters, usr_par );
 
 
 %- add term from regularization
 [absbound] = reshape( init_absbound() , [], 1 );
-Hm( 1:end - nx*nz, 1 ) = Hm( 1:end - nx*nz, 1 ) + double( absbound == 1 ) .* usr_par.regularization.alpha ...
+H_m( 1:end - nx*nz, 1 ) = H_m( 1:end - nx*nz, 1 ) + double( absbound == 1 ) .* usr_par.regularization.alpha ...
     .* repmat( usr_par.regularization.weighting, ( numel(m)-nx*nz ) / numel(usr_par.regularization.weighting), 1 ) ;
 
-Hm( end - nx*nz + 1 : end, 1 ) = Hm( end - nx*nz + 1 : end, 1 ) + double( absbound == 1 ) ...
+H_m( end - nx*nz + 1 : end, 1 ) = H_m( end - nx*nz + 1 : end, 1 ) + double( absbound == 1 ) ...
     .* usr_par.regularization.beta .* usr_par.regularization.weighting;
+
+
+save( '../output/hessian_H_m.mat', 'H_m', 'usr_par', '-v7.3' )
+save( '../output/hessian_H_parameters.mat', 'H_parameters', 'usr_par', '-v7.3' )
 
 
 end

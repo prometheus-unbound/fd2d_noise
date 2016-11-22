@@ -44,9 +44,18 @@ set(gca,'XDir','Reverse');
 
 
 %% random 0.07
-% random 0.07 - structure cc
+% structure cc - equal source
 regu = [1e-1;  1e-2;  1e-3;  1e-4;  1e-5;  1e-6];
 misfit = [2.311953e+02; 7.149076e+01; 5.257688e+01; 4.885496e+01; 5.088960e+01; 5.118338e+01];
+
+figure
+semilogx(regu, misfit,'*')
+set(gca,'XDir','Reverse');
+
+
+% structure cc - equal source
+regu = [1e-1;  1e-2;  1e-3;  1e-4];
+misfit = [2.259439e+02; 6.694452e+01; 4.792296e+01; 4.376327e+01];
 
 figure
 semilogx(regu, misfit,'*')

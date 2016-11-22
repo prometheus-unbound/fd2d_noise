@@ -2,8 +2,8 @@
 clear all
 
 
-folder = '~/Desktop/runs/paper/data/';
-random = [0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.20];
+folder = '~/Desktop/runs/paper/data_inversion/';
+random = [0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.20];
 
 
 % load reference
@@ -23,17 +23,17 @@ end
 
 
 % compute misfits
-misfit_eqhovseq = zeros(length(random), 4);
-misfit_eqhovsgauss = zeros(length(random), 4);
-misfit_gausshovsgauss = zeros(length(random), 4);
-misfit_eqvsgauss = zeros(length(random), 4);
+misfit_eqho_vs_eq = zeros(length(random), 4);
+misfit_eqho_vs_gauss = zeros(length(random), 4);
+misfit_gaussho_vs_gauss = zeros(length(random), 4);
+misfit_eq_vs_gauss = zeros(length(random), 4);
 
 for i = 1:length(random)
    
-    misfit_eqhovseq(i,:) = sum( compare_influences( equal_homog.c_data, equal(i).c_data, t, array, ref_stat, 'no' ), 1);
-    misfit_eqhovsgauss(i,:) = sum( compare_influences( equal_homog.c_data, gaussian(i).c_data, t, array, ref_stat, 'no' ), 1);
-    misfit_gausshovsgauss(i,:) = sum( compare_influences( gaussian_homog.c_data, gaussian(i).c_data, t, array, ref_stat, 'no' ), 1);
-    misfit_eqvsgauss(i,:) = sum( compare_influences( equal(i).c_data, gaussian(i).c_data, t, array, ref_stat, 'no' ), 1);
+    misfit_eqho_vs_eq(i,:) = sum( compare_influences( equal_homog.c_data, equal(i).c_data, t, array, ref_stat, 'no' ), 1);
+    misfit_eqho_vs_gauss(i,:) = sum( compare_influences( equal_homog.c_data, gaussian(i).c_data, t, array, ref_stat, 'no' ), 1);
+    misfit_gaussho_vs_gauss(i,:) = sum( compare_influences( gaussian_homog.c_data, gaussian(i).c_data, t, array, ref_stat, 'no' ), 1);
+    misfit_eq_vs_gauss(i,:) = sum( compare_influences( equal(i).c_data, gaussian(i).c_data, t, array, ref_stat, 'no' ), 1);
     
 end
 
@@ -44,21 +44,24 @@ titles(2,:) = 'amp ';
 titles(3,:) = 'cc  ';
 titles(4,:) = 'wd  ';
 
+indices = 4:length(random);
 for i = 1:4
     
     subplot( 2, 2, i )
     hold on
-    plot( random, misfit_eqhovseq(:,i), 'r' )
-    plot( random, misfit_eqhovsgauss(:,i), 'b' )
-    plot( random, misfit_gausshovsgauss(:,i), 'k' )
-    plot( random, misfit_eqvsgauss(:,i), 'c' )
+    plot( random(indices), misfit_eqho_vs_eq(indices,i), 'r' )
+    plot( random(indices), misfit_eqho_vs_gauss(indices,i), 'b' )
+%     plot( random(indices), misfit_gaussho_vs_gauss(indices,i), 'k' )
+%     plot( random(indices), misfit_eq_vs_gauss(indices,i), 'c' )
     grid on
     
     title( titles(i,:), 'Interpreter', 'none' )
     
 end
 
+legend( 'homog. structure, equal noise dist.  VS  random structure, equal noise dist.', 'homog. structure, equal noise dist.  VS  random structure, gaussian noise dist.' );% , 'Location', 'Outside' )
 
+return
 
 
 path = '~/Desktop/model_25.mat';

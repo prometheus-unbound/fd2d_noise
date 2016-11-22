@@ -63,39 +63,41 @@ for i = 1:length(models_dir)
     end
     
     m_parameters = map_m_to_parameters(model.m, usr_par);
-%     plot_models( m_parameters, 0, array, [0 0 clim(1) clim(2)], 'no', 'yes');
-%     plot_models( m_parameters, 0, array, [0 0 4.6e10 5.0e10], 'no', 'yes');
-    plot_models( m_parameters, 0, array, [0 0 4.6e10 5.0e10], 'no', 'yes');
-    
-    fig1 = figure(1);
-    subplot(2,2,3)
-    if(i==1)
-        normg0 = norm(model.gradient);
-    end
-    semilogy(i,norm(model.gradient)/normg0,'x')
-    % text(i,norm(model.gradient)/normg0,step(i))
-    xlim([0 length(models_dir)])
-    ylim([1e-3 1])
-    % axis square
-    hold on
-    
-    subplot(2,2,4)
-    semilogy(i,misfit(i),'x')
-    xlim([0 length(models_dir)])
-    ylim([5 70])
-    % axis square
-    hold on
+
+    [~,rho] = define_material_parameters( nx, nz, model_type );
+    m_parameters(:,:,end) = sqrt( m_parameters(:,:,end)./rho );
+    plot_models( m_parameters, 0, array, [0 5 3700 4300], 'no', 'yes');
     
     
-    fig2 = figure(2);
-    if(i==1)
-        normg0 = norm(model.gradient);
-    end
-    semilogy(i,norm(model.gradient)/normg0,'x')
-    text(i,norm(model.gradient)/normg0,step(i),'FontSize',7)
-    xlim([0 length(models_dir)])
-    ylim([1e-3 1])
-    hold on
+%     fig1 = figure(1);
+%     subplot(2,2,3)
+%     if(i==1)
+%         normg0 = norm(model.gradient);
+%     end
+%     semilogy(i,norm(model.gradient)/normg0,'x')
+%     % text(i,norm(model.gradient)/normg0,step(i))
+%     xlim([0 length(models_dir)])
+%     ylim([1e-3 1])
+%     % axis square
+%     hold on
+%     
+%     subplot(2,2,4)
+%     semilogy(i,misfit(i),'x')
+%     xlim([0 length(models_dir)])
+%     ylim([5 70])
+%     % axis square
+%     hold on
+    
+    
+%     fig2 = figure(2);
+%     if(i==1)
+%         normg0 = norm(model.gradient);
+%     end
+%     semilogy(i,norm(model.gradient)/normg0,'x')
+%     text(i,norm(model.gradient)/normg0,step(i),'FontSize',7)
+%     xlim([0 length(models_dir)])
+%     ylim([1e-3 1])
+%     hold on
     
     
     drawnow

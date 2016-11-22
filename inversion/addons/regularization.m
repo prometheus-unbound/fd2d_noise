@@ -2,12 +2,6 @@ function [ j, g ] = regularization( j, g, m, usr_par )
 
     nx = usr_par.config.nx;
     nz = usr_par.config.nz;
-
-    if( usr_par.config.n_basis_fct == 0 )
-        n_basis_fct = 1;
-    else
-        n_basis_fct = usr_par.config.n_basis_fct;
-    end
     
 
     % misfit with regularization

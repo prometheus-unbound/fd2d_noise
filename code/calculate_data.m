@@ -33,7 +33,8 @@ usr_par.initial.mu_0 = 4.8e10;
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
 % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
-usr_par.kernel.sigma.source = [1e-3 1e-3];
+% usr_par.kernel.sigma.source = [1e-3 1e-3];
+usr_par.kernel.sigma.source = [5e4 5e4];
 usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
 
 
@@ -137,6 +138,26 @@ elseif(model_type==888)
 end
 
 
+
+% load inversion model and perturb it
+% initial_model = load('initial_models/model_137.mat');
+% initial.source_dist = initial_model.model.m( 1 : end - nx*nz, 1 );
+% initial.structure = initial_model.model.m( end - nx*nz + 1 : end, 1 );
+
+% m = map_parameters_to_m( m_parameters, usr_par );
+% m( 1 : end - nx*nz, 1 ) = initial.source_dist;
+% m( end - nx*nz + 1 : end, 1 ) = initial.structure;
+
+% m = reshape( m, nx, nz, [] );
+% m( 382:386, 291:295, 1 ) = m( 382:386, 291:295, 1 ) + 5.5;
+% m( 382:386, 291:295, 2 ) = m( 382:386, 291:295, 2 ) + 5.5;
+% m = reshape( m, [], 1 );
+
+% m_parameters = map_m_to_parameters( m , usr_par );
+% m_parameters( 382:386, 291:295, 2 ) = m_parameters( 382:386, 291:295, 2 ) + 2e9;
+
+
+
 % convert to m and then back to parameters again, necessary since the smoothing operator is part of the parameterization
 m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
 
@@ -157,7 +178,7 @@ end
 
 % plot configuration
 % if( strcmp(make_plots,'yes') )
-    
+%     
 %     figure
 %     hold on
 %     plot( array(:,1), array(:,2), 'o' )
@@ -179,7 +200,8 @@ end
 %     
 %     m_parameters2 = m_parameters;
 %     m_parameters2(:,:,end) = sqrt( m_parameters(:,:,end) ./ rho );
-%     plot_models( m_parameters2, n_basis_fct, array, [0 7 3600 4400] );
+%     plot_models( m_parameters2, n_basis_fct, array, [0 7 3700 4300] );
+%     plot_models( m_parameters2, n_basis_fct, array, [0 0 0 0] );
 %     return
 %     
 % end

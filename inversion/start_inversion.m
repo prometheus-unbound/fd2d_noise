@@ -35,7 +35,7 @@ usr_par.initial.mu_0 = 4.8e10;
 
 
 % if wanted, load initial perturbations for source and/or structure
-initial_model = load('initial_models/structure_source_random_0.07_cc_1em2_ampdiff_1em3.mat');
+initial_model = load('initial_models/model_137.mat');
 usr_par.initial.source_dist = initial_model.model.m( 1 : end - nx*nz, 1 );
 % initial_model = load('initial_models/structure_source_random_0.10_cc_1em2_ampdiff_1em5.mat');
 usr_par.initial.structure = initial_model.model.m( end - nx*nz + 1 : end, 1 );
@@ -76,7 +76,8 @@ usr_par.ring.taper_strength = 70e8;
 
 % load array with reference stations and data
 usr_par.network = load('../output/interferometry/array_16_ref.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_0_gaussian_random_0.07_0.8e10_nosmooth.mat');
+% usr_par.data = load('../output/interferometry/data_16_ref_0_gaussian_random_0.07_0.8e10_nosmooth.mat');
+usr_par.data = load('../output/interferometry/data_16_ref_0_model_137_sharp_2e9.mat');
 
 
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')
@@ -91,8 +92,8 @@ usr_par.filter.f_max = 1/7 + 0.01;
 
 % regularization j_total = dj/dm + alpha * ||m_source-m0_source||^2 + beta * ||m_structure-m0_structure||^2 
 % (i.e. set alpha or beta to zero to turn it off)
-usr_par.regularization.alpha = 1e-5;
-usr_par.regularization.beta = 1e-2;
+usr_par.regularization.alpha = 1e-6;
+usr_par.regularization.beta = 1e-4;
 usr_par.regularization.weighting = weighting( nx, nz );
 
 
