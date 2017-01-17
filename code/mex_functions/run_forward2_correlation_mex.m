@@ -221,7 +221,7 @@ for n = 1:nt
         for ns = 1:n_noise_sources
             
             for k = 1:n_sample
-                S(:,:,ns) = S(:,:,ns) + spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) * ifft_coeff(i_ftc,k);
+                S(:,:,ns) = S(:,:,ns) - spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) * ifft_coeff(i_ftc,k);
                 % S(:,:,ns) = S(:,:,ns) + spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) * ifft_coeff(i_ftc,k) ./ ( sum(sum( spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) .* conj(G_fft(:,:,k)), 1 ), 2) + 0.01 );
             end
             

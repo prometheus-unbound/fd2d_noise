@@ -6,10 +6,11 @@ clear all
 [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, fw_nth] = input_parameters();
 
 
-path = '~/Desktop/model_27.mat';
-% path = '~/Desktop/paper/joint_model_5.mat';
+% path = '~/Desktop/model_00.mat';
+% path = '~/Diss/Paper/phd_paper_1/matlab_files/final_models/joint_model_5.mat';
+% path = '~/Diss/Paper/phd_paper_1/matlab_files/final_models/loga_cc_model_27.mat';
 % path = 'initial_models/structure_random_0.10_cc_equal_homogeneous_regu_1em2_smooth_5e4.mat';
-% path = 'initial_models/structure_random_0.07_cc_equal_homogeneous_regu_1em2_smooth_5e4.mat';
+path = 'initial_models/structure_random_0.07_cc_equal_homogeneous_regu_1em2_smooth_5e4.mat';
 % path2 = '~/Desktop/model_137.mat';
 
 
@@ -173,14 +174,18 @@ else
         
         cm_source_orig = cbrewer('div','RdBu',120,'PCHIP');
 
-        cm_source = cm_source_orig(13:120,:);
-        plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 2.2 3700 4300], 'no', 'no', cm_source );
+        % cm_source = cm_source_orig(13:120,:);
+        % plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 2.2 3700 4300], 'no', 'no', cm_source );
+        % plot_models_poster( m_parameters, usr_par.config.n_basis_fct, array, [0 2.2 3700 4300], 'no', 'no', cm_source );
         
-        % cm_source = cm_source_orig(48:120,:);
+        cm_source = cm_source_orig(48:120,:);
         % plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 5.3 3700 4300], 'no', 'no', cm_source );
+        plot_models_poster( m_parameters, usr_par.config.n_basis_fct, array, [0 5.3 3700 4300], 'no', 'no', cm_source );
         
         % cm_source = cm_source_orig(50:120,:);
         % plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 7 3700 4300], 'no', 'no', cm_source );
+        
+        % plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 3700 4300], 'no', 'no' );
         
     else
         plot_models( m_parameters, usr_par.config.n_basis_fct, array, [0 0 0 0], 'no', 'no' );

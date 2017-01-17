@@ -10,14 +10,14 @@ addpath(genpath('../'))
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usr_par.cluster = 'monch';
+usr_par.cluster = 'local';
 % 'local';
 % 'monch';
 % 'euler';
 % 'brutus';
 
 
-usr_par.use_mex = 'yes';
+usr_par.use_mex = 'no';
 % 'yes'
 % 'no'
 
@@ -33,8 +33,8 @@ usr_par.initial.mu_0 = 4.8e10;
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
 % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
-% usr_par.kernel.sigma.source = [1e-3 1e-3];
-usr_par.kernel.sigma.source = [5e4 5e4];
+usr_par.kernel.sigma.source = [1e-3 1e-3];
+% usr_par.kernel.sigma.source = [5e4 5e4];
 usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
 
 
@@ -46,13 +46,13 @@ for i = 1:nr_x
     for j = 1:nr_z        
         
         % big - normal config
-        array( (i-1)*nr_z + j, 1 ) = 0.9e6 + ( i-1 ) * 0.25e6;
-        array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 ) * 0.25e6;
+        % array( (i-1)*nr_z + j, 1 ) = 0.9e6 + ( i-1 ) * 0.25e6;
+        % array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 ) * 0.25e6;
 
         
         % small - normal config
-        % array( (i-1)*nr_z + j, 1 ) = 1.8e5 + ( i-1 ) * 0.5e5;
-        % array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 ) * 0.5e5;
+        array( (i-1)*nr_z + j, 1 ) = 1.8e5 + ( i-1 ) * 0.5e5;
+        array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 ) * 0.5e5;
 
         % small - full coverage
         % array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
@@ -90,9 +90,14 @@ end
 % array(2,1) = 2.75e5;
 % array(:,2) = 2.0e5;
 
+% array = zeros(2,2);
+% array(1,1) = 0.85e6;
+% array(2,1) = 1.15e6;
+% array(:,2) = 1.0e6;
+
 
 % select receivers that will be reference stations
-ref_stat = array; %(1,:);
+ref_stat = array(1,:);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

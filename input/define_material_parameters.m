@@ -214,8 +214,10 @@ if( strcmp(make_plots,'yes') )
     m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
     m_parameters(:,:,end) = sqrt( m_parameters(:,:,end) ./ rho );
     
-    plot_models( m_parameters, n_basis_fct, array, [0 7 3700 4300] );
+%     plot_models( m_parameters, n_basis_fct, array, [0 7 3700 4300] );
 %     plot_models( m_parameters, n_basis_fct, array, [0 0 0 0] );
+
+    plot_models_poster( m_parameters, n_basis_fct, array, [0 7 3700 4300] );
     
 end
 

@@ -10,14 +10,14 @@ usr_par.config.n_basis_fct = n_basis_fct;
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usr_par.cluster = 'monch';
+usr_par.cluster = 'local';
 % 'local';
 % 'monch';
 % 'euler';
 % 'brutus';
 
 
-usr_par.type = 'joint';
+usr_par.type = 'structure';
 % 'source'
 % 'structure'
 % 'joint'
@@ -35,13 +35,13 @@ usr_par.initial.mu_0 = 4.8e10;
 
 
 % if wanted, load initial perturbations for source and/or structure
-initial_model = load('initial_models/model_137.mat');
-usr_par.initial.source_dist = initial_model.model.m( 1 : end - nx*nz, 1 );
+% initial_model = load('initial_models/model_137.mat');
+% usr_par.initial.source_dist = initial_model.model.m( 1 : end - nx*nz, 1 );
 % initial_model = load('initial_models/structure_source_random_0.10_cc_1em2_ampdiff_1em5.mat');
-usr_par.initial.structure = initial_model.model.m( end - nx*nz + 1 : end, 1 );
+% usr_par.initial.structure = initial_model.model.m( end - nx*nz + 1 : end, 1 );
 
 
-usr_par.measurement.source = 'amplitude_difference';
+usr_par.measurement.source = 'log_amplitude_ratio';
 usr_par.measurement.structure = 'waveform_difference';
 % 'log_amplitude_ratio';
 % 'amplitude_difference';
@@ -75,9 +75,11 @@ usr_par.ring.taper_strength = 70e8;
 
 
 % load array with reference stations and data
-usr_par.network = load('../output/interferometry/array_16_ref.mat');
+% usr_par.network = load('../output/interferometry/array_16_ref.mat');
 % usr_par.data = load('../output/interferometry/data_16_ref_0_gaussian_random_0.07_0.8e10_nosmooth.mat');
-usr_par.data = load('../output/interferometry/data_16_ref_0_model_137_sharp_2e9.mat');
+% usr_par.data = load('../output/interferometry/data_16_ref_0_model_137_sharp_2e9.mat');
+usr_par.network = load('../output/interferometry/array_1_ref_poster_structure_kernel.mat');
+usr_par.data = load('../output/interferometry/data_1_ref_0_poster_structure_kernel.mat');
 
 
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')

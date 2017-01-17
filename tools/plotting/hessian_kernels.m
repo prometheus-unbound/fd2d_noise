@@ -6,7 +6,7 @@ clear all
 [width] = absorb_specs();
 
 
-load ~/Desktop/hessian_H_m.mat
+% load ~/Desktop/hessian_H_m.mat
 % load ~/Desktop/hessian_H_parameters.mat
 
 % load ~/Desktop/paper_matlab_files/hessian/dm_structure/hessian_H_m_center_model_0.mat
@@ -15,7 +15,7 @@ load ~/Desktop/hessian_H_m.mat
 % load ~/Desktop/paper_matlab_files/hessian/dm_structure/hessian_H_m_center_model_00.mat
 % load ~/Desktop/paper_matlab_files/hessian/dm_structure/hessian_H_parameters_center_model_00.mat
 
-% load ~/Desktop/paper_matlab_files/hessian/dm_structure/hessian_H_m_center_model_5.mat
+load ~/Desktop/paper_matlab_files/hessian/dm_structure/hessian_H_m_center_model_5.mat
 % load ~/Desktop/paper_matlab_files/hessian/dm_structure/hessian_H_parameters_center_model_5.mat
 
 % load ~/Desktop/paper_matlab_files/hessian/dm_structure/model_137/hessian_H_m_center.mat
@@ -46,53 +46,55 @@ usr_par.network.array = usr_par.network.array / 1000;
 fig1 = figure;
 set(fig1,'units','normalized','position',[.1 .3 0.5 0.4])
 
-font_size = 8;
-title_size = 12;
-maker_size = 4;
+font_size = 30;
+title_size = 34;
+maker_size = 14;
 
 
-subplot(1,2,1)
-set( gca, 'FontSize', font_size );
-
-hold on
-% m = max(max(abs(tmp(:,:,1))));
-m = 1;
-mesh( X, Z, tmp(:,:,1)'/m )
-
-offset = max(max(abs( tmp(:,:,1) )));
-plot3( usr_par.network.array(:,1), usr_par.network.array(:,2), 0*usr_par.network.array(:,2) + offset, 'wv', 'MarkerSize', maker_size, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0. 0. 0.]);
-
-plot3([width,Lx-width],[width,width],[offset,offset],'k--')
-plot3([width,Lx-width],[Lz-width,Lz-width],[offset,offset],'k--')
-plot3([width,width],[width,Lz-width],[offset,offset],'k--')
-plot3([Lx-width,Lx-width],[width,Lz-width],[offset,offset],'k--')
-
-colormap(cm)
-c1 = 0.9 * max(max(abs(tmp(:,:,1))) );
-caxis( [ -c1, c1 ] )
-view([0 90])
-axis square
-box on
-
-title('change of source kernel', 'FontSize', title_size)
-xlabel('x [km]')
-ylabel('z [km]')
-
-xlabels = [0 1000 2000];
-ylabels = [0 1000 2000];
-
-set(gca, 'XTick', xlabels);
-set(gca, 'YTick', ylabels);
-% set(gca,'yaxislocation','right');
-
-shading interp
-grid on
-box on
-ax = gca;
-ax.LineWidth = 2;
-axis square
-colorbar
-
+% subplot(1,1,1)
+% set( gca, 'FontSize', font_size );
+% 
+% hold on
+% % m = max(max(abs(tmp(:,:,1))));
+% m = 1;
+% mesh( X, Z, tmp(:,:,1)'/m )
+% 
+% offset = max(max(abs( tmp(:,:,1) )));
+% plot3( usr_par.network.array(:,1), usr_par.network.array(:,2), 0*usr_par.network.array(:,2) + offset, 'wv', 'MarkerSize', maker_size, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0. 0. 0.]);
+% 
+% plot3([width,Lx-width],[width,width],[offset,offset],'k--')
+% plot3([width,Lx-width],[Lz-width,Lz-width],[offset,offset],'k--')
+% plot3([width,width],[width,Lz-width],[offset,offset],'k--')
+% plot3([Lx-width,Lx-width],[width,Lz-width],[offset,offset],'k--')
+% 
+% colormap(cm)
+% c1 = 0.9 * max(max(abs(tmp(:,:,1))) );
+% caxis( [ -c1, c1 ] )
+% view([0 90])
+% axis square
+% box on
+% 
+% % title('change of source kernel', 'FontSize', title_size)
+% xlabel('x [km]')
+% ylabel('z [km]')
+% 
+% xlabels = [0 1000 2000];
+% ylabels = [0 1000 2000];
+% 
+% set(gca, 'XTick', xlabels);
+% set(gca, 'YTick', ylabels);
+% % set(gca,'yaxislocation','right');
+% 
+% shading interp
+% grid on
+% box on
+% ax = gca;
+% ax.LineWidth = 2;
+% axis square
+% cb = colorbar;
+% set(cb,'YTick',[-1 0 1]*1e-4)
+% 
+% orient landscape
 % return
 
 
@@ -101,7 +103,7 @@ colorbar
 % figure
 % clf
 
-subplot(1,2,2)
+subplot(1,1,1)
 set( gca, 'FontSize', font_size );
 
 hold on
@@ -110,6 +112,14 @@ m = 1;
 mesh( X, Z, tmp(:,:,2)'/m )
 
 offset = 10*max(max(abs( tmp(:,:,2) )));
+
+
+% dm_parameters = inf * tmp;
+% dm_parameters( 382:386, 291:295, 2 ) = offset;
+% test = mesh( X, Z, dm_parameters(:,:,2)', 10000*dm_parameters(:,:,2)');
+
+
+
 plot3( usr_par.network.array(:,1), usr_par.network.array(:,2), 0*usr_par.network.array(:,2) + offset, 'wv', 'MarkerSize', maker_size, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0. 0. 0.]);
 
 plot3([width,Lx-width],[width,width],[offset,offset],'k--')
@@ -124,7 +134,7 @@ view([0 90])
 axis square
 box on
 
-title('change of structure kernel', 'FontSize', title_size)
+% title('change of structure kernel', 'FontSize', title_size)
 xlabel('x [km]')
 % ylabel('z [km]')
 
@@ -143,7 +153,9 @@ box on
 ax = gca;
 ax.LineWidth = 2;
 axis square
-colorbar
+cb = colorbar;
+set(cb,'YTick',[-1 0 1]*1e-3)
+% set(test,'Edgecolor',[0 0.9 0])
 
 
 orient landscape
