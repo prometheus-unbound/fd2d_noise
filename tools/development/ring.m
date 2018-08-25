@@ -46,7 +46,7 @@ mesh( X, Z, noise_source_distribution' )
 colormap('autumn')
 hold on
 
-load ../output/interferometry/array_16_ref_center2.mat
+load ../output/interferometry/array_16_ref.mat
 
 level = 3;
 plot3(array(:,1),array(:,2),level+0*array(:,2),'x')

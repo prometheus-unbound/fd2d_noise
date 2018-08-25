@@ -175,26 +175,6 @@ end
 %%% END TEST %%%
 
 
-
-%%% TEST 2 %%%
-% for ns = 1:n_noise_sources
-%     for k = 1:n_sample
-%         distribution(:,:,k) = distribution(:,:,k) + spectrum(k,ns) * distribution(:,:,k);
-%     end
-% end
-% 
-% x_time_ifft = fftshift( ifft( ifftshift( distribution ) * nt, [], 3 ) );
-
-
-% for ix = 1:nx
-%     for iz = 1:nz
-%         test_G_in(ix, iz, :) = conv( squeeze(test_G_in( ix, iz, : )), squeeze(S( ix, iz, : )), 'same' );
-%     end
-% end
-%%% END TEST 2 %%%
-
-
-
 for n = 1:nt
 
     
@@ -221,7 +201,9 @@ for n = 1:nt
         for ns = 1:n_noise_sources
             
             for k = 1:n_sample
-                S(:,:,ns) = S(:,:,ns) - spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) * ifft_coeff(i_ftc,k);
+                S(:,:,ns) = S(:,:,ns) + spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) * ifft_coeff(i_ftc,k);
+                
+                % deconvolution
                 % S(:,:,ns) = S(:,:,ns) + spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) * ifft_coeff(i_ftc,k) ./ ( sum(sum( spectrum(k,ns) * distribution(:,:,k) .* G_fft(:,:,k) .* conj(G_fft(:,:,k)), 1 ), 2) + 0.01 );
             end
             
@@ -232,8 +214,6 @@ for n = 1:nt
         i_ftc = i_ftc + 1;
         
     end
-
-    % DS = DS + S(:,:,n);
     
     
     %- update velocity field ----------------------------------------------

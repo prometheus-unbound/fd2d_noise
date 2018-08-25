@@ -6,25 +6,25 @@ function [Lx, Lz, nx, nz, dt, nt, order, model_type, source_type, n_basis_fct, f
 %==========================================================================
 
 % % tiny setup for gradient validation
-% Lx = 6.0e4;             % model extension in x-direction [m]
-% Lz = 6.0e4;             % model extension in y-direction [m]
-% 
-% nx = 50;                % grid points in x-direction
-% nz = 50;                % grid points in z-direction
-% 
-% dt = 0.09;              % time step [s]
-% nt = 50;                % number of iterations
+Lx = 6.0e4;             % model extension in x-direction [m]
+Lz = 6.0e4;             % model extension in y-direction [m]
+
+nx = 50;                % grid points in x-direction
+nz = 50;                % grid points in z-direction
+
+dt = 0.09;              % time step [s]
+nt = 150;                % number of iterations
 
 
 % % small setup
-Lx = 4.0e5;         % model extension in x-direction [m]
-Lz = 4.0e5;         % model extension in y-direction [m]
-
-nx = 300;           % grid points in x-direction
-nz = 300;           % grid points in z-direction
-
-dt = 0.09;          % time step [s]
-nt = 900;           % number of iterations
+% Lx = 4.0e5;         % model extension in x-direction [m]
+% Lz = 4.0e5;         % model extension in y-direction [m]
+% 
+% nx = 300;           % grid points in x-direction
+% nz = 300;           % grid points in z-direction
+% 
+% dt = 0.09;          % time step [s]
+% nt = 900;           % number of iterations
 
 
 % % setup Andreas
@@ -39,7 +39,7 @@ nt = 900;           % number of iterations
 % dt = 0.23;              % time step [s]
 % nt = 1300;              % number of iterations
 % % nt = 1600;              % number of iterations
-% % nt = 3500;            % number of iterations
+% % nt = 3000;            % number of iterations
 
 
 order = 4;              % finite-difference order (2 or 4)
@@ -50,7 +50,7 @@ order = 4;              % finite-difference order (2 or 4)
 %==========================================================================
 
 % store every nth time step of forward field
-fw_nth = 8;
+fw_nth = 1;
 
 
 %==========================================================================
@@ -81,6 +81,7 @@ model_type = 1;
 
 source_type = 'homogeneous';
 % source_type = 'gaussian';
+% source_type = 'point';
 
 % number of frequency bands
 n_basis_fct = 0;  

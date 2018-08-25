@@ -10,8 +10,7 @@ usr_par.cluster = 'monch';
 % 'brutus';
 
 
-% usr_par.network = load( '../output/interferometry/array_1_ref_testing_small.mat' );
-usr_par.network = load( '../output/interferometry/array_16_ref_hessian_small.mat' );
+usr_par.network = load( '../output/interferometry/array_16_ref_small.mat' );
 
 
 % set up options
@@ -51,3 +50,4 @@ save( '../output/eigenvectors.mat', 'flag', 'v', 'd', 'counter' ,'-v7.3' )
 if( ~strcmp( usr_par.cluster, 'local' ) )
     delete(parobj)
 end
+

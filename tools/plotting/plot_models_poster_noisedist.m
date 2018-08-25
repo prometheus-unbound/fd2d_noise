@@ -7,7 +7,7 @@
 %
 % optional: leave empty if not wanted
 
-function plot_models_poster( m_parameter, n_basis_fct, array, clim, overlay, video, cm_source, cm_structure )
+function plot_models_poster_noisedist( m_parameter, n_basis_fct, array, clim, overlay, video, cm_source, cm_structure )
 
     if( nargin < 5 || isempty(overlay) )
         overlay = 'no';
@@ -24,8 +24,8 @@ function plot_models_poster( m_parameter, n_basis_fct, array, clim, overlay, vid
     [width] = absorb_specs();
     
     % convert to km
-    X = X / 1000;  Lx = Lx / 1000;
-    Z = Z / 1000;  Lz = Lz / 1000;
+    X = X / 1000 - 1000;  Lx = Lx / 1000 - 1000;
+    Z = Z / 1000 - 1000;  Lz = Lz / 1000 - 1000;
     width = width/1000;
     
     
@@ -45,9 +45,9 @@ function plot_models_poster( m_parameter, n_basis_fct, array, clim, overlay, vid
     
     
     %% open figure, set size, etc.
-    font_size = 18;
-    title_size = 24;
-    maker_size = 8;
+    font_size = 12;
+    title_size = 16;
+    maker_size = 6;
     
     if(strcmp(video,'no') )
         fig1 = figure;
@@ -72,7 +72,7 @@ function plot_models_poster( m_parameter, n_basis_fct, array, clim, overlay, vid
     % plot array if given
     if( ~isempty(array) )
         % plot3( array(:,1)/1000, array(:,2)/1000, 7+0*array(:,2), 'd', 'MarkerFaceColor', 'k', 'MarkerSize', maker_size )
-        handle(1,:) = plot3( array(:,1)/1000, array(:,2)/1000, 7+0*array(:,2), 'wv', 'MarkerSize', maker_size, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0. 0. 0.]);
+        handle(1,:) = plot3( array(:,1)/1000 - 1000, array(:,2)/1000 - 1000, 7+0*array(:,2), 'wv', 'MarkerSize', maker_size, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0. 0. 0.]);
         % legend('array')
     end
     
@@ -93,15 +93,16 @@ function plot_models_poster( m_parameter, n_basis_fct, array, clim, overlay, vid
 
         else
             
-            mesh(X, Z, m_parameter(:,:,1)' )
+            surf(X, Z, m_parameter(:,:,1)' )
 
         end
         
-        handle(2,:) = plot3([width,Lx-width],[width,width],[2,2],'k--');
-        plot3([width,Lx-width],[Lz-width,Lz-width],[2,2],'k--')
-        plot3([width,width],[width,Lz-width],[2,2],'k--')
-        plot3([Lx-width,Lx-width],[width,Lz-width],[2,2],'k--')
+%         handle(2,:) = plot3([width,Lx-width],[width,width],[2,2],'k--');
+%         plot3([width,Lx-width],[Lz-width,Lz-width],[2,2],'k--')
+%         plot3([width,width],[width,Lz-width],[2,2],'k--')
+%         plot3([Lx-width,Lx-width],[width,Lz-width],[2,2],'k--')
 %         legend(handle, 'receiver', 'absorbing boundaries')
+        legend(handle, 'receiver')
         
     % plot maps for different frequency maps
     else
@@ -135,7 +136,6 @@ function plot_models_poster( m_parameter, n_basis_fct, array, clim, overlay, vid
 %     cb = colorbar('SouthOutside');
     ylabel(cb,'[kg^2 m^{-2} s^{-2}]')
     colormap(ax1,cm_source)
-    set(cb,'YTick',[0.9,1])
             
     if( clim(1)~=0 || clim(2)~=0 )
         caxis([clim(1) clim(2)]);
@@ -144,35 +144,39 @@ function plot_models_poster( m_parameter, n_basis_fct, array, clim, overlay, vid
         caxis([0 7])
         set(cb,'YTick',[0 2 4 6])
     else
-        caxis([0 7])
-        set(cb,'YTick',[0 2 4 6])
+        caxis([0 500])
+        set(cb,'YTick',[0 250 500])
     end
     
-    xlabels = [0 1000 2000];
-    ylabels = [0 1000 2000];
-%     set(gca, 'XTick', xlabels);
-    set(gca, 'YTick', ylabels);
-    set(gca, 'XTick', []);
-%     set(gca, 'YTick', []);
-%     xlabel('x [km]')
-    ylabel('z [km]')
-    xlim([0 Lx])
-    ylim([0 Lz])
+    text(-110, -160, 100, '1', 'FontSize', font_size)
+    text(190, -160, 100, '7', 'FontSize', font_size)
     
-    shading interp
-    grid on
+    xlabels = [-400 -200 0 200 400];
+    ylabels = [-200 0 200];
+    set(gca, 'XTick', xlabels);
+    set(gca, 'YTick', ylabels);
+%     set(gca, 'XTick', []);
+%     set(gca, 'YTick', []);
+    xlabel('x [km]')
+    ylabel('z [km]')
+    xlim([-450 450])
+    ylim([-350 350])
+    
+    %     grid on
     box on
+    shading interp
     ax = gca;
     ax.LineWidth = 2;
-    axis square
+    daspect([max(daspect)*[1 1] 1])
     
 %     title('target source distribution', 'FontSize', title_size)
-    title('inverted source distribution', 'FontSize', title_size)
+%     title('inverted source distribution', 'FontSize', title_size)
 %     title('initial source distribution', 'FontSize', title_size)
-%     title('source distribution', 'FontSize', title_size)
+    title('source distribution', 'FontSize', title_size)
     
-    orient landscape
+%     orient landscape
     return
+    
     
 
     %% structure plot

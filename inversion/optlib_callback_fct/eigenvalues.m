@@ -11,14 +11,8 @@ function [Hdm] = eigenvalues( dm )
     % user input
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    % usr_par.network = load( '../output/interferometry/array_1_ref_testing_small.mat' );
-    % usr_par.data = load( '../output/interferometry/data_1_ref_0_testing_small.mat' );
-    
-    % usr_par.network = load( '../output/interferometry/array_16_ref_hessian_big.mat' );
-    % usr_par.data = load( '../output/interferometry/data_16_ref_0_hessian_big.mat' );
-
-    usr_par.network = load( '../output/interferometry/array_16_ref_hessian_small.mat' );
-    usr_par.data = load( '../output/interferometry/data_16_ref_0_hessian_small.mat' );
+    usr_par.network = load( '../output/interferometry/array_16_ref_small.mat' );
+    usr_par.data = load( '../output/interferometry/data_16_ref_0_small_gaussian.mat' );
     
     % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
     usr_par.kernel.sigma.source = [1 1];

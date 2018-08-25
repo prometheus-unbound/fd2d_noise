@@ -48,7 +48,7 @@ for k=1:size(u,1)
     end
     
     % plot recordings
-    h = plot(t,spacing*(k+a)+u(k,:)/m,'color',color,'LineWidth',1);
+    h = plot(t,spacing*(k+a)+u(k,:)/m,color,'LineWidth',1);
        
 end
 

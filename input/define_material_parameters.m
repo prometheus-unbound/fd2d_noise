@@ -175,14 +175,14 @@ if( strcmp(make_plots,'yes') )
     [Lx,Lz,nx,nz,~,~,~,~,source_type,n_basis_fct] = input_parameters();   
     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
     
-    load ../output/interferometry/array_16_ref.mat
-    min_x = min(array(:,1));
-    min_z = min(array(:,2));
-    max_x = max(array(:,1));
-    max_z = max(array(:,2));
+%     load ../output/interferometry/array_16_ref.mat
+%     min_x = min(array(:,1));
+%     min_z = min(array(:,2));
+%     max_x = max(array(:,1));
+%     max_z = max(array(:,2));
     
-    buffer = 1e5;
-    pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
+%     buffer = 1e5;
+%     pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
     
     % array = [];
     
@@ -198,8 +198,10 @@ if( strcmp(make_plots,'yes') )
     
     usr_par.network = []; usr_par.data = [];
     
-    load('../models/random_0.07_norm.mat');
-    m_parameters(:,:,end) = m_parameters(:,:,end) + 0.8e10 * signal;% .* pattern';
+%     load('../models/random_0.07_norm.mat');
+%     load('../models/random_0.11_norm.mat');
+%     load('../models/random_0.20_norm.mat');
+    m_parameters(:,:,end) = m_parameters(:,:,end); % + 0.8e10 * signal;% .* pattern';
     
     % usr_par.kernel.imfilter.source = fspecial('gaussian', [1 1], 1);
     % usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
@@ -217,7 +219,8 @@ if( strcmp(make_plots,'yes') )
 %     plot_models( m_parameters, n_basis_fct, array, [0 7 3700 4300] );
 %     plot_models( m_parameters, n_basis_fct, array, [0 0 0 0] );
 
-    plot_models_poster( m_parameters, n_basis_fct, array, [0 7 3700 4300] );
+%     plot_models_poster( m_parameters, n_basis_fct, array, [0 7 3700 4300] );
+    plot_models_poster( m_parameters, n_basis_fct, [], [0 7 3700 4300] );
     
 end
 

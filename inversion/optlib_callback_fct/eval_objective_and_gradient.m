@@ -145,8 +145,8 @@ end
 
 
 %- map grad_parameters to grad_m
+norm_first = sum(sum(sum(grad_parameters)))
 g = map_gradparameters_to_gradm( m, grad_parameters, usr_par );
-
 
 %- add regularization
 [ j, g ] = regularization( j, g, m, usr_par );

@@ -269,7 +269,6 @@ for n = 1:nt
     end
     
     
-    
     %- update velocity field ----------------------------------------------
     v = v + dt * DS./rho;
     

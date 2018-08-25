@@ -5,7 +5,6 @@ function [dcheck, dcheck_struct] = optlib_check_adjoint_stf(u,u0,du,t,src,rec,hp
 
 [j, adj_stf(1,:)] = make_adjoint_sources( u, u0, 0, t, usr_par.veldis, usr_par.measurement, src, rec, '1st' );
 
-j
 norm_adj_stf = norm(adj_stf)
 norm_du = norm(du)
 djdu = fliplr(adj_stf) * du'

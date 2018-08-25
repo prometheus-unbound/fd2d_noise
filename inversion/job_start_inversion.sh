@@ -3,7 +3,8 @@
 
 brutus=`grep brutus start_inversion.m  | awk 'END {print NR}'`
 euler=`grep euler start_inversion.m  | awk 'END {print NR}'`
-monch=`grep monch start_inversion.m  | awk 'END {print NR}'`
+# monch=`grep monch start_inversion.m  | awk 'END {print NR}'`
+monch=2
 
 if [ $brutus -gt 1 ] || [ $euler -gt 1 ]; then
     module load matlab/8.5
@@ -60,7 +61,7 @@ cat <<EOF > inversion.sh
 #SBATCH --error=logs/matlab_%j.err
 #SBATCH --time=07-00:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=10240
+#SBATCH --mem-per-cpu=32768
 
 ######################
 # Begin work section #

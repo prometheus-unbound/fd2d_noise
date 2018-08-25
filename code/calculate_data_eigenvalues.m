@@ -10,14 +10,14 @@ addpath(genpath('../'))
 % user input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usr_par.cluster = 'local';
+usr_par.cluster = 'monch';
 % 'local';
 % 'monch';
 % 'euler';
 % 'brutus';
 
 
-usr_par.use_mex = 'no';
+usr_par.use_mex = 'yes';
 % 'yes'
 % 'no'
 
@@ -33,44 +33,44 @@ usr_par.initial.mu_0 = 4.8e10;
 % usr_par.kernel.imfilter.source = fspecial('gaussian',[1 1], 1);
 % usr_par.kernel.imfilter.structure = usr_par.kernel.imfilter.source;
 
-usr_par.kernel.sigma.source = [1e-3 1e-3];
-% usr_par.kernel.sigma.source = [2e4 2e4];
+% usr_par.kernel.sigma.source = [1e-3 1e-3];
+usr_par.kernel.sigma.source = [2e4 2e4];
 % usr_par.kernel.sigma.source = [5e4 5e4];
 usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
 
 
 % define receiver array
-% nr_x = 4;
-% nr_z = 4;
-% array = zeros(nr_x*nr_z,2);
-% for i = 1:nr_x
-%     for j = 1:nr_z        
-%         
-%         % big - normal config
-%         % array( (i-1)*nr_z + j, 1 ) = 0.9e6 + ( i-1 ) * 0.25e6;
-%         % array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 ) * 0.25e6;
-% 
-%         % paper kernel
-%         % array( (i-1)*nr_z + j, 1 ) = 0.8e6 + ( i-1 ) * 0.4e6;
-%         % array( (i-1)*nr_z + j, 2 ) = 1.0e6;
-%         
-%         % small - normal config
-%         array( (i-1)*nr_z + j, 1 ) = 1.8e5 + ( i-1 ) * 0.5e5;
-%         array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 ) * 0.5e5;
-% 
-%         % small - full coverage
-%         % array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
-%         % array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.8e5;
-%         
-%     end
-% end
+nr_x = 4;
+nr_z = 4;
+array = zeros(nr_x*nr_z,2);
+for i = 1:nr_x
+    for j = 1:nr_z        
+        
+        % big - normal config
+        % array( (i-1)*nr_z + j, 1 ) = 0.9e6 + ( i-1 ) * 0.25e6;
+        % array( (i-1)*nr_z + j, 2 ) = 0.6e6 + ( j-1 ) * 0.25e6;
+
+        % paper kernel
+        % array( (i-1)*nr_z + j, 1 ) = 0.8e6 + ( i-1 ) * 0.4e6;
+        % array( (i-1)*nr_z + j, 2 ) = 1.0e6;
+        
+        % small - normal config
+        array( (i-1)*nr_z + j, 1 ) = 1.8e5 + ( i-1 ) * 0.5e5;
+        array( (i-1)*nr_z + j, 2 ) = 1.2e5 + ( j-1 ) * 0.5e5;
+
+        % small - full coverage
+        % array( (i-1)*nr_z + j, 1 ) = 0.8e5 + ( i-1 ) * 0.8e5;
+        % array( (i-1)*nr_z + j, 2 ) = 0.8e5 + ( j-1 ) * 0.8e5;
+        
+    end
+end
 
 
 % small test array, only two receivers close to each other
-array = zeros(2,2);
-array(1,1) = 2.5e4;
-array(2,1) = 3.5e4;
-array(:,2) = 3.0e4;
+% array = zeros(2,2);
+% array(1,1) = 2.5e4;
+% array(2,1) = 3.5e4;
+% array(:,2) = 3.0e4;
 
 
 % select receivers that will be reference stations
@@ -99,12 +99,12 @@ m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
 
 
 % perturb source model and velocity model for gradient test
-m_parameters(:,:,end) = m_parameters(:,:,end) + 1e9;
-if( n_basis_fct == 0 )
-    m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + rand(nx,nz);
-else
-    m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + rand(nx,nz,n_basis_fct);
-end
+% m_parameters(:,:,end) = m_parameters(:,:,end) + 1e9;
+% if( n_basis_fct == 0 )
+%     m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + rand(nx,nz);
+% else
+%     m_parameters(:,:,1:end-1) = m_parameters(:,:,1:end-1) + rand(nx,nz,n_basis_fct);
+% end
 
 
 if(model_type==666)
@@ -186,19 +186,24 @@ end
 
 
 tic
-parfor i = 1:n_ref
-        
-    src = ref_stat(i,:);
-    rec = array( find(~ismember(array,src,'rows') ) , :);
+for i_eigenvector = 1:10
     
-    fprintf( '%i: calculate Green function\n', i )
-    G = run_forward1_green_mex( mu, rho, src, rec, 0, [], single([]) );
     
-    fprintf( '%i: calculate correlation\n', i )    
-    c_it(i,:,:) = run_forward2_correlation_mex( mu, rho, G, spectrum, source_dist, rec, 0, [], single([]) );
     
-    fprintf( '%i: done\n', i )
-    
+    parfor i = 1:n_ref
+
+        src = ref_stat(i,:);
+        rec = array( find(~ismember(array,src,'rows') ) , :);
+
+        fprintf( '%i: calculate Green function\n', i )
+        G = run_forward1_green_mex( mu, rho, src, rec, 0, [], single([]) );
+
+        fprintf( '%i: calculate correlation\n', i )    
+        c_it(i,:,:) = run_forward2_correlation_mex( mu, rho, G, spectrum, source_dist, rec, 0, [], single([]) );
+
+        fprintf( '%i: done\n', i )
+
+    end
 end
 toc
 
@@ -211,11 +216,11 @@ end
 
 
 % plot data
-% if( strcmp(make_plots,'yes') )
+if( strcmp(make_plots,'yes') )
     figure
     plot_recordings(c_data,t,'vel','k-',true);
     legend('data')
-% end
+end
 
 
 % save array and data for inversion

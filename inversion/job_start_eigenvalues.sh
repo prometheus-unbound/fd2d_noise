@@ -39,11 +39,11 @@ if [ $monch -gt 1 ]; then
 cat <<EOF > eigenvalues.sh
 #!/bin/bash -l								
 
-#SBATCH --partition=fichtner_compute_wk
+#SBATCH --partition=fichtner_compute
 #SBATCH --job-name=inversion
 #SBATCH --output=logs/matlab_%j.out
 #SBATCH --error=logs/matlab_%j.err
-#SBATCH --time=07-00:00:00
+#SBATCH --time=01-00:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=32768
 

@@ -75,9 +75,15 @@ for n=1:n_receivers
         right = t(end);
     
     else        
-        distance = sqrt( (src(1,1) - rec(n,1)).^2 + (src(1,2) - rec(n,2)).^2 );
-        left = distance/4000.0 - 27.0;
-        right = distance/4000.0 + 27.0;
+        % distance = sqrt( (src(1,1) - rec(n,1)).^2 + (src(1,2) - rec(n,2)).^2 );
+        % left = distance/4000.0 - 27.0;
+        % right = distance/4000.0 + 27.0;
+        
+        % left = distance/4000.0 - 17.0;
+        % right = distance/4000.0 + 17.0;
+        
+        left = 100;
+        right = 200;
         
         if( left < 0 )
             index = find( t==0 );
@@ -133,7 +139,7 @@ for n=1:n_receivers
         [misfit_n_caus, adstf_caus(1,:)] = amp_diff( u(n,:), u_0(n,:), du(n,:), win, t, deriv_order );
         
         [left, right] = swap( -left, -right );
-        win = get_window( t, left, right, 'cos_taper' );       
+        win = get_window( t, left, right, 'cos_taper' );
         [misfit_n_acaus, adstf_acaus(1,:)] = amp_diff( u(n,:), u_0(n,:), du(n,:), win, t, deriv_order );
         
         if( strcmp( deriv_order, '1st' ) )
@@ -163,6 +169,7 @@ for n=1:n_receivers
     end      
 
     
+    
 end
 
-
+end

@@ -41,7 +41,7 @@ usr_par.initial.mu_0 = 4.8e10;
 % usr_par.initial.structure = initial_model.model.m( end - nx*nz + 1 : end, 1 );
 
 
-usr_par.measurement.source = 'log_amplitude_ratio';
+usr_par.measurement.source = 'waveform_difference';
 usr_par.measurement.structure = 'waveform_difference';
 % 'log_amplitude_ratio';
 % 'amplitude_difference';
@@ -77,10 +77,12 @@ usr_par.ring.taper_strength = 70e8;
 % load array with reference stations and data
 % usr_par.network = load('../output/interferometry/array_16_ref.mat');
 % usr_par.data = load('../output/interferometry/data_16_ref_0_gaussian_random_0.07_0.8e10_nosmooth.mat');
-% usr_par.data = load('../output/interferometry/data_16_ref_0_model_137_sharp_2e9.mat');
-usr_par.network = load('../output/interferometry/array_1_ref_poster_structure_kernel.mat');
-usr_par.data = load('../output/interferometry/data_1_ref_0_poster_structure_kernel.mat');
 
+% usr_par.network = load('../output/interferometry/array_18_ref.mat');
+% usr_par.data = load('../output/interferometry/data_18_ref_0_grenoble_point_nosmooth.mat');
+
+usr_par.network = load('../output/interferometry/array_1_ref.mat');
+usr_par.data = load('../output/interferometry/data_1_ref_0.mat');
 
 % do measurement on displacement or velocity correlations (for NOW: use 'dis')
 usr_par.veldis = 'dis';
@@ -94,8 +96,8 @@ usr_par.filter.f_max = 1/7 + 0.01;
 
 % regularization j_total = dj/dm + alpha * ||m_source-m0_source||^2 + beta * ||m_structure-m0_structure||^2 
 % (i.e. set alpha or beta to zero to turn it off)
-usr_par.regularization.alpha = 1e-6;
-usr_par.regularization.beta = 1e-4;
+usr_par.regularization.alpha = 0;
+usr_par.regularization.beta = 0;
 usr_par.regularization.weighting = weighting( nx, nz );
 
 
@@ -108,7 +110,7 @@ usr_par.regularization.weighting = weighting( nx, nz );
 options.tolerance = 1e-3;
 options.successive_change = 1e-3;
 options.successive_iterations = 5;
-options.max_iterations = 500;
+options.max_iterations = 0;
 options.wolfe_try_to_increase_step_length = false;
 options.verbose = true;
 

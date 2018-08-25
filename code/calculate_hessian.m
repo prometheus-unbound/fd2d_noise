@@ -163,24 +163,24 @@ dm_parameters( 382:386, 291:295, 2 ) = 2e9;
 
 
 % if( strcmp( usr_par.cluster, 'local' ) )
-    
-    figure
-    [Lx,Lz] = input_parameters();
-    [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
-    [width] = absorb_specs();
-    offset = max( max( max( abs(dm_parameters) ) ) );
-    
-    hold on
-    mesh( X, Z, dm_parameters(:,:,2)' )
-    plot3( usr_par.network.array(:,1), usr_par.network.array(:,2), 0*usr_par.network.array(:,1) + offset, 'x' )
-    plot3([width,Lx-width],[width,width],[offset,offset],'k--')
-    plot3([width,Lx-width],[Lz-width,Lz-width],[offset,offset],'k--')
-    plot3([width,width],[width,Lz-width],[offset,offset],'k--')
-    plot3([Lx-width,Lx-width],[width,Lz-width],[offset,offset],'k--')
-    axis square
-    
-    return
-    
+%     
+%     figure
+%     [Lx,Lz] = input_parameters();
+%     [X,Z] = define_computational_domain(Lx,Lz,nx,nz);
+%     [width] = absorb_specs();
+%     offset = max( max( max( abs(dm_parameters) ) ) );
+%     
+%     hold on
+%     mesh( X, Z, dm_parameters(:,:,2)' )
+%     plot3( usr_par.network.array(:,1), usr_par.network.array(:,2), 0*usr_par.network.array(:,1) + offset, 'x' )
+%     plot3([width,Lx-width],[width,width],[offset,offset],'k--')
+%     plot3([width,Lx-width],[Lz-width,Lz-width],[offset,offset],'k--')
+%     plot3([width,width],[width,Lz-width],[offset,offset],'k--')
+%     plot3([Lx-width,Lx-width],[width,Lz-width],[offset,offset],'k--')
+%     axis square
+%     
+%     return
+%     
 % end
 
 
@@ -240,7 +240,7 @@ end
 
 
 % save solution
-% save( '../output/hessian.mat', 'Hdm', 'usr_par', 'dm_parameters', '-v7.3' )
+save( '../output/hessian.mat', 'Hdm', 'usr_par', 'dm_parameters', '-v7.3' )
 
 
 % close matlabpool

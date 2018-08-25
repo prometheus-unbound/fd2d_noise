@@ -81,7 +81,32 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
 
         end
 
+        
+    elseif(strcmp(source_type,'point'))
+        
+%         x_sourcem = 1.5e6;
+%         z_sourcem = 1.4e6;
+%         sourcearea_width = 0.5e5;
+%         magnitude = 8;
+        
+        x_sourcem = 0.85e6;
+        z_sourcem = 1.0e6;
+        sourcearea_width = 0.1e5;
+        magnitude = 8;
 
+%         x_sourcem = [1.4e6, 1.35e6, 1.3e6, 1.25e6, 1.2e6, 1.15e6 1.1e6, 1.05e6, 1.0e6, 0.95e6, 0.9e6, 0.85e6, 0.8e6, 0.75e6, 0.7e6, 0.65e6, 0.6e6,];
+%         z_sourcem = [0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6, 0.8e6];
+%         sourcearea_width = [0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5, 0.2e5];
+%         magnitude = [500, 500, 500, 500, 300, 350, 350, 400, 500, 500, 500, 500, 500, 500, 500, 500, 500];
+%         magnitude = [500, 500, 500, 500, 200, 300, 500, 500, 500, 600, 700, 500, 500, 500, 500, 500, 500];
+
+%         x_sourcem = 0.8e6;
+%         z_sourcem = 0.8e6;
+%         sourcearea_width_x = 0.2e6;
+%         sourcearea_width_z = 0.2e5;
+%         magnitude = 5e10;
+        
+        
     % ring of sources
     elseif(strcmp(source_type,'ring'))
         
@@ -113,10 +138,6 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         noise_spectrum(:,ns) = strength(ns) * exp( -(abs(f_sample)-f_peak(ns)).^2 / bandwidth(ns)^2 );       
     end
     
-%     if( strcmp(source_type, 'homogeneous') )
-%         noise_spectrum = sum(noise_spectrum,2);
-%         n_noise_sources = 1;
-%     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % geographic power-spectral density distribution
@@ -144,6 +165,25 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
 %                 + magnitude(ns) * ( exp( -(X-0.5e6).^2  / 1.8e5^2 ) .* exp( -(Z-1.0e6).^2 / 5.0e5^2 ) )';
 %         end
 
+
+    elseif(strcmp(source_type,'point'))
+        
+        noise_source_distribution = zeros(nx,nz,n_noise_sources);
+        for ns = 5:11 %length(x_sourcem) % n_noise_sources
+            noise_source_distribution(:,:,1) = noise_source_distribution(:,:,1) ...
+                + magnitude(ns) * ( exp( -( (X-x_sourcem(ns)).^2 + (Z-z_sourcem(ns)).^2 ) / (sourcearea_width(ns))^2 ) )';
+        end
+        
+%         for ns = 1:length(x_sourcem) % n_noise_sources
+%             noise_source_distribution(:,:,1) = noise_source_distribution(:,:,1) ...
+%                 + magnitude(ns) * ( exp( -( (X-x_sourcem(ns)).^2 / sourcearea_width_x(ns)^2 + (Z-z_sourcem(ns)).^2 / sourcearea_width_z(ns)^2 ) ) )';
+%         end
+        
+%         noise_source_distribution(:,:,1) = 0*noise_source_distribution(:,:,1) ...
+%             + double(abs((X-z_sourcem)) < sourcearea_width_z) ...
+%             .* double(abs((Z-x_sourcem)) < sourcearea_width_x); 
+
+        
         
     % ring of sources with taper
     elseif( strcmp(source_type,'ring') )
@@ -194,29 +234,29 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
     
     if ( strcmp(make_plots,'yes') )
         
-        if ( n_basis_fct == 0 )
-            
-            cmap = hsv(n_noise_sources);
-            for ns = 1:n_noise_sources
-                
-                if(ns==1)
-                    figure
-                    set(gca,'FontSize',12)
-                    hold on
-                    grid on
-                    cstring = [];
-                end
-                
-                plot(f_sample,noise_spectrum(:,ns),'Color',cmap(ns,:))
-                cstring{end+1} = ['source ' num2str(ns)];
-                xlabel('frequency [Hz]');
-                legend(cstring)
-                
-                xlim([f_sample(1) f_sample(end)])
-                
-            end
-            
-        end
+%         if ( n_basis_fct == 0 )
+%             
+%             cmap = hsv(n_noise_sources);
+%             for ns = 1:n_noise_sources
+%                 
+%                 if(ns==1)
+%                     figure
+%                     set(gca,'FontSize',12)
+%                     hold on
+%                     grid on
+%                     cstring = [];
+%                 end
+%                 
+%                 plot(f_sample,noise_spectrum(:,ns),'Color',cmap(ns,:))
+%                 cstring{end+1} = ['source ' num2str(ns)];
+%                 xlabel('frequency [Hz]');
+%                 legend(cstring)
+%                 
+%                 xlim([f_sample(1) f_sample(end)])
+%                 
+%             end
+%             
+%         end
         
         
         % load ../output/interferometry/array_28_ref.mat
@@ -225,6 +265,7 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         % load ../output/interferometry/array_16_ref_small.mat
         % load ../output/interferometry/array_16_ref_center2.mat
         array = [];
+%         load ../output/interferometry/array_1_ref.mat
         
         if( n_basis_fct == 0 )
             m_parameters = zeros( nx, nz, 2);
@@ -233,7 +274,7 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         end
         
         m_parameters(:,:,1:end-1) = noise_source_distribution;
-        m_parameters(:,:,end) = define_material_parameters( nx, nz, model_type );
+        [m_parameters(:,:,end), rho] = define_material_parameters( nx, nz, model_type );
         
         usr_par.network = [];
         usr_par.data = [];
@@ -241,15 +282,19 @@ function [ noise_source_distribution, noise_spectrum ] = make_noise_source( sour
         
         % usr_par.kernel.imfilter.source = fspecial('gaussian',[75 75], 30);
         % usr_par.kernel.imfilter.source = fspecial('gaussian',[40 40], 20);
-        usr_par.kernel.sigma.source = [5e4 5e4];
+%         usr_par.kernel.sigma.source = [5e4 5e4];
+        usr_par.kernel.sigma.source = [1e-3 1e-3];
+%         usr_par.kernel.sigma.source = [2e4 2e4];
         usr_par.kernel.sigma.structure = usr_par.kernel.sigma.source;
         
         [usr_par] = usr_par_init_default_parameters_lbfgs(usr_par);
         m_parameters = map_m_to_parameters( map_parameters_to_m(m_parameters, usr_par ) , usr_par );
+        m_parameters(:,:,end) = sqrt( m_parameters(:,:,end) ./ rho );
         
-        % cm = cbrewer('div','RdBu',120,'PCHIP');
-        % plot_models( m_parameters, n_basis_fct, array, [-0.2 1.1 3.8e3 4.2e3], 'no', 'no', cm );       
-        plot_models( m_parameters, n_basis_fct, array, [0 0 0 0], 'no', 'no' );       
+        cm = cbrewer('div','RdBu',120,'PCHIP');
+        cm = cm(60:120,:);
+        plot_models_poster( m_parameters, n_basis_fct, array, [0 0 0 0], 'no', 'no', cm );
+        % plot_models_poster_noisedist( m_parameters, n_basis_fct, array, [0 0 0 0], 'no', 'no', cm );
         
     end
     

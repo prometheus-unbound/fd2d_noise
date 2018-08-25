@@ -64,7 +64,7 @@ figure(2)
 hold on
 
 plot( t, source_time_fct, 'r' )
-plot( t, test_trace, 'b' )
+% plot( t, test_trace, 'b' )
 
 
 
@@ -73,17 +73,17 @@ plot( t, test_trace, 'b' )
 
 
 % % Fourier Transform
-% Nsamps = nt;
-% Fs = 1/dt;
-% 
-% f = Fs*(0:Nsamps/2-1)/Nsamps;
-% 
-% data_fft = abs(fft(source_time_fct));
-% data_fft = data_fft( 1:Nsamps/2 );
-% 
-% figure(3)
-% plot(f,data_fft)
-% xlim([0 0.2])
+Nsamps = nt;
+Fs = 1/dt;
+
+f = Fs*(0:Nsamps/2-1)/Nsamps;
+
+data_fft = abs(fft(source_time_fct));
+data_fft = data_fft( 1:Nsamps/2 );
+
+figure(3)
+plot(f,data_fft)
+xlim([0 0.2])
 
 
 

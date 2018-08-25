@@ -25,17 +25,20 @@ x_fft2 = fft(x_time_orig);
 P1 = abs( x_fft / L );
 P2 = abs( x_fft2 / L );
 
-% P1 = P2(1:L/2+1);
-% P1(2:end-1) = 2*P1(2:end-1);
+% P3 = P2(1:L/2+1);
+% P3(2:end-1) = 2*P3(2:end-1);
 
 
 
 
 subplot(2,2,2)
 hold on
+
 f = ((-L/2):(L/2)-1) * Fs/L;
+
 plot(f,P1,'b')
 plot(f,P2,'r')
+
 title('Single-Sided Amplitude Spectrum of X(t)')
 xlabel('f (Hz)')
 ylabel('|P1(f)|')

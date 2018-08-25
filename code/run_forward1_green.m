@@ -110,8 +110,6 @@ else
     % G_out = 0.0;
 end
 
-% G_out_2 = zeros(nx,nz,2*nt-1,'single');
-
 
 %- initialise seismograms -------------------------------------------------
 seismograms = zeros(n_receivers,nt);
@@ -137,9 +135,7 @@ for n = 1:nt
         % G_out(:,:,i_fw_out) = v;
         i_fw_out = i_fw_out + 1;
     end
-    
-    % G_out_2(:,:,nt-1+n) = single( v );
-    
+     
     
     if( ~isempty( dmu ) )
         sxy = sxy + dt * dmu(1:nx-1,:) .* dx_v( G_in(:,:,i_fw_in), dx, dz, nx, nz, order );

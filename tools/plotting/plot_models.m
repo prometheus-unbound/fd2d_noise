@@ -24,8 +24,10 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     [width] = absorb_specs();
     
     % convert to km
-    X = X / 1000;  Lx = Lx / 1000;
-    Z = Z / 1000;  Lz = Lz / 1000;
+    X = X / 1000;% - 1.5e3;  
+    Lx = Lx / 1000;% - 1.5e3;
+    Z = Z / 1000;% - 1.0e3;
+    Lz = Lz / 1000;% - 1.0e3;
     width = width/1000;
     
     
@@ -45,9 +47,9 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     
     
     %% open figure, set size, etc.
-    font_size = 8;
-    title_size = 12;
-    maker_size = 4;
+    font_size = 18;
+    title_size = 24;
+    maker_size = 8;
     
     if(strcmp(video,'no') )
         fig1 = figure;
@@ -58,9 +60,9 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     % clf
     set(fig1,'units','normalized','position',[.1 .3 0.5 0.4])
     if(strcmp(video,'yes'))
-        ax1 = subplot(1,2,1);
+        ax1 = subplot(1,1,1);
     else
-        ax1 = subplot(1,2,1);
+        ax1 = subplot(1,1,1);
     end
     cla
     set(ax1,'FontSize',font_size);
@@ -69,8 +71,8 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     
     %% plot array if given
     if( ~isempty(array) )
-        % plot3( array(:,1)/1000, array(:,2)/1000, 7+0*array(:,2), 'd', 'MarkerFaceColor', 'k', 'MarkerSize', maker_size )
-        plot3( array(:,1)/1000, array(:,2)/1000, 7+0*array(:,2), 'wv', 'MarkerSize', maker_size, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0. 0. 0.]);
+        plot3( array(:,1)/1000, array(:,2)/1000, 7+0*array(:,2), 'd', 'MarkerFaceColor', 'k', 'MarkerSize', maker_size )
+        % plot3( array(:,1)/1000 - 1.5e3, array(:,2)/1000 - 1.0e3, 7+0*array(:,2), 'wv', 'MarkerSize', maker_size, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0. 0. 0.]);
         % legend('array')
     end
     
@@ -91,14 +93,14 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
 
         else
             
-            mesh(X, Z, m_parameter(:,:,1)' )
+            surf(X, Z, m_parameter(:,:,1)' )
 
         end
         
-        plot3([width,Lx-width],[width,width],[2,2],'k--')
-        plot3([width,Lx-width],[Lz-width,Lz-width],[2,2],'k--')
-        plot3([width,width],[width,Lz-width],[2,2],'k--')
-        plot3([Lx-width,Lx-width],[width,Lz-width],[2,2],'k--')
+%         plot3([width,Lx-width],[width,width],[2,2],'k--')
+%         plot3([width,Lx-width],[Lz-width,Lz-width],[2,2],'k--')
+%         plot3([width,width],[width,Lz-width],[2,2],'k--')
+%         plot3([Lx-width,Lx-width],[width,Lz-width],[2,2],'k--')
 
         
     %% plot maps for different frequency maps
@@ -141,16 +143,20 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
         caxis([0 7])
         set(cb,'YTick',[0 2 4 6])
     else
-        % caxis([0 7])
-        % set(cb,'YTick',[0 2 4 6])
+%         caxis([0 10])
+%         set(cb,'YTick',[0 5 10])
     end
     
-    xlabels = [0 1000 2000];
-    ylabels = [0 1000 2000];
-    set(gca, 'XTick', xlabels);
-    set(gca, 'YTick', ylabels);
+%     xlabels = [-1000 -500 0 500 1000];
+%     ylabels = [-500 0 500];
+%     xlabels = [0 1000 2000];
+%     ylabels = [0 1000 2000];
+%     set(gca, 'XTick', xlabels);
+%     set(gca, 'YTick', ylabels);
     xlabel('x [km]')
     ylabel('z [km]')
+%     xlim([0 2000])
+%     ylim([0 2000])
     xlim([0 Lx])
     ylim([0 Lz])
     
@@ -159,11 +165,14 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     box on
     ax = gca;
     ax.LineWidth = 2;
-    axis square
-    title('source distribution', 'FontSize', title_size)
+%     axis image
+    daspect([max(daspect)*[1 1] 1])
+%     title('only using surface waves', 'FontSize', title_size)
+%     title('only using non-physical arrivals', 'FontSize', title_size)
+    title('true source distribution', 'FontSize', title_size)
     
-    
-    % return
+    orient landscape
+    return
     
 
     %% structure plot
@@ -196,47 +205,47 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     ylabel(cb,'[m/s]')
     
     
-    buffer = 1.0e2;
-    pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
-    pattern( pattern == 1 ) = NaN;
-    pattern( pattern == 0 ) = 4600;    
-    h(2) = mesh(X, Z, pattern );
+%     buffer = 1.0e2;
+%     pattern = double( X > (min_x-buffer) & X < (max_x+buffer) ) .* double( Z > (min_z-buffer) & Z < (max_z+buffer) );
+%     pattern( pattern == 1 ) = NaN;
+%     pattern( pattern == 0 ) = 4600;    
+%     h(2) = mesh(X, Z, pattern );
+%     
+%     set(h(2), 'FaceColor', 'interp')
+%     alpha(h(2), 0.6)   
+% 
+%     c_data_1 = m_parameter(:,:,end)';
+%     c_data_1( c_data_1 > 4300 ) = 4299;
+%     c_data_1( c_data_1 < 3700 ) = 3700;    
+%     
+%     set( h(1), 'CData', c_data_1 );
+%     set( h(2), 'CData', pattern );
+%     
+%     caxis([3700 4900])
+%     set(cb,'Limits',[3700 4300])
+%     set(cb,'YTick',[3700 4000 4300])
+%     
+%     cm = [cm_structure; cbrewer('seq','Greys',120,'PCHIP')];
+%     colormap(ax2, cm);
     
-    set(h(2), 'FaceColor', 'interp')
-    alpha(h(2), 0.6)   
+    
+    if( clim(3)~=0 || clim(4)~=0 )
+        caxis([clim(3) clim(4)]);
+        set(cb,'YTick',[clim(3) clim(4)])
+    elseif( strcmp(video,'yes') )
+        caxis([3.6 4.4]*1e3)
+        set(cb,'YTick',[3.6 4.0 4.4]*1e3,'FontSize',28)
+    else
+%         caxis([3.87 4.13]*1e3)
+%         set(cb,'YTick',[3.9 4.0 4.1]*1e3)
+    end
+    colormap(ax2, cm_structure);
 
-    c_data_1 = m_parameter(:,:,end)';
-    c_data_1( c_data_1 > 4300 ) = 4299;
-    c_data_1( c_data_1 < 3700 ) = 3700;    
     
-    set( h(1), 'CData', c_data_1 );
-    set( h(2), 'CData', pattern );
-    
-    caxis([3700 4900])
-    set(cb,'Limits',[3700 4300])
-    set(cb,'YTick',[3700 4000 4300])
-    
-    cm = [cm_structure; cbrewer('seq','Greys',120,'PCHIP')];
-    colormap(ax2, cm);
-    
-    
-%     if( clim(3)~=0 || clim(4)~=0 )
-%         caxis([clim(3) clim(4)]);
-%         set(cb,'YTick',[clim(3) clim(4)])
-%     elseif( strcmp(video,'yes') )
-%         caxis([3.6 4.4]*1e3)
-%         set(cb,'YTick',[3.6 4.0 4.4]*1e3,'FontSize',28)
-%     else
-% %         caxis([3.87 4.13]*1e3)
-% %         set(cb,'YTick',[3.9 4.0 4.1]*1e3)
-%     end
-%     colormap(ax2, cm_structure);
-
-    
-    xlabels = [0 1000 2000];
-    ylabels = [0 1000 2000];
-    set(gca, 'XTick', xlabels);
-    set(gca, 'YTick', ylabels);
+%     xlabels = [0 1000 2000];
+%     ylabels = [0 1000 2000];
+%     set(gca, 'XTick', xlabels);
+%     set(gca, 'YTick', ylabels);
 %     set(gca, 'XTick', []);
     set(gca, 'YTick', []);
     xlabel('x [km]')
@@ -262,7 +271,7 @@ function plot_models( m_parameter, n_basis_fct, array, clim, overlay, video, cm_
     box on
     ax = gca;
     ax.LineWidth = 2;
-    axis square
+    daspect([max(daspect)*[1 1] 1])
     title('velocity model', 'FontSize', title_size)
     
         

@@ -41,27 +41,34 @@ function [misfit, adstf] = log_amp_ratio( u, u_0, du, win_caus, t, deriv_order )
     e_acaus = trapz( (win_acaus .* u).^2 ) * dt + eps;
     e0_caus = trapz( (win_caus .* u_0).^2 ) * dt;
     e0_acaus = trapz( (win_acaus .* u_0).^2 ) * dt + eps;
+    
+    fprintf("%f, %f, %f, %f\n", e_caus, e_acaus, e0_caus, e0_acaus)
 
 
     % compute asymmetry ---------------------------------------------------
     A = log( e_caus/e_acaus );
     A0 = log( e0_caus/e0_acaus );
-
+    
+    fprintf("%f, %f\n", A, A0)
     
     if( strcmp( deriv_order, '1st' ) )
         
         % compute misfit --------------------------------------------------
         misfit = 0.5 * ( A - A0 )^2;
+        fprintf("%f\n", misfit)
         % misfit = A;
         
         % compute adjoint source time function ----------------------------
         de_caus = 2 * win_caus.^2 .* u * dt;
         de_acaus = 2 * win_acaus.^2 .* u * dt;
         
+        fprintf("%f, %f\n", sum(de_caus), sum(de_acaus))
+        
         if ( sum(u_0==0) == length(t) )
             adstf = de_caus/e_caus - de_acaus/e_acaus;
         else
             adstf = ( A - A0 ) * ( de_caus/e_caus - de_acaus/e_acaus );
+            fprintf("%f\n", sum(adstf))
         end
         
     else
