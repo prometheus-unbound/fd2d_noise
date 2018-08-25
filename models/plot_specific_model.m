@@ -7,6 +7,7 @@ close all
 
 load random_0.07_norm.mat
 
+
 [Lx, Lz, nx, nz] = input_parameters();
 [X,Z,x,z,dx,dz] = define_computational_domain(Lx,Lz,nx,nz);
 [width] = absorb_specs();
