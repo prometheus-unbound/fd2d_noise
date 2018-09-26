@@ -1,6 +1,6 @@
 function [dcheck, dcheck_struct] = optlib_check_du( m, dm, hpmin, hpmax, step, usr_par )
 
-[~, du, u] = eval_hessian_vector_product( m, dm, optlib_generate_random_string(8), usr_par, 999);
+[~, du, u] = eval_hessian_vector_product( m, dm, optlib_generate_random_string(8), usr_par);
 
 norm_du = norm(du)
 norm_dm = norm(dm)
@@ -13,7 +13,7 @@ for hp=hpmin:step:hpmax
     fprintf('current power of 10: %5d \niteration:           %2d/%2d\n', hp, it, (hpmax-hpmin)/step+1 );
     mh = m + 10^hp * dm;
     
-    [~, ~, uh] = eval_hessian_vector_product( mh, 0, optlib_generate_random_string(8), usr_par, 1);
+    [~, ~, uh] = eval_hessian_vector_product( mh, 0, optlib_generate_random_string(8), usr_par);
     uh_vec(it,:) = (uh-u) / 10^hp;
     
     figure(1)

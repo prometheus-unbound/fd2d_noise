@@ -20,11 +20,11 @@ for hp=hpmin:step:hpmax
     d_adjstf_h_du2 = ( fliplr( adjstf_h - adjstf_ref ) / 10^hp ) * du2';
     adjstf_h_vec(it,:) = adjstf_h;
     
-    figure(1)
-    clf
-    hold on
-    plot(d_adjstf_du1,'b*')
-    plot((adjstf_h-adjstf_ref)/10^hp,'r+')
+%     figure(1)
+%     clf
+%     hold on
+%     plot(d_adjstf_du1,'b*')
+%     plot((adjstf_h-adjstf_ref)/10^hp,'r+')
     
 %     figure(2)
 %     plot((adjstf_h-adjstf_ref)/10^hp - d_adjstf_du1)
